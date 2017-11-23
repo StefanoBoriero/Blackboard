@@ -86,6 +86,9 @@ public class ToDoListAdapter extends RecyclerView.Adapter<ToDoListAdapter.ViewHo
                             sharedView.getTransitionName()
                     ).toBundle();
             Intent intent = new Intent(host, DetailTaskActivity.class);
+
+            String paramName = v.getResources().getString(R.string.task_name);
+            intent.putExtra(paramName, (String)sharedView.getText());
             host.startActivity(intent, bundle);
         }
     }

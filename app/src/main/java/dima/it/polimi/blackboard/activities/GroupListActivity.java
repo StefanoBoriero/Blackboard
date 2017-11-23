@@ -1,7 +1,5 @@
 package dima.it.polimi.blackboard.activities;
 
-import android.app.ActivityOptions;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -39,7 +37,7 @@ public class GroupListActivity extends AppCompatActivity {
         int i;
         List<ToDoTask> list = new ArrayList<>();
         for(i=0; i<42; i++){
-            ToDoTask task = new ToDoTask("Clean", "Cleaning", "The house has to be cleaned");
+            ToDoTask task = new ToDoTask("Clean" + i, "Cleaning", "The house has to be cleaned");
             list.add(task);
         }
 
