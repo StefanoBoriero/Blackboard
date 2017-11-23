@@ -2,4 +2,5 @@
     <string name="app_name">Blackboard</string>
     <string name="group_button">Group List</string>
     <string name="toolbar_group_list">Group List</string>
+    <string name="task_name">TaskName</string>
 </resources>

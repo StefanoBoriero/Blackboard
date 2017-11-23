@@ -1,5 +1,7 @@
 package dima.it.polimi.blackboard.activities;
 
+import android.app.ActivityOptions;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -31,7 +33,7 @@ public class GroupListActivity extends AppCompatActivity {
         ((CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar_group)).setTitle("Group List"/*R.string.toolbar_group_list*/);
 
         /*
-        TESTING CODE TO BE ELIMINATED!!!!!!!!!
+        TESTING CODE TO BE ELIMINATED FROM HERE!!!!!!!!!
          */
 
         int i;
@@ -41,8 +43,11 @@ public class GroupListActivity extends AppCompatActivity {
             list.add(task);
         }
 
-        RecyclerView rv = (RecyclerView)findViewById(R.id.todo_group_list);
+        /* ELIMINATE UNTIL HERE !!!!!!!!!!!!!!!!!!*/
+
+        RecyclerView rv = findViewById(R.id.todo_group_list);
         rv.setLayoutManager(new LinearLayoutManager(this));
         rv.setAdapter(new ToDoListAdapter(getBaseContext(),list));
     }
+
 }

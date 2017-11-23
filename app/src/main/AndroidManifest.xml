@@ -18,8 +18,9 @@
         </activity>
         <activity android:name=".activities.GroupListActivity"
             android:theme="@style/AppTheme.NoTitle">
-
         </activity>
+
+        <activity android:name=".activities.DetailTaskActivity"/>
     </application>
 
 </manifest>

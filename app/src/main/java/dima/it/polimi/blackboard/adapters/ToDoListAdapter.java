@@ -1,6 +1,10 @@
 package dima.it.polimi.blackboard.adapters;
 
+import android.app.Activity;
+import android.app.ActivityOptions;
 import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +14,7 @@ import android.widget.TextView;
 import java.util.List;
 
 import dima.it.polimi.blackboard.R;
+import dima.it.polimi.blackboard.activities.DetailTaskActivity;
 import dima.it.polimi.blackboard.model.ToDoTask;
 
 /**
@@ -31,9 +36,8 @@ public class ToDoListAdapter extends RecyclerView.Adapter<ToDoListAdapter.ViewHo
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
 
         View todoTaskView = inflater.inflate(R.layout.todo_task_item, parent, false);
-        ViewHolder holder = new ViewHolder(todoTaskView);
 
-        return holder;
+        return new ViewHolder(todoTaskView);
     }
 
     @Override
@@ -53,7 +57,7 @@ public class ToDoListAdapter extends RecyclerView.Adapter<ToDoListAdapter.ViewHo
         return mContext;
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         /*TODO
         Change this and todo_task_item layout to a better option
          */
@@ -63,8 +67,26 @@ public class ToDoListAdapter extends RecyclerView.Adapter<ToDoListAdapter.ViewHo
         public ViewHolder(View itemView){
             super(itemView);
 
+            itemView.setOnClickListener(this);
             task_name = itemView.findViewById(R.id.task_name);
             task_type = itemView.findViewById(R.id.task_type);
+        }
+
+        @Override
+        public void onClick(View v) {
+            TextView sharedView = v.findViewById(R.id.task_name);
+
+            //Gets the activity that hosts the view:
+            Activity host = (Activity)v.getContext();
+
+            Bundle bundle = ActivityOptions
+                    .makeSceneTransitionAnimation(
+                            host,
+                            sharedView,
+                            sharedView.getTransitionName()
+                    ).toBundle();
+            Intent intent = new Intent(host, DetailTaskActivity.class);
+            host.startActivity(intent, bundle);
         }
     }
 }
