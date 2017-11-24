@@ -11,6 +11,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import java.util.List;
 
 import dima.it.polimi.blackboard.R;
@@ -43,9 +47,11 @@ public class ToDoListAdapter extends RecyclerView.Adapter<ToDoListAdapter.ViewHo
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         ToDoTask todoTask = todoList.get(position);
+        Gson gson = new Gson();
+        String todoTaskJson = gson.toJson(todoTask);
+        JsonObject jsonObject = new JsonParser().parse(todoTaskJson).getAsJsonObject();
 
-        holder.task_name.setText(todoTask.getName());
-        holder.task_type.setText(todoTask.getType());
+        holder.bind(jsonObject);
     }
 
     @Override
@@ -58,18 +64,25 @@ public class ToDoListAdapter extends RecyclerView.Adapter<ToDoListAdapter.ViewHo
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        /*TODO
-        Change this and todo_task_item layout to a better option
-         */
-        TextView task_name;
-        TextView task_type;
+        //TODO Change this and todo_task_item layout to a better option
 
-        public ViewHolder(View itemView){
+        private TextView task_name;
+        private TextView task_type;
+        private JsonObject todoTaskJSON;
+
+        private ViewHolder(View itemView){
             super(itemView);
 
             itemView.setOnClickListener(this);
             task_name = itemView.findViewById(R.id.task_name);
             task_type = itemView.findViewById(R.id.task_type);
+        }
+
+        private void bind(JsonObject jsonObject){
+            this.todoTaskJSON = jsonObject;
+
+            task_name.setText(todoTaskJSON.get("title").getAsString());
+            task_type.setText(todoTaskJSON.get("type").getAsString());
         }
 
         @Override
@@ -88,6 +101,7 @@ public class ToDoListAdapter extends RecyclerView.Adapter<ToDoListAdapter.ViewHo
             Intent intent = new Intent(host, DetailTaskActivity.class);
 
             String paramName = v.getResources().getString(R.string.task_name);
+            intent.putExtra("JSON_task", todoTaskJSON.toString());
             intent.putExtra(paramName, (String)sharedView.getText());
             host.startActivity(intent, bundle);
         }

@@ -5,6 +5,9 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import dima.it.polimi.blackboard.R;
 
 /**
@@ -14,14 +17,22 @@ import dima.it.polimi.blackboard.R;
  */
 
 public class DetailTaskActivity extends AppCompatActivity {
+    //TODO extract the text view style in a proprer @style/xxx.xml file
+    private JsonObject todoTaskJSON;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.todo_task_detail);
 
         Intent intent = getIntent();
-        String title = intent.getStringExtra( getResources().getString(R.string.task_name));
+        todoTaskJSON = new JsonParser().parse(intent.getStringExtra( "JSON_task"))
+                .getAsJsonObject();
+        String title = todoTaskJSON.get( getResources().getString(R.string.title_field))
+                .getAsString();
+
         TextView tv = findViewById(R.id.textView);
+
         tv.setText(title);
 
     }

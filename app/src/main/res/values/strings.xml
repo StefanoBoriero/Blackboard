@@ -3,4 +3,7 @@
     <string name="group_button">Group List</string>
     <string name="toolbar_group_list">Group List</string>
     <string name="task_name">TaskName</string>
+    <string name="title_field">title</string>
+    <string name="type_field">title</string>
+    <string name="description_field">title</string>
 </resources>
