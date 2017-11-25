@@ -2,6 +2,7 @@ package dima.it.polimi.blackboard.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 
@@ -19,6 +20,9 @@ import dima.it.polimi.blackboard.R;
 public class DetailTaskActivity extends AppCompatActivity {
     //TODO extract the text view style in a proprer @style/xxx.xml file
     private JsonObject todoTaskJSON;
+    private String title;
+    private String type;
+    private String description;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,12 +32,29 @@ public class DetailTaskActivity extends AppCompatActivity {
         Intent intent = getIntent();
         todoTaskJSON = new JsonParser().parse(intent.getStringExtra( "JSON_task"))
                 .getAsJsonObject();
-        String title = todoTaskJSON.get( getResources().getString(R.string.title_field))
-                .getAsString();
+        extractInfo();
 
-        TextView tv = findViewById(R.id.textView);
 
-        tv.setText(title);
+        CollapsingToolbarLayout ctl = findViewById(R.id.detail_collapsing_toolbar);
+        TextView tvInfo = findViewById(R.id.detail_additional_info);
+        TextView tvDescription = findViewById(R.id.detail_description);
+
+        ctl.setTitle(title);
+        tvInfo.setText("Type: " + type);
+        tvDescription.setText(description);
 
     }
+
+    private void extractInfo(){
+        this.title = todoTaskJSON.get( getResources().getString(R.string.title_field))
+                .getAsString();
+
+        this.type = todoTaskJSON.get( getResources().getString(R.string.type_field))
+                .getAsString();
+
+        this.description = todoTaskJSON.get( getResources().getString(R.string.description_field))
+                .getAsString();
+    }
+
+
 }

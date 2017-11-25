@@ -4,8 +4,8 @@
     <string name="toolbar_group_list">Group List</string>
     <string name="task_name">TaskName</string>
     <string name="title_field">title</string>
-    <string name="type_field">title</string>
-    <string name="description_field">title</string>
+    <string name="type_field">type</string>
+    <string name="description_field">description</string>
     <string name="title_activity_main">MainActivity</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
