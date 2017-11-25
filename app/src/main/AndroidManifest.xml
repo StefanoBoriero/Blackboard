@@ -9,10 +9,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
         <activity
             android:name=".activities.GroupListActivity"
-            android:theme="@style/AppTheme.NoTitle"></activity>
+            android:theme="@style/AppTheme.NoTitle" />
         <activity android:name=".activities.DetailTaskActivity" />
         <activity
             android:name=".activities.MainActivity"
