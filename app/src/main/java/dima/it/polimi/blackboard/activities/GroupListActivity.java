@@ -1,6 +1,5 @@
 package dima.it.polimi.blackboard.activities;
 
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -9,9 +8,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 
 import dima.it.polimi.blackboard.R;
-import dima.it.polimi.blackboard.fragments.ToDoTaskDetailFragment;
 import dima.it.polimi.blackboard.fragments.ToDoTaskListFragment;
-import dima.it.polimi.blackboard.model.ToDoTaskParcelable;
+import dima.it.polimi.blackboard.model.TodoTask;
 
 public class GroupListActivity extends AppCompatActivity implements ToDoTaskListFragment.OnListFragmentInteractionListener {
 
@@ -40,7 +38,7 @@ public class GroupListActivity extends AppCompatActivity implements ToDoTaskList
     }
 
     @Override
-    public void onListFragmentInteraction(ToDoTaskParcelable item) {
+    public void onListFragmentInteraction(TodoTask item) {
 
     }
 }

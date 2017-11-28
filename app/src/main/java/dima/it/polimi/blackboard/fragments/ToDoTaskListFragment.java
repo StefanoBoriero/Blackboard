@@ -15,7 +15,7 @@ import java.util.List;
 
 import dima.it.polimi.blackboard.R;
 import dima.it.polimi.blackboard.adapters.ToDoTaskRecyclerViewAdapter;
-import dima.it.polimi.blackboard.model.ToDoTaskParcelable;
+import dima.it.polimi.blackboard.model.TodoTask;
 
 /**
  * A fragment representing a list of Items.
@@ -63,9 +63,9 @@ public class ToDoTaskListFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_todo_task_list, container, false);
 
         //TODO eliminate the following lines
-        List<ToDoTaskParcelable> items = new ArrayList<>();
+        List<TodoTask> items = new ArrayList<>();
         for(int i=0; i<31; i++){
-            ToDoTaskParcelable item = new ToDoTaskParcelable("Clean " + i,
+            TodoTask item = new TodoTask("Clean " + i,
                     "Housing", "The house has to be cleaned");
             items.add(item);
         }
@@ -114,6 +114,6 @@ public class ToDoTaskListFragment extends Fragment {
      */
     public interface OnListFragmentInteractionListener {
         // TODO: Update argument type and name
-        void onListFragmentInteraction(ToDoTaskParcelable item);
+        void onListFragmentInteraction(TodoTask item);
     }
 }

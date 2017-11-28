@@ -8,21 +8,21 @@ import android.widget.TextView;
 
 import dima.it.polimi.blackboard.R;
 import dima.it.polimi.blackboard.fragments.ToDoTaskListFragment.OnListFragmentInteractionListener;
-import dima.it.polimi.blackboard.model.ToDoTaskParcelable;
+import dima.it.polimi.blackboard.model.TodoTask;
 
 import java.util.List;
 
 /**
- * {@link RecyclerView.Adapter} that can display a {@link ToDoTaskParcelable} and makes a call to the
+ * {@link RecyclerView.Adapter} that can display a {@link TodoTask} and makes a call to the
  * specified {@link OnListFragmentInteractionListener}.
  * TODO: Replace the implementation with code for your data type.
  */
 public class ToDoTaskRecyclerViewAdapter extends RecyclerView.Adapter<ToDoTaskRecyclerViewAdapter.ViewHolder> {
 
-    private final List<ToDoTaskParcelable> todoList;
+    private final List<TodoTask> todoList;
     private final OnListFragmentInteractionListener mListener;
 
-    public ToDoTaskRecyclerViewAdapter(List<ToDoTaskParcelable> items, OnListFragmentInteractionListener listener) {
+    public ToDoTaskRecyclerViewAdapter(List<TodoTask> items, OnListFragmentInteractionListener listener) {
         todoList = items;
         mListener = listener;
     }
@@ -36,7 +36,7 @@ public class ToDoTaskRecyclerViewAdapter extends RecyclerView.Adapter<ToDoTaskRe
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        ToDoTaskParcelable todoTask = todoList.get(position);
+        TodoTask todoTask = todoList.get(position);
 
         holder.mItem = todoTask;
         holder.nameView.setText(todoTask.getName());
@@ -63,7 +63,7 @@ public class ToDoTaskRecyclerViewAdapter extends RecyclerView.Adapter<ToDoTaskRe
         private final View mView;
         private final TextView nameView;
         private final TextView typeView;
-        private ToDoTaskParcelable mItem;
+        private TodoTask mItem;
 
         public ViewHolder(View view) {
             super(view);
