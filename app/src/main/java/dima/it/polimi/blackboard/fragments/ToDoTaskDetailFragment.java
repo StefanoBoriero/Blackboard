@@ -63,18 +63,19 @@ public class ToDoTaskDetailFragment extends Fragment {
             todoTask = getArguments().getParcelable(ARG_TODO);
             transitionName = getArguments().getString(ARG_TR_NAME);
         }
-
+/*
         postponeEnterTransition();
         Transition enterTransition = TransitionInflater.from(getContext())
                 .inflateTransition(R.transition.detail_transition);
         setSharedElementEnterTransition(enterTransition);
+*/
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View out =  inflater.inflate(R.layout.fragment_to_do_task_detail, container, false);
+        View out =  inflater.inflate(R.layout.fragment_todo_task_detail, container, false);
 
         return out;
     }

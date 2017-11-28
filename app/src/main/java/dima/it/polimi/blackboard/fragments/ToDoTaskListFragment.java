@@ -1,6 +1,7 @@
 package dima.it.polimi.blackboard.fragments;
 
 import android.content.Context;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
@@ -23,7 +24,7 @@ import dima.it.polimi.blackboard.model.TodoTask;
  * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
  * interface.
  */
-public class ToDoTaskListFragment extends Fragment {
+public class ToDoTaskListFragment extends Fragment implements ToDoTaskDetailFragment.OnFragmentInteractionListener{
 
     // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
@@ -100,6 +101,15 @@ public class ToDoTaskListFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    /**
+     *
+     * @param uri
+     */
+    @Override
+    public void onFragmentInteraction(Uri uri) {
+
     }
 
     /**

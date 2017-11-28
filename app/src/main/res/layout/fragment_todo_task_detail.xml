@@ -26,7 +26,6 @@
 
         <include layout="@layout/detail_header" />
 
-        <!-- TODO change the content displayed -->
         <TextView
             android:id="@+id/title_text_view"
             android:layout_width="match_parent"
