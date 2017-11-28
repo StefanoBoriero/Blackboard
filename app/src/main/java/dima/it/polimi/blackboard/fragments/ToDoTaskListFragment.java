@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import dima.it.polimi.blackboard.R;
+import dima.it.polimi.blackboard.adapters.ToDoTaskRecyclerViewAdapter;
 import dima.it.polimi.blackboard.model.ToDoTaskParcelable;
 
 /**
