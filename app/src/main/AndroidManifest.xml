@@ -10,7 +10,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".activities.GroupListActivity"
+            android:name=".activities.GroupListActivityDELETE"
             android:theme="@style/AppTheme.NoTitle" />
         <activity android:name=".activities.DetailTaskActivity" />
         <activity
@@ -24,6 +24,10 @@
             </intent-filter>
         </activity>
         <activity android:name=".activities.NewToDoTaskActivity" />
+        <activity
+            android:name=".activities.GroupListActivity"
+            android:label="@string/title_activity_group_list"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

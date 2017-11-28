@@ -2,9 +2,13 @@ package dima.it.polimi.blackboard.adapters;
 
 import android.app.Activity;
 import android.app.ActivityOptions;
+
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.ViewCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,7 +23,9 @@ import java.util.List;
 
 import dima.it.polimi.blackboard.R;
 import dima.it.polimi.blackboard.activities.DetailTaskActivity;
+import dima.it.polimi.blackboard.fragments.ToDoTaskDetailFragment;
 import dima.it.polimi.blackboard.model.ToDoTask;
+import dima.it.polimi.blackboard.model.ToDoTaskParcelable;
 
 /**
  * Adapter to display the list of tasks to be done
@@ -51,6 +57,9 @@ public class ToDoListAdapter extends RecyclerView.Adapter<ToDoListAdapter.ViewHo
         String todoTaskJson = gson.toJson(todoTask);
         JsonObject jsonObject = new JsonParser().parse(todoTaskJson).getAsJsonObject();
 
+        View sharedElement = holder.getTaskName();
+        ViewCompat.setTransitionName(sharedElement, todoTask.getName() + position);  //TODO change the transition name
+
         holder.bind(jsonObject);
     }
 
@@ -66,27 +75,56 @@ public class ToDoListAdapter extends RecyclerView.Adapter<ToDoListAdapter.ViewHo
     public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         //TODO Change this and todo_task_item layout to a better option
 
-        private TextView task_name;
-        private TextView task_type;
+        private TextView taskName;
+        private TextView taskType;
         private JsonObject todoTaskJSON;
 
         private ViewHolder(View itemView){
             super(itemView);
 
             itemView.setOnClickListener(this);
-            task_name = itemView.findViewById(R.id.task_name);
-            task_type = itemView.findViewById(R.id.task_type);
+            taskName = itemView.findViewById(R.id.task_name);
+            taskType = itemView.findViewById(R.id.task_type);
         }
 
         private void bind(JsonObject jsonObject){
             this.todoTaskJSON = jsonObject;
 
-            task_name.setText(todoTaskJSON.get("title").getAsString());
-            task_type.setText(todoTaskJSON.get("type").getAsString());
+            taskName.setText(todoTaskJSON.get("title").getAsString());
+            taskType.setText(todoTaskJSON.get("type").getAsString());
+        }
+
+        public View getTaskName(){
+            return taskName;
         }
 
         @Override
         public void onClick(View v) {
+            //onClickActivity(v);
+
+            onClickFragment(v);
+        }
+
+        private void onClickFragment(View v){
+            AppCompatActivity host = (AppCompatActivity) v.getContext();
+            TextView sharedElement = v.findViewById(R.id.task_name);
+            String transitionName = sharedElement.getTransitionName();
+            String taskName = (String)sharedElement.getText();
+
+            ToDoTaskParcelable todoTaskParcelable = new ToDoTaskParcelable("Clean", "Cleaning", "Have to clean");
+
+
+            FragmentTransaction fragmentTransaction = host.getSupportFragmentManager()
+                    .beginTransaction()
+                    .addSharedElement(sharedElement, transitionName)
+                    .addToBackStack(null)
+                    .replace(R.id.detail_additional_info,
+                            ToDoTaskDetailFragment.newInstance(todoTaskParcelable,transitionName));
+            fragmentTransaction.commit();
+            return;
+        }
+
+        private void onClickActivity(View v){
             TextView sharedView = v.findViewById(R.id.task_name);
 
             //Gets the activity that hosts the view:

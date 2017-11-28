@@ -1,51 +1,46 @@
 package dima.it.polimi.blackboard.activities;
 
+import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-
-import java.util.ArrayList;
-import java.util.List;
+import android.support.v7.widget.Toolbar;
+import android.view.View;
 
 import dima.it.polimi.blackboard.R;
-import dima.it.polimi.blackboard.adapters.ToDoListAdapter;
-import dima.it.polimi.blackboard.model.ToDoTask;
+import dima.it.polimi.blackboard.fragments.ToDoTaskDetailFragment;
+import dima.it.polimi.blackboard.fragments.ToDoTaskListFragment;
+import dima.it.polimi.blackboard.model.ToDoTaskParcelable;
 
-
-/**
- * This Activity shows the user the list of activities his group has defined.
- * It also allows him to view more details about an existing one and pick it.
- * Lastly, the user can add a new task to the list
- * Created by Stefano on 22/11/2017.
- */
-
-public class GroupListActivity extends AppCompatActivity {
+public class GroupListActivity extends AppCompatActivity implements ToDoTaskListFragment.OnListFragmentInteractionListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_group);
+        setContentView(R.layout.activity_group_list);
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
-        ((CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar_group)).setTitle("Group List"/*R.string.toolbar_group_list*/);
 
-        /*
-        TESTING CODE TO BE ELIMINATED FROM HERE!!!!!!!!!
-         */
 
-        int i;
-        List<ToDoTask> list = new ArrayList<>();
-        for(i=0; i<42; i++){
-            ToDoTask task = new ToDoTask("Clean" + i, "Cleaning", "The house has to be cleaned");
-            list.add(task);
-        }
+        FloatingActionButton fab = findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+            }
+        });
 
-        /* ELIMINATE UNTIL HERE !!!!!!!!!!!!!!!!!!*/
-
-        RecyclerView rv = findViewById(R.id.todo_group_list);
-        rv.setLayoutManager(new LinearLayoutManager(this));
-        rv.setAdapter(new ToDoListAdapter(getBaseContext(),list));
+        getSupportFragmentManager()
+                .beginTransaction()
+                .add(R.id.content, ToDoTaskListFragment.newInstance(1))
+                .commit();
     }
 
+    @Override
+    public void onListFragmentInteraction(ToDoTaskParcelable item) {
+
+    }
 }

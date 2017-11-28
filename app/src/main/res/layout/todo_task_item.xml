@@ -7,6 +7,13 @@
     android:paddingBottom="8dp"
     >
 
+    <ImageView
+        android:id="@+id/user_icon"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:transitionName="user_icon"
+        android:src="@drawable/ic_person_black_24dp"/>
+
     <TextView
         android:id="@+id/task_name"
         android:layout_width="match_parent"
