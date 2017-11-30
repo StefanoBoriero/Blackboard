@@ -5,16 +5,31 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
 import android.view.View;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import dima.it.polimi.blackboard.R;
+import dima.it.polimi.blackboard.adapters.TodoListAdapter;
 import dima.it.polimi.blackboard.fragments.ToDoTaskDetailFragment;
 import dima.it.polimi.blackboard.fragments.ToDoTaskListFragment;
-import dima.it.polimi.blackboard.model.TodoTask;
+import dima.it.polimi.blackboard.model.TodoItem;
 
-public class GroupListActivity extends AppCompatActivity implements ToDoTaskListFragment.OnListFragmentInteractionListener, ToDoTaskDetailFragment.OnFragmentInteractionListener {
+public class GroupListActivity extends AppCompatActivity implements ToDoTaskListFragment.OnListFragmentInteractionListener, ToDoTaskDetailFragment.OnFragmentInteractionListener, TodoListAdapter.TodoListAdapterListener {
+
+    private List<TodoItem> todoItemList = new ArrayList<>();
+    private RecyclerView recyclerView;
+    private TodoListAdapter mAdapter;
+    private SwipeRefreshLayout swipeRefreshLayout;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,10 +49,41 @@ public class GroupListActivity extends AppCompatActivity implements ToDoTaskList
             }
         });
 
+        recyclerView = findViewById(R.id.recycler_view);
+        swipeRefreshLayout = findViewById(R.id.swipe_refresh_layout);
+        // TODO implement refreshing
+        // swipeRefreshLayout.setOnRefreshListener(this);
+
+        createSampleTodoItems();
+
+        mAdapter = new TodoListAdapter(this, todoItemList, this);
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
+        recyclerView.setLayoutManager(mLayoutManager);
+        //recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
+        recyclerView.setAdapter(mAdapter);
+
+/*
         getSupportFragmentManager()
                 .beginTransaction()
                 .add(R.id.content, ToDoTaskListFragment.newInstance(1))
                 .commit();
+         */
+    }
+
+    private void createSampleTodoItems(){
+        for(int i=0; i<31; i++){
+            TodoItem item = new TodoItem("Clean " + i,
+                    "Housing", "The house has to be cleaned");
+            todoItemList.add(item);
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_group_list, menu);
+        return true;
     }
 
     /**
@@ -47,20 +93,31 @@ public class GroupListActivity extends AppCompatActivity implements ToDoTaskList
      * @param item the clicked item
      */
     @Override
-    public void onListFragmentInteraction(TodoTask item) {
+    public void onListFragmentInteraction(TodoItem item, View itemView) {
         //TODO get the real transition name
-        String transitionName = "";
+        View sharedElement = itemView.findViewById(R.id.task_name);
+        String transitionName = sharedElement.getTransitionName();
         Fragment detailFragment = ToDoTaskDetailFragment.newInstance(item, transitionName);
-
+/*
         getSupportFragmentManager()
                 .beginTransaction()
                 .addToBackStack(null)
-                .replace(R.id.fragment_detail_placeholder, detailFragment)
+                .addSharedElement(sharedElement, transitionName)
+                //.replace(R.id.fragment_detail_placeholder, detailFragment)
+                .replace(R.id.content, detailFragment)
                 .commit();
+             */
     }
 
     @Override
     public void onFragmentInteraction(Uri uri) {
 
+    }
+
+    @Override
+    public void onTodoItemClicked(TodoItem todoItem, View view) {
+        Snackbar.make(view, "Item " + todoItem.getName() + " have been clicked",
+                Snackbar.LENGTH_LONG)
+                .setAction("Action", null).show();
     }
 }

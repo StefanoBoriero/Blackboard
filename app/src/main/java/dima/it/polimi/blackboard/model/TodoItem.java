@@ -7,19 +7,19 @@ import android.os.Parcelable;
  * Created by Stefano on 27/11/2017.
  */
 
-public class TodoTask implements Parcelable {
+public class TodoItem implements Parcelable {
     private String name;
     private String type;
     private String description;
 
-    protected TodoTask(Parcel in) {
+    protected TodoItem(Parcel in) {
         //Order must be the same of writeToParcel
         this.name = in.readString();
         this.type = in.readString();
         this.description = in.readString();
     }
 
-    public TodoTask(String name, String type, String description){
+    public TodoItem(String name, String type, String description){
         this.name = name;
         this.type = type;
         this.description = description;
@@ -49,15 +49,15 @@ public class TodoTask implements Parcelable {
         return 0;
     }
 
-    public static final Creator<TodoTask> CREATOR = new Creator<TodoTask>() {
+    public static final Creator<TodoItem> CREATOR = new Creator<TodoItem>() {
         @Override
-        public TodoTask createFromParcel(Parcel in) {
-            return new TodoTask(in);
+        public TodoItem createFromParcel(Parcel in) {
+            return new TodoItem(in);
         }
 
         @Override
-        public TodoTask[] newArray(int size) {
-            return new TodoTask[size];
+        public TodoItem[] newArray(int size) {
+            return new TodoItem[size];
         }
     };
 }
