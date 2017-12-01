@@ -7,10 +7,9 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.DividerItemDecoration;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Menu;
 import android.view.View;
 
@@ -20,10 +19,13 @@ import java.util.List;
 import dima.it.polimi.blackboard.R;
 import dima.it.polimi.blackboard.adapters.TodoListAdapter;
 import dima.it.polimi.blackboard.fragments.ToDoTaskDetailFragment;
-import dima.it.polimi.blackboard.fragments.ToDoTaskListFragment;
+import dima.it.polimi.blackboard.fragments.TodoItemListFragment;
+import dima.it.polimi.blackboard.helper.TodoItemTouchHelper;
 import dima.it.polimi.blackboard.model.TodoItem;
 
-public class GroupListActivity extends AppCompatActivity implements ToDoTaskListFragment.OnListFragmentInteractionListener, ToDoTaskDetailFragment.OnFragmentInteractionListener, TodoListAdapter.TodoListAdapterListener {
+public class GroupListActivity extends AppCompatActivity implements TodoItemListFragment.OnListFragmentInteractionListener,
+        ToDoTaskDetailFragment.OnFragmentInteractionListener, TodoListAdapter.TodoListAdapterListener,
+        TodoItemTouchHelper.TodoItemTouchHelperListener{
 
     private List<TodoItem> todoItemList = new ArrayList<>();
     private RecyclerView recyclerView;
@@ -48,7 +50,7 @@ public class GroupListActivity extends AppCompatActivity implements ToDoTaskList
                         .setAction("Action", null).show();
             }
         });
-
+/*
         recyclerView = findViewById(R.id.recycler_view);
         swipeRefreshLayout = findViewById(R.id.swipe_refresh_layout);
         // TODO implement refreshing
@@ -62,13 +64,13 @@ public class GroupListActivity extends AppCompatActivity implements ToDoTaskList
         //recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
         recyclerView.setAdapter(mAdapter);
+*/
 
-/*
         getSupportFragmentManager()
                 .beginTransaction()
-                .add(R.id.content, ToDoTaskListFragment.newInstance(1))
+                .add(R.id.content, TodoItemListFragment.newInstance(1))
                 .commit();
-         */
+
     }
 
     private void createSampleTodoItems(){
@@ -116,8 +118,28 @@ public class GroupListActivity extends AppCompatActivity implements ToDoTaskList
 
     @Override
     public void onTodoItemClicked(TodoItem todoItem, View view) {
+        //TODO implement detail fragment display
         Snackbar.make(view, "Item " + todoItem.getName() + " have been clicked",
                 Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show();
     }
+
+    @Override
+    public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction, int position) {
+        View view = viewHolder.itemView;
+
+        //TODO implement take in charge or delete functionalities
+        if(direction == ItemTouchHelper.LEFT){
+            Snackbar.make(view, "OH SHIT YOU SWIPED LEFT",
+                    Snackbar.LENGTH_LONG)
+                    .setAction("Action", null).show();
+        }
+        else if(direction == ItemTouchHelper.RIGHT){
+            Snackbar.make(view, "OH SHIT YOU SWIPED RIGHT",
+                    Snackbar.LENGTH_LONG)
+                    .setAction("Action", null).show();
+        }
+    }
+
+
 }

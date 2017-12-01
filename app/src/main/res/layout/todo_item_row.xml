@@ -18,8 +18,8 @@
         android:layout_height="wrap_content"
         android:clickable="true"
         android:orientation="vertical"
-        android:paddingLeft="72dp"
-        android:paddingRight="@dimen/padding_list_row">
+        android:paddingStart="72dp"
+        android:paddingEnd="@dimen/padding_list_row">
 
     <TextView
         android:id="@+id/item_name"

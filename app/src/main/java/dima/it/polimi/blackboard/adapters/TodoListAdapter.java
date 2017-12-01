@@ -65,7 +65,6 @@ public class TodoListAdapter extends RecyclerView.Adapter<TodoListAdapter.ViewHo
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder{
-        //private View itemView;
         private TextView todoItemName;
         private TextView todoItemType;
         private ImageView userIcon;

@@ -9,5 +9,5 @@
     android:layout_marginLeft="16dp"
     android:layout_marginRight="16dp"
     app:layoutManager="LinearLayoutManager"
-    tools:context="dima.it.polimi.blackboard.fragments.ToDoTaskListFragment"
+    tools:context="dima.it.polimi.blackboard.fragments.TodoItemListFragment"
     tools:listitem="@layout/fragment_todo_task" />
