@@ -12,7 +12,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import dima.it.polimi.blackboard.R;
-import dima.it.polimi.blackboard.model.TodoTask;
+import dima.it.polimi.blackboard.model.TodoItem;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -29,7 +29,7 @@ public class ToDoTaskDetailFragment extends Fragment {
     private static final String ARG_TR_NAME = "transitionName";
 
 
-    private TodoTask todoTask;
+    private TodoItem todoTask;
     private String transitionName;
 
     private OnFragmentInteractionListener mListener;
@@ -47,7 +47,7 @@ public class ToDoTaskDetailFragment extends Fragment {
      * @return A new instance of fragment ToDoTaskDetailFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static Fragment newInstance(TodoTask todoTask, String transitionName) {
+    public static Fragment newInstance(TodoItem todoTask, String transitionName) {
         ToDoTaskDetailFragment fragment = new ToDoTaskDetailFragment();
         Bundle args = new Bundle();
         args.putParcelable(ARG_TODO, todoTask);
