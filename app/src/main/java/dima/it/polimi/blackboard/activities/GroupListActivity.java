@@ -1,5 +1,7 @@
 package dima.it.polimi.blackboard.activities;
 
+import android.animation.AnimatorInflater;
+import android.animation.AnimatorSet;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -23,9 +25,12 @@ import dima.it.polimi.blackboard.fragments.TodoItemListFragment;
 import dima.it.polimi.blackboard.helper.TodoItemTouchHelper;
 import dima.it.polimi.blackboard.model.TodoItem;
 
-public class GroupListActivity extends AppCompatActivity implements TodoItemListFragment.OnListFragmentInteractionListener,
-        ToDoTaskDetailFragment.OnFragmentInteractionListener, TodoListAdapter.TodoListAdapterListener,
-        TodoItemTouchHelper.TodoItemTouchHelperListener{
+/**
+ * This activity presents the list of todo_items that have been added to the group but nobody has
+ * taken in charge. It displays at first a fragment with the list in a RecyclerView, and on click of
+ * one item displays the details in another fragment.
+ */
+public class GroupListActivity extends AppCompatActivity implements TodoItemListFragment.OnListFragmentInteractionListener{
 
     private List<TodoItem> todoItemList = new ArrayList<>();
     private RecyclerView recyclerView;
@@ -88,57 +93,49 @@ public class GroupListActivity extends AppCompatActivity implements TodoItemList
         return true;
     }
 
+
     /**
-     * This method is called when an item from the list is clicked.
-     * Once the click has been performed, the activity should load and
-     * display the fragment with the item's details.
-     * @param item the clicked item
+     * This method is called when an item in the list displayed by the fragment is clicked.
+     * The activity creates a new fragment containing the details of the item clicked and shows it
+     * @param todoItem the item clicked
+     * @param view the view clicked
      */
     @Override
-    public void onListFragmentInteraction(TodoItem item, View itemView) {
-        //TODO get the real transition name
-        View sharedElement = itemView.findViewById(R.id.task_name);
-        String transitionName = sharedElement.getTransitionName();
-        Fragment detailFragment = ToDoTaskDetailFragment.newInstance(item, transitionName);
-/*
-        getSupportFragmentManager()
-                .beginTransaction()
-                .addToBackStack(null)
-                .addSharedElement(sharedElement, transitionName)
-                //.replace(R.id.fragment_detail_placeholder, detailFragment)
-                .replace(R.id.content, detailFragment)
-                .commit();
-             */
-    }
-
-    @Override
-    public void onFragmentInteraction(Uri uri) {
-
-    }
-
-    @Override
-    public void onTodoItemClicked(TodoItem todoItem, View view) {
+    public void onItemClick(TodoItem todoItem, View view) {
         //TODO implement detail fragment display
-        Snackbar.make(view, "Item " + todoItem.getName() + " have been clicked",
+
+        /*
+        AnimatorSet elevate = (AnimatorSet)AnimatorInflater.loadAnimator(this,
+                R.animator.todo_item_detail_display);
+        elevate.setTarget(view);
+
+        final AnimatorSet animator = new AnimatorSet();
+        animator.play(elevate);
+        animator.start();
+
+        View v = findViewById(R.id.root_view);
+        Snackbar.make(v, "Item " + todoItem.getName() + " have been clicked",
+                Snackbar.LENGTH_LONG)
+                .setAction("Action", null).show();
+        */
+
+    }
+
+    @Override
+    public void onSwipeLeft(){
+        //TODO implement take in charge or delete functionalities
+        View view = findViewById(R.id.root_view);
+        Snackbar.make(view, "OH SHIT YOU SWIPED LEFT",
                 Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show();
     }
 
     @Override
-    public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction, int position) {
-        View view = viewHolder.itemView;
-
-        //TODO implement take in charge or delete functionalities
-        if(direction == ItemTouchHelper.LEFT){
-            Snackbar.make(view, "OH SHIT YOU SWIPED LEFT",
-                    Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show();
-        }
-        else if(direction == ItemTouchHelper.RIGHT){
-            Snackbar.make(view, "OH SHIT YOU SWIPED RIGHT",
-                    Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show();
-        }
+    public void onSwipeRight(){
+        View view = findViewById(R.id.root_view);
+        Snackbar.make(view, "OH SHIT YOU SWIPED RIGHT",
+                Snackbar.LENGTH_LONG)
+                .setAction("Action", null).show();
     }
 
 

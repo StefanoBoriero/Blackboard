@@ -2,6 +2,7 @@ package dima.it.polimi.blackboard.adapters;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.transition.TransitionManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +25,7 @@ public class TodoListAdapter extends RecyclerView.Adapter<TodoListAdapter.ViewHo
     private Context mContext;
     private List<TodoItem> todoItems;
     private TodoListAdapterListener mListener;
+    private ViewGroup parent;
 
     public TodoListAdapter(Context context, List<TodoItem> todoItems, TodoListAdapterListener listener){
         this.mContext = context;
@@ -33,26 +35,30 @@ public class TodoListAdapter extends RecyclerView.Adapter<TodoListAdapter.ViewHo
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        this.parent = parent;
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.todo_item_row, parent, false);
         return new ViewHolder(itemView);
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(final ViewHolder holder, int position) {
         final TodoItem todoItem = todoItems.get(position);
 
         holder.todoItemName.setText(todoItem.getName());
         holder.todoItemType.setText(todoItem.getType());
         //TODO get user icon and todoItem timestamp
 
+
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                holder.itemView.setSelected(true);
+                holder.userIcon.setSelected(true);
+                TransitionManager.beginDelayedTransition(parent);
                 mListener.onTodoItemClicked(todoItem, v);
             }
         });
-
     }
 
     @Override

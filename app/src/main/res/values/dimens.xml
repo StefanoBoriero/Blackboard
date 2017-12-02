@@ -18,4 +18,7 @@
     <dimen name="icon_star">25dp</dimen>
     <dimen name="icon_text">22dp</dimen>
     <dimen name="timestamp">12dp</dimen>
+
+    <!-- Dimensions for todoItem detail reveal -->
+    <dimen name="on_reveal_elevation">4dp</dimen>
 </resources>

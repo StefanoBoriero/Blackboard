@@ -1,9 +1,9 @@
 package dima.it.polimi.blackboard.fragments;
 
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -26,14 +26,14 @@ import dima.it.polimi.blackboard.model.TodoItem;
  * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
  * interface.
  */
-public class TodoItemListFragment extends Fragment implements ToDoTaskDetailFragment.OnFragmentInteractionListener{
+public class TodoItemListFragment extends Fragment implements TodoListAdapter.TodoListAdapterListener,
+        TodoItemTouchHelper.TodoItemTouchHelperListener{
 
     // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
     // TODO: Customize parameters
     private int mColumnCount = 1;
-    private TodoListAdapter.TodoListAdapterListener mListener;
-    private TodoItemTouchHelper.TodoItemTouchHelperListener swipeListener;
+    private OnListFragmentInteractionListener mListener;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -43,7 +43,6 @@ public class TodoItemListFragment extends Fragment implements ToDoTaskDetailFrag
     }
 
     // TODO: Customize parameter initialization
-    @SuppressWarnings("unused")
     public static TodoItemListFragment newInstance(int columnCount) {
         TodoItemListFragment fragment = new TodoItemListFragment();
         Bundle args = new Bundle();
@@ -81,16 +80,15 @@ public class TodoItemListFragment extends Fragment implements ToDoTaskDetailFrag
         } else {
             recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
         }
-        recyclerView.setAdapter(new TodoListAdapter(getContext(),items, mListener));
-
+        recyclerView.setAdapter(new TodoListAdapter(getContext(),items, this));
+        recyclerView.addItemDecoration(new DividerItemDecoration(this.getActivity(), LinearLayoutManager.VERTICAL));
         ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new TodoItemTouchHelper(0,
-                ItemTouchHelper.RIGHT | ItemTouchHelper.LEFT, swipeListener
-        );
+                ItemTouchHelper.RIGHT | ItemTouchHelper.LEFT, this);
         new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(recyclerView);
 
         /*TODO fetch data on swipe refresh
         swipeRefreshLayout = findViewById(R.id.swipe_refresh_layout);
-         swipeRefreshLayout.setOnRefreshListener(this);
+        swipeRefreshLayout.setOnRefreshListener(this);
         */
 
         return view;
@@ -100,18 +98,11 @@ public class TodoItemListFragment extends Fragment implements ToDoTaskDetailFrag
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof TodoListAdapter.TodoListAdapterListener) {
-            mListener = (TodoListAdapter.TodoListAdapterListener) context;
+        if (context instanceof OnListFragmentInteractionListener) {
+            mListener = (OnListFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement TodoListAdapterListener");
-        }
-
-        if (context instanceof TodoItemTouchHelper.TodoItemTouchHelperListener) {
-            swipeListener = (TodoItemTouchHelper.TodoItemTouchHelperListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement TodoItemTouchHelperListener");
         }
     }
 
@@ -121,13 +112,21 @@ public class TodoItemListFragment extends Fragment implements ToDoTaskDetailFrag
         mListener = null;
     }
 
-    /**
-     *
-     * @param uri
-     */
-    @Override
-    public void onFragmentInteraction(Uri uri) {
 
+    @Override
+    public void onTodoItemClicked(TodoItem todoItem, View view) {
+        //TODO implement detail fragment display
+       mListener.onItemClick(todoItem, view);
+    }
+
+    @Override
+    public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction, int position) {
+        if(direction == ItemTouchHelper.LEFT){
+            mListener.onSwipeLeft();
+        }
+        else if(direction == ItemTouchHelper.RIGHT){
+            mListener.onSwipeRight();
+        }
     }
 
     /**
@@ -141,7 +140,8 @@ public class TodoItemListFragment extends Fragment implements ToDoTaskDetailFrag
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnListFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onListFragmentInteraction(TodoItem item, View view);
+        void onItemClick(TodoItem item, View view);
+        void onSwipeLeft();
+        void onSwipeRight();
     }
 }

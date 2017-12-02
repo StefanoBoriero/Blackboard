@@ -7,19 +7,24 @@
     android:focusable="true"
     android:orientation="vertical"
     android:paddingBottom="@dimen/padding_list_row"
-    android:paddingLeft="?listPreferredItemPaddingLeft"
-    android:paddingRight="?listPreferredItemPaddingRight"
+    android:paddingStart="?listPreferredItemPaddingLeft"
+    android:paddingEnd="?listPreferredItemPaddingRight"
     android:paddingTop="@dimen/padding_list_row"
+    android:clipToPadding="false"
+    android:clipChildren="false"
+    android:outlineProvider="bounds"
+    android:stateListAnimator="@animator/item_state"
     >
 
     <LinearLayout
         android:id="@+id/todo_item_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:clickable="true"
         android:orientation="vertical"
         android:paddingStart="72dp"
-        android:paddingEnd="@dimen/padding_list_row">
+        android:paddingEnd="@dimen/padding_list_row"
+        android:clipToPadding="false"
+        >
 
     <TextView
         android:id="@+id/item_name"
@@ -45,13 +50,16 @@
         android:id="@+id/user_icon_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        >
 
         <ImageView
             android:id="@+id/user_icon"
             android:layout_width="@dimen/icon_width_height"
             android:layout_height="@dimen/icon_width_height"
-            android:src="@drawable/background_user_circle" />
+            android:src="@drawable/background_user_circle"
+            android:stateListAnimator="@animator/item_state"
+            />
 
     </RelativeLayout>
 
@@ -59,7 +67,7 @@
         android:id="@+id/timestamp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
         android:textSize="@dimen/timestamp"
         android:textStyle="bold" />
 
