@@ -17,10 +17,25 @@
 
     <string name="action_settings">Settings</string>
 
+    <string-array name="priorities">
+        <item></item>
+        <item>Very important</item>
+        <item>Important</item>
+        <item>Not so important</item>
+    </string-array>
+
+    <string name="shopping">Shopping</string>
+    <string name="houseKeeping">Housekeeping</string>
+    <string name="bills">Bills</string>
+
+
+
     <string name="type_selection">Select activity type</string>
     <string name="name_selection">Insert activity name</string>
     <string name="name">Name</string>
     <string name="type">Type</string>
+    <string name="description">Description</string>
+    <string name="new_activity">Add activity</string>
     <string name="type_menu">Select a type</string>
     <string name="title_activity_dummy">Dummy</string>
     <string name="title_activity_group_list">GroupListActivity</string>

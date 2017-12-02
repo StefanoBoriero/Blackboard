@@ -71,12 +71,12 @@ public class NewToDoTaskActivity extends AppCompatActivity {
 
     public boolean onContextItemSelected (MenuItem item){
         // TODO Auto-generated method stub
-
+        typeButton.setText(item.toString());
 
     return true;
     }
 
-
+    //TODO manage the case where the user doesn't select anything in priority
 
 
 }
