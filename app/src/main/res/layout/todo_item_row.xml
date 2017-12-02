@@ -12,7 +12,6 @@
     android:paddingTop="@dimen/padding_list_row"
     android:clipToPadding="false"
     android:clipChildren="false"
-    android:outlineProvider="bounds"
     android:stateListAnimator="@animator/item_state"
     >
 
