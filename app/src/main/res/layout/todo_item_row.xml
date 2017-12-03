@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/item_row"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/background_list_row"
@@ -12,7 +13,7 @@
     android:paddingTop="@dimen/padding_list_row"
     android:clipToPadding="false"
     android:clipChildren="false"
-    android:stateListAnimator="@animator/item_state"
+
     >
 
     <LinearLayout
@@ -70,13 +71,13 @@
         android:textSize="@dimen/timestamp"
         android:textStyle="bold" />
 
-    <!-- TODO use it for priority
+
     <ImageView
         android:id="@+id/icon_star"
         android:layout_width="@dimen/icon_star"
         android:layout_height="@dimen/icon_star"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
-        android:tint="@color/icon_tint_normal" />
-        -->
+        android:src="@drawable/grey_priority_sign" />
+
 </RelativeLayout>

@@ -1,20 +1,12 @@
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_gravity="center"
-    android:theme="@style/AppTheme.NoTitle"
-    >
-
-
-    <LinearLayout
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-
+        android:layout_margin="32dp"
         android:orientation="vertical"
-        android:background="#FFFFFF"
-        android:elevation="8dp"
+        android:background="@drawable/background_list_row"
+        android:elevation="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -44,7 +36,4 @@
         <!-- TODO Add accept/close buttons -->
     </LinearLayout>
 
-
-
-</android.support.constraint.ConstraintLayout>
 

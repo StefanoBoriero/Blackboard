@@ -116,7 +116,7 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
     @Override
     public void onTodoItemClicked(TodoItem todoItem, View view) {
         //TODO implement detail fragment display
-       mListener.onItemClick(todoItem, view);
+        mListener.onItemClick(todoItem, view);
     }
 
     @Override

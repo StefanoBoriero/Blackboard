@@ -20,5 +20,5 @@
     <dimen name="timestamp">12dp</dimen>
 
     <!-- Dimensions for todoItem detail reveal -->
-    <dimen name="on_reveal_elevation">4dp</dimen>
+    <dimen name="on_reveal_elevation">16dp</dimen>
 </resources>

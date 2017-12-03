@@ -1,7 +1,10 @@
 package dima.it.polimi.blackboard.activities;
 
+import android.animation.Animator;
 import android.animation.AnimatorInflater;
 import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -14,6 +17,10 @@ import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Menu;
 import android.view.View;
+import android.view.ViewPropertyAnimator;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +37,8 @@ import dima.it.polimi.blackboard.model.TodoItem;
  * taken in charge. It displays at first a fragment with the list in a RecyclerView, and on click of
  * one item displays the details in another fragment.
  */
-public class GroupListActivity extends AppCompatActivity implements TodoItemListFragment.OnListFragmentInteractionListener{
+public class GroupListActivity extends AppCompatActivity implements TodoItemListFragment.OnListFragmentInteractionListener,
+ToDoTaskDetailFragment.OnTodoItemDetailInteraction{
 
     private List<TodoItem> todoItemList = new ArrayList<>();
     private RecyclerView recyclerView;
@@ -103,22 +111,97 @@ public class GroupListActivity extends AppCompatActivity implements TodoItemList
     @Override
     public void onItemClick(TodoItem todoItem, View view) {
         //TODO implement detail fragment display
-
+        view.setSelected(true);
+        elevateAndExpand(view, findViewById(R.id.content));
         /*
-        AnimatorSet elevate = (AnimatorSet)AnimatorInflater.loadAnimator(this,
-                R.animator.todo_item_detail_display);
-        elevate.setTarget(view);
+        TextView itemName = view.findViewById(R.id.item_name);
+        ImageView userIcon = view.findViewById(R.id.user_icon);
 
-        final AnimatorSet animator = new AnimatorSet();
-        animator.play(elevate);
-        animator.start();
 
-        View v = findViewById(R.id.root_view);
-        Snackbar.make(v, "Item " + todoItem.getName() + " have been clicked",
-                Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show();
-        */
+        String transitionName = itemName.getTransitionName();
+        String transitionNameIcon = userIcon.getTransitionName();
 
+        Fragment detailFragment = ToDoTaskDetailFragment.newInstance(todoItem, transitionName,
+                transitionNameIcon);
+
+        getSupportFragmentManager().beginTransaction()
+                .addSharedElement(itemName, transitionName)
+                .addSharedElement(userIcon, transitionNameIcon)
+                .replace(R.id.content, detailFragment)
+                .commit();
+*/
+    }
+
+    private void elevateAndExpand(final View target, View parent){
+        final int startingHeight = target.getMeasuredHeight();
+        final int finalHeight = parent.getMeasuredHeight();
+
+        final Float targetElevation = getResources().getDimension(R.dimen.on_reveal_elevation);
+        final Integer duration = getResources().getInteger(R.integer.on_reveal_duration);
+
+        ObjectAnimator elevator = ObjectAnimator.ofFloat(target, "elevation", targetElevation);
+        elevator.setDuration(duration);
+        elevator.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                ValueAnimator expander = ValueAnimator.ofInt(startingHeight, finalHeight);
+                expander.setDuration(duration);
+                expander.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                    @Override
+                    public void onAnimationUpdate(ValueAnimator animation) {
+                        Integer value = (Integer)animation.getAnimatedValue();
+                        target.getLayoutParams().height = value;
+                        target.requestLayout();
+                    }
+                });
+
+                ObjectAnimator translator = ObjectAnimator.ofFloat(target, "y", 0);
+                translator.setDuration(duration);
+
+
+                AnimatorSet animatorSet = new AnimatorSet();
+                animatorSet.playTogether(expander, translator);
+                animatorSet.start();
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        });
+
+        elevator.start();
+/*
+        ValueAnimator expander = ValueAnimator.ofInt(startingHeight, finalHeight);
+        expander.setDuration(duration);
+        expander.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                Integer value = (Integer)animation.getAnimatedValue();
+                target.getLayoutParams().height = value;
+                target.requestLayout();
+            }
+        });
+
+        ObjectAnimator translator = ObjectAnimator.ofFloat(target, "y", 0);
+        translator.setDuration(duration);
+
+
+        AnimatorSet animatorSet = new AnimatorSet();
+        animatorSet.playSequentially(elevator, expander, translator);
+        //animatorSet.playTogether();
+        animatorSet.start();
+*/
     }
 
     @Override
@@ -139,4 +222,13 @@ public class GroupListActivity extends AppCompatActivity implements TodoItemList
     }
 
 
+    @Override
+    public void onAcceptClick(TodoItem todoItem) {
+        //onBackPressed();
+    }
+
+    @Override
+    public void onCloseClick() {
+        //onBackPressed();
+    }
 }

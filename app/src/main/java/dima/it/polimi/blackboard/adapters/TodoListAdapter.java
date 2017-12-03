@@ -47,15 +47,14 @@ public class TodoListAdapter extends RecyclerView.Adapter<TodoListAdapter.ViewHo
 
         holder.todoItemName.setText(todoItem.getName());
         holder.todoItemType.setText(todoItem.getType());
+        holder.todoItemName.setTransitionName(todoItem.getName());
+        holder.userIcon.setTransitionName(todoItem.getName() + "Icon");
         //TODO get user icon and todoItem timestamp
 
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                holder.itemView.setSelected(true);
-                holder.userIcon.setSelected(true);
-                TransitionManager.beginDelayedTransition(parent);
                 mListener.onTodoItemClicked(todoItem, v);
             }
         });
