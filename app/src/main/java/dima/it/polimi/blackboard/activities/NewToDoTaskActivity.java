@@ -95,7 +95,8 @@ public class NewToDoTaskActivity extends AppCompatActivity {
     public boolean onContextItemSelected (MenuItem item){
         // TODO Auto-generated method stub
         typeButton.setText(item.toString());
-        if(item.toString().equals("Bills"))
+        
+        if(item.toString().equals(getString(R.string.bills)))
         {
             //show cost field
             costEditText.setVisibility(View.VISIBLE);
