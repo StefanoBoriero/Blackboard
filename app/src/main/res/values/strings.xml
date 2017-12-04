@@ -32,11 +32,14 @@
 
     <string name="type_selection">Select activity type</string>
     <string name="name_selection">Insert activity name</string>
+    <string name="cost_selection">Insert activity cost</string>
     <string name="name">Name</string>
     <string name="type">Type</string>
     <string name="description">Description</string>
+    <string name="cost">Cost</string>
     <string name="new_activity">Add activity</string>
     <string name="type_menu">Select a type</string>
+
     <string name="title_activity_dummy">Dummy</string>
     <string name="title_activity_group_list">GroupListActivity</string>
     <string name="large_text">
