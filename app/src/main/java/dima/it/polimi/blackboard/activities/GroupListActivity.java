@@ -1,11 +1,6 @@
 package dima.it.polimi.blackboard.activities;
 
-import android.animation.Animator;
-import android.animation.AnimatorInflater;
-import android.animation.AnimatorSet;
-import android.animation.ObjectAnimator;
-import android.animation.ValueAnimator;
-import android.net.Uri;
+
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -14,22 +9,17 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Menu;
 import android.view.View;
-import android.view.ViewPropertyAnimator;
-import android.view.animation.AccelerateDecelerateInterpolator;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import dima.it.polimi.blackboard.R;
 import dima.it.polimi.blackboard.adapters.TodoListAdapter;
-import dima.it.polimi.blackboard.fragments.ToDoTaskDetailFragment;
+import dima.it.polimi.blackboard.fragments.TodoItemDetailFragment;
 import dima.it.polimi.blackboard.fragments.TodoItemListFragment;
-import dima.it.polimi.blackboard.helper.TodoItemTouchHelper;
+import dima.it.polimi.blackboard.helper.TodoDetailAnimatorHelper;
 import dima.it.polimi.blackboard.model.TodoItem;
 
 /**
@@ -38,12 +28,14 @@ import dima.it.polimi.blackboard.model.TodoItem;
  * one item displays the details in another fragment.
  */
 public class GroupListActivity extends AppCompatActivity implements TodoItemListFragment.OnListFragmentInteractionListener,
-ToDoTaskDetailFragment.OnTodoItemDetailInteraction{
+TodoItemDetailFragment.OnTodoItemDetailInteraction, TodoDetailAnimatorHelper.EndAnimationListener{
 
     private List<TodoItem> todoItemList = new ArrayList<>();
     private RecyclerView recyclerView;
     private TodoListAdapter mAdapter;
     private SwipeRefreshLayout swipeRefreshLayout;
+    private TodoDetailAnimatorHelper detailAnimatorHelper;
+    private boolean isExpanded; //boolean flag for item detail expanded
 
 
     @Override
@@ -83,15 +75,6 @@ ToDoTaskDetailFragment.OnTodoItemDetailInteraction{
                 .beginTransaction()
                 .add(R.id.content, TodoItemListFragment.newInstance(1))
                 .commit();
-
-    }
-
-    private void createSampleTodoItems(){
-        for(int i=0; i<31; i++){
-            TodoItem item = new TodoItem("Clean " + i,
-                    "Housing", "The house has to be cleaned");
-            todoItemList.add(item);
-        }
     }
 
     @Override
@@ -111,102 +94,27 @@ ToDoTaskDetailFragment.OnTodoItemDetailInteraction{
     @Override
     public void onItemClick(TodoItem todoItem, View view) {
         //TODO implement detail fragment display
-        view.setSelected(true);
-        elevateAndExpand(view, findViewById(R.id.content));
-        /*
-        TextView itemName = view.findViewById(R.id.item_name);
-        ImageView userIcon = view.findViewById(R.id.user_icon);
+        detailAnimatorHelper = new TodoDetailAnimatorHelper(view, findViewById(R.id.content),
+                getApplicationContext(), todoItem, this);
+        detailAnimatorHelper.expand();
+        isExpanded = true;
 
-
-        String transitionName = itemName.getTransitionName();
-        String transitionNameIcon = userIcon.getTransitionName();
-
-        Fragment detailFragment = ToDoTaskDetailFragment.newInstance(todoItem, transitionName,
-                transitionNameIcon);
-
-        getSupportFragmentManager().beginTransaction()
-                .addSharedElement(itemName, transitionName)
-                .addSharedElement(userIcon, transitionNameIcon)
-                .replace(R.id.content, detailFragment)
-                .commit();
-*/
     }
 
-    private void elevateAndExpand(final View target, View parent){
-        final int startingHeight = target.getMeasuredHeight();
-        final int finalHeight = parent.getMeasuredHeight();
-
-        final Float targetElevation = getResources().getDimension(R.dimen.on_reveal_elevation);
-        final Integer duration = getResources().getInteger(R.integer.on_reveal_duration);
-
-        ObjectAnimator elevator = ObjectAnimator.ofFloat(target, "elevation", targetElevation);
-        elevator.setDuration(duration);
-        elevator.addListener(new Animator.AnimatorListener() {
-            @Override
-            public void onAnimationStart(Animator animation) {
-
-            }
-
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                ValueAnimator expander = ValueAnimator.ofInt(startingHeight, finalHeight);
-                expander.setDuration(duration);
-                expander.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                    @Override
-                    public void onAnimationUpdate(ValueAnimator animation) {
-                        Integer value = (Integer)animation.getAnimatedValue();
-                        target.getLayoutParams().height = value;
-                        target.requestLayout();
-                    }
-                });
-
-                ObjectAnimator translator = ObjectAnimator.ofFloat(target, "y", 0);
-                translator.setDuration(duration);
-
-
-                AnimatorSet animatorSet = new AnimatorSet();
-                animatorSet.playTogether(expander, translator);
-                animatorSet.start();
-            }
-
-            @Override
-            public void onAnimationCancel(Animator animation) {
-
-            }
-
-            @Override
-            public void onAnimationRepeat(Animator animation) {
-
-            }
-        });
-
-        elevator.start();
-/*
-        ValueAnimator expander = ValueAnimator.ofInt(startingHeight, finalHeight);
-        expander.setDuration(duration);
-        expander.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                Integer value = (Integer)animation.getAnimatedValue();
-                target.getLayoutParams().height = value;
-                target.requestLayout();
-            }
-        });
-
-        ObjectAnimator translator = ObjectAnimator.ofFloat(target, "y", 0);
-        translator.setDuration(duration);
-
-
-        AnimatorSet animatorSet = new AnimatorSet();
-        animatorSet.playSequentially(elevator, expander, translator);
-        //animatorSet.playTogether();
-        animatorSet.start();
-*/
+    @Override
+    public void onBackPressed(){
+        if(isExpanded){
+            detailAnimatorHelper.collapse();
+            isExpanded = false;
+        }
+        else{
+            super.onBackPressed();
+        }
     }
 
     @Override
     public void onSwipeLeft(){
-        //TODO implement take in charge or delete functionalities
+        //TODO implement take in charge functionality
         View view = findViewById(R.id.root_view);
         Snackbar.make(view, "OH SHIT YOU SWIPED LEFT",
                 Snackbar.LENGTH_LONG)
@@ -215,6 +123,7 @@ ToDoTaskDetailFragment.OnTodoItemDetailInteraction{
 
     @Override
     public void onSwipeRight(){
+        //TODO implement take in charge or delete functionality
         View view = findViewById(R.id.root_view);
         Snackbar.make(view, "OH SHIT YOU SWIPED RIGHT",
                 Snackbar.LENGTH_LONG)
@@ -230,5 +139,10 @@ ToDoTaskDetailFragment.OnTodoItemDetailInteraction{
     @Override
     public void onCloseClick() {
         //onBackPressed();
+    }
+
+    @Override
+    public void onAnimationEnded(TodoItem item) {
+        //TODO load the fragment with the description
     }
 }

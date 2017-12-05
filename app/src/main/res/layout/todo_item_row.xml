@@ -13,7 +13,6 @@
     android:paddingTop="@dimen/padding_list_row"
     android:clipToPadding="false"
     android:clipChildren="false"
-
     >
 
     <LinearLayout
@@ -73,11 +72,11 @@
 
 
     <ImageView
-        android:id="@+id/icon_star"
+        android:id="@+id/icon_priority"
         android:layout_width="@dimen/icon_star"
         android:layout_height="@dimen/icon_star"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
         android:src="@drawable/grey_priority_sign" />
 
 </RelativeLayout>

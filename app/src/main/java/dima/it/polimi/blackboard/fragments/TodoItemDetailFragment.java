@@ -8,6 +8,7 @@ import android.transition.TransitionInflater;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -17,12 +18,12 @@ import dima.it.polimi.blackboard.model.TodoItem;
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link ToDoTaskDetailFragment.OnTodoItemDetailInteraction} interface
+ * {@link TodoItemDetailFragment.OnTodoItemDetailInteraction} interface
  * to handle interaction events.
- * Use the {@link ToDoTaskDetailFragment#newInstance} factory method to
+ * Use the {@link TodoItemDetailFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ToDoTaskDetailFragment extends Fragment {
+public class TodoItemDetailFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_TODO = "todoItem";
@@ -36,7 +37,7 @@ public class ToDoTaskDetailFragment extends Fragment {
 
     private OnTodoItemDetailInteraction mListener;
 
-    public ToDoTaskDetailFragment() {
+    public TodoItemDetailFragment() {
         // Required empty public constructor
     }
 
@@ -46,13 +47,13 @@ public class ToDoTaskDetailFragment extends Fragment {
      *
      * @param todoTask Item which information have to be displayed.
      * @param transitionName Transition name to set the shared element transition.
-     * @return A new instance of fragment ToDoTaskDetailFragment.
+     * @return A new instance of fragment TodoItemDetailFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static Fragment newInstance(TodoItem todoTask, String transitionName, String transitionNameIcon) {
-        ToDoTaskDetailFragment fragment = new ToDoTaskDetailFragment();
+    public static Fragment newInstance(TodoItem todoItem, String transitionName, String transitionNameIcon) {
+        TodoItemDetailFragment fragment = new TodoItemDetailFragment();
         Bundle args = new Bundle();
-        args.putParcelable(ARG_TODO, todoTask);
+        args.putParcelable(ARG_TODO, todoItem);
         args.putString(ARG_TR_NAME, transitionName);
         args.putString(ARG_TR_ICON, transitionNameIcon);
         fragment.setArguments(args);
@@ -79,7 +80,7 @@ public class ToDoTaskDetailFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View out =  inflater.inflate(R.layout.fragment_todo_task_detail, container, false);
+        View out =  inflater.inflate(R.layout.fragment_todo_item_detail, container, false);
 
         return out;
     }
@@ -89,18 +90,23 @@ public class ToDoTaskDetailFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         // Gets the text views to populate them
-        ImageView userIconView = view.findViewById(R.id.user_icon);
-        TextView titleView = view.findViewById(R.id.title_text_view);
-        TextView typeView = view.findViewById(R.id.type_text_view);
-        TextView descriptionView = view.findViewById(R.id.description_text_view);
+        TextView descriptionView = view.findViewById(R.id.item_description);
 
-        titleView.setText(todoTask.getName());
-        typeView.setText(todoTask.getType());
         descriptionView.setText(todoTask.getDescription());
 
         // Binds dynamically the shared element through transition name
-        titleView.setTransitionName(transitionName);
-        userIconView.setTransitionName(transitionNameIcon);
+        //titleView.setTransitionName(transitionName);
+        //userIconView.setTransitionName(transitionNameIcon);
+
+        //Binds the button click action to parent activity
+        Button acceptBtn = view.findViewById(R.id.accept_button);
+        acceptBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mListener.onAcceptClick(todoTask);
+            }
+        });
+
     }
 
 
