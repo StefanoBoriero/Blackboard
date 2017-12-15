@@ -29,10 +29,10 @@ import dima.it.polimi.blackboard.model.TodoItem;
 public class TodoItemListFragment extends Fragment implements TodoListAdapter.TodoListAdapterListener,
         TodoItemTouchHelper.TodoItemTouchHelperListener{
 
-    // TODO: Customize parameter argument names
+
     private static final String ARG_COLUMN_COUNT = "column-count";
     private static final String ARG_TODO_ITEMS = "todo-items";
-    // TODO: Customize parameters
+
     private int mColumnCount = 1;
     private OnListFragmentInteractionListener mListener;
     private TodoListAdapter adapter;
@@ -45,11 +45,12 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
     public TodoItemListFragment() {
     }
 
-    // TODO: Customize parameter initialization
     public static TodoItemListFragment newInstance(int columnCount, List<TodoItem> todoItems) {
         TodoItemListFragment fragment = new TodoItemListFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
+
+        //TODO change this with network fetching
         args.putParcelableArrayList(ARG_TODO_ITEMS, (ArrayList)todoItems);
         fragment.setArguments(args);
         return fragment;
@@ -117,7 +118,6 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
 
     @Override
     public void onTodoItemClicked(TodoItem todoItem, View view) {
-        //TODO implement detail fragment display
         mListener.onItemClick(todoItem, view);
     }
 

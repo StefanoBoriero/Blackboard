@@ -24,8 +24,6 @@ import dima.it.polimi.blackboard.model.TodoItem;
  * create an instance of this fragment.
  */
 public class TodoItemDetailFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_TODO = "todoItem";
     private static final String ARG_TR_NAME = "transitionName";
     private static final String ARG_TR_ICON = "transitionNameIcon";
@@ -46,9 +44,9 @@ public class TodoItemDetailFragment extends Fragment {
      * this fragment using the provided parameters.
      *
      * @param todoItem Item which information have to be displayed.
+     * @param transitionNameIcon Transition name for shared element transitions
      * @return A new instance of fragment TodoItemDetailFragment.
      */
-    // TODO: Rename and change types and number of parameters
     public static Fragment newInstance(TodoItem todoItem, String transitionNameIcon) {
         TodoItemDetailFragment fragment = new TodoItemDetailFragment();
         Bundle args = new Bundle();
@@ -72,8 +70,7 @@ public class TodoItemDetailFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View out =  inflater.inflate(R.layout.content_todo_item_detail, container, false);
-        return out;
+        return inflater.inflate(R.layout.content_todo_item_detail, container, false);
     }
 
     @Override

@@ -3,13 +3,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="dima.it.polimi.blackboard.activities.GroupListActivity">
 
-    <!-- TODO replace Search with string resource -->
+
     <item
         android:id="@+id/action_search"
         android:icon="@drawable/ic_search_white_24dp"
         android:orderInCategory="100"
-        android:title="Search"
-        app:showAsAction="always" />
+        android:title="@string/action_search"
+        app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/action_settings"
