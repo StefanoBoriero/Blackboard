@@ -52,7 +52,8 @@ public class TodoListAdapter extends RecyclerView.Adapter<TodoListAdapter.ViewHo
         //TODO get user icon and todoItem timestamp
 
 
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
+        holder.itemView.findViewById(R.id.foreground_row)
+                .setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mListener.onTodoItemClicked(todoItem, v);
@@ -63,6 +64,16 @@ public class TodoListAdapter extends RecyclerView.Adapter<TodoListAdapter.ViewHo
     @Override
     public int getItemCount() {
         return todoItems.size();
+    }
+
+    public void removeItem(int position){
+        todoItems.remove(position);
+        notifyItemRemoved(position);
+    }
+
+    public void insertItem(TodoItem item, int position){
+        todoItems.add(position, item);
+        notifyItemInserted(position);
     }
 
     public interface TodoListAdapterListener {
@@ -76,8 +87,13 @@ public class TodoListAdapter extends RecyclerView.Adapter<TodoListAdapter.ViewHo
         private LinearLayout todoItemContainer;
         private RelativeLayout userIconContainer;
 
+        public RelativeLayout viewForeground;
+        public RelativeLayout viewBackground;
+
         public ViewHolder(View itemView) {
             super(itemView);
+            viewForeground = itemView.findViewById(R.id.foreground_row);
+            viewBackground = itemView.findViewById(R.id.background_row);
             todoItemName = itemView.findViewById(R.id.item_name);
             todoItemType = itemView.findViewById(R.id.item_type);
             userIcon = itemView.findViewById(R.id.user_icon);

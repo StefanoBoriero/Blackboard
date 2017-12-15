@@ -31,9 +31,12 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
 
     // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
+    private static final String ARG_TODO_ITEMS = "todo-items";
     // TODO: Customize parameters
     private int mColumnCount = 1;
     private OnListFragmentInteractionListener mListener;
+    private TodoListAdapter adapter;
+    private List<TodoItem> todoItems;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -43,10 +46,11 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
     }
 
     // TODO: Customize parameter initialization
-    public static TodoItemListFragment newInstance(int columnCount) {
+    public static TodoItemListFragment newInstance(int columnCount, List<TodoItem> todoItems) {
         TodoItemListFragment fragment = new TodoItemListFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
+        args.putParcelableArrayList(ARG_TODO_ITEMS, (ArrayList)todoItems);
         fragment.setArguments(args);
         return fragment;
     }
@@ -57,6 +61,7 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
 
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
+            todoItems = getArguments().getParcelableArrayList(ARG_TODO_ITEMS);
         }
     }
 
@@ -66,21 +71,14 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
         View view = inflater.inflate(R.layout.content_group_list, container, false);
         RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
 
-        //TODO eliminate the following lines
-        List<TodoItem> items = new ArrayList<>();
-        for(int i=0; i<31; i++){
-            TodoItem item = new TodoItem("Clean " + i,
-                    "Housing", "The house has to be cleaned");
-            items.add(item);
-        }
-
         Context context = view.getContext();
         if (mColumnCount <= 1) {
             recyclerView.setLayoutManager(new LinearLayoutManager(context));
         } else {
             recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
         }
-        recyclerView.setAdapter(new TodoListAdapter(getContext(),items, this));
+        adapter = new TodoListAdapter(getContext(),todoItems, this);
+        recyclerView.setAdapter(adapter);
         recyclerView.addItemDecoration(new DividerItemDecoration(this.getActivity(), LinearLayoutManager.VERTICAL));
         ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new TodoItemTouchHelper(0,
                 ItemTouchHelper.RIGHT | ItemTouchHelper.LEFT, this);
@@ -112,6 +110,10 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
         mListener = null;
     }
 
+    public TodoListAdapter getAdapter(){
+        return this.adapter;
+    }
+
 
     @Override
     public void onTodoItemClicked(TodoItem todoItem, View view) {
@@ -121,12 +123,7 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
 
     @Override
     public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction, int position) {
-        if(direction == ItemTouchHelper.LEFT){
-            mListener.onSwipeLeft();
-        }
-        else if(direction == ItemTouchHelper.RIGHT){
-            mListener.onSwipeRight();
-        }
+        mListener.onSwiped(viewHolder, direction, position);
     }
 
     /**
@@ -141,7 +138,6 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
      */
     public interface OnListFragmentInteractionListener {
         void onItemClick(TodoItem item, View view);
-        void onSwipeLeft();
-        void onSwipeRight();
+        void onSwiped(RecyclerView.ViewHolder viewHolder, int direction, int position);
     }
 }

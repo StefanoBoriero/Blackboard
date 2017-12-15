@@ -1,13 +1,13 @@
 <resources>
-    <string name="app_name">Blackboard</string>
-    <string name="group_button">Group List</string>
-    <string name="toolbar_group_list">Group List</string>
-    <string name="task_name">TaskName</string>
-    <string name="title_field">title</string>
-    <string name="type_field">type</string>
-    <string name="description_field">description</string>
-    <string name="title_activity_main">Blackboard</string>
 
+    <!-- Activity Names -->
+    <string name="app_name">Blackboard</string>
+    <string name="title_activity_main">Blackboard</string>
+    <string name="title_activity_detail">Item Details</string>
+    <string name="title_activity_group_list">GroupListActivity</string>
+
+
+    <!-- Navigation Drawer strings -->
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
@@ -17,6 +17,13 @@
 
     <string name="action_settings">Settings</string>
 
+
+    <!-- Grouplist Activity strings -->
+    <string name="todo_item">TodoItem</string>
+
+
+
+    <!-- New Item strings -->
     <string-array name="priorities">
         <item></item>
         <item>Very important</item>
@@ -29,7 +36,6 @@
     <string name="bills">Bills</string>
 
 
-
     <string name="type_selection">Select activity type</string>
     <string name="name_selection">Insert activity name</string>
     <string name="cost_selection">Insert activity cost</string>
@@ -40,8 +46,10 @@
     <string name="new_activity">Add activity</string>
     <string name="type_menu">Select a type</string>
 
-    <string name="title_activity_dummy">Dummy</string>
-    <string name="title_activity_group_list">GroupListActivity</string>
+
+    <string name="swipe_text">Accept Task</string>
+
+
     <string name="large_text">
         "Material is the metaphor.\n\n"
 
@@ -131,5 +139,6 @@
         "For example, position the FAB to one side of stream of a cards so the FAB won’t interfere "
         "when a user tries to pick up one of cards.\n\n"
     </string>
+
 
 </resources>

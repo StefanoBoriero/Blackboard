@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/item_row"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:shrinkColumns="1"
+    android:elevation="16dp">
+
+    <TableRow
+        android:id="@+id/added_by_row"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="5dp">
+        <TextView
+            android:id="@+id/added_by_title"
+            android:text="Added by"
+            android:layout_marginStart="@dimen/row_margin_start"
+            android:textSize="@dimen/title_text_size"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/added_by_name"
+            android:layout_marginStart="@dimen/row_margin_start"
+            android:layout_marginEnd="@dimen/row_margin_end"
+            android:textSize="@dimen/description_text_size"
+            android:text="Maurizio Sarri"
+            />
+    </TableRow>
+
+    <TableRow
+        android:id="@+id/description_row"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="5dp" >
+
+        <TextView
+            android:id="@+id/description_title"
+            android:text="Description"
+            android:layout_marginStart="@dimen/row_margin_start"
+            android:textSize="@dimen/title_text_size"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/item_description"
+            android:layout_marginStart="@dimen/row_margin_start"
+            android:layout_marginEnd="@dimen/row_margin_end"
+            android:textSize="@dimen/description_text_size"
+            android:text="Lorem ipsum dolet sic amor"
+            />
+    </TableRow>
+
+    <TableRow
+        android:id="@+id/expiration_row"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="5dp" >
+
+        <TextView
+            android:id="@+id/expiration_title"
+            android:text="Expires"
+            android:layout_marginStart="@dimen/row_margin_start"
+            android:textSize="@dimen/title_text_size"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/expiration"
+            android:layout_marginStart="@dimen/row_margin_start"
+            android:layout_marginEnd="@dimen/row_margin_end"
+            android:textSize="@dimen/description_text_size"
+            android:text="Lorem ipsum dolet sic amor"
+            />
+    </TableRow>
+
+    <TableRow
+        android:id="@+id/suggested_row"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="5dp" >
+
+        <TextView
+            android:id="@+id/suggested_title"
+            android:text="Suggested User"
+            android:layout_marginStart="@dimen/row_margin_start"
+            android:textSize="@dimen/title_text_size"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/suggested_user"
+            android:layout_marginStart="@dimen/row_margin_start"
+            android:layout_marginEnd="@dimen/row_margin_end"
+            android:textSize="@dimen/description_text_size"
+            android:text="Ezio Greggio"
+            />
+    </TableRow>
+
+    <Button
+        android:id="@+id/accept_button"
+        android:layout_margin="56dp"
+        android:text="Accept"
+        android:backgroundTint="@color/greenAccept"
+        />
+
+
+</TableLayout>

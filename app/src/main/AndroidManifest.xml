@@ -9,7 +9,6 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activities.DetailTaskActivity" />
         <activity
             android:name=".activities.MainActivity"
             android:label="@string/title_activity_main"
@@ -20,11 +19,20 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".activities.DetailTodoItemActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:label="@string/title_activity_detail"/>
         <activity android:name=".activities.NewToDoTaskActivity" />
         <activity
             android:name=".activities.GroupListActivity"
             android:label="@string/title_activity_group_list"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar"
+            android:parentActivityName=".activities.MainActivity">
+            <!-- Parent activity meta-data to support 4.0 and lower -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="dima.it.polimi.blackboard.activities.MainActivity" />
+        </activity>
     </application>
 
 </manifest>

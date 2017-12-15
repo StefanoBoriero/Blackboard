@@ -45,16 +45,14 @@ public class TodoItemDetailFragment extends Fragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param todoTask Item which information have to be displayed.
-     * @param transitionName Transition name to set the shared element transition.
+     * @param todoItem Item which information have to be displayed.
      * @return A new instance of fragment TodoItemDetailFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static Fragment newInstance(TodoItem todoItem, String transitionName, String transitionNameIcon) {
+    public static Fragment newInstance(TodoItem todoItem, String transitionNameIcon) {
         TodoItemDetailFragment fragment = new TodoItemDetailFragment();
         Bundle args = new Bundle();
         args.putParcelable(ARG_TODO, todoItem);
-        args.putString(ARG_TR_NAME, transitionName);
         args.putString(ARG_TR_ICON, transitionNameIcon);
         fragment.setArguments(args);
         return fragment;
@@ -65,14 +63,8 @@ public class TodoItemDetailFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             todoTask = getArguments().getParcelable(ARG_TODO);
-            transitionName = getArguments().getString(ARG_TR_NAME);
             transitionNameIcon = getArguments().getString(ARG_TR_ICON);
         }
-
-        //postponeEnterTransition();
-        Transition enterTransition = TransitionInflater.from(getContext())
-                .inflateTransition(R.transition.detail_transition);
-        setSharedElementEnterTransition(enterTransition);
 
     }
 
@@ -80,8 +72,7 @@ public class TodoItemDetailFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View out =  inflater.inflate(R.layout.fragment_todo_item_detail, container, false);
-
+        View out =  inflater.inflate(R.layout.content_todo_item_detail, container, false);
         return out;
     }
 
@@ -91,12 +82,12 @@ public class TodoItemDetailFragment extends Fragment {
 
         // Gets the text views to populate them
         TextView descriptionView = view.findViewById(R.id.item_description);
-
         descriptionView.setText(todoTask.getDescription());
 
         // Binds dynamically the shared element through transition name
         //titleView.setTransitionName(transitionName);
-        //userIconView.setTransitionName(transitionNameIcon);
+        View userIconView = view.findViewById(R.id.user_icon);
+        userIconView.setTransitionName(transitionNameIcon);
 
         //Binds the button click action to parent activity
         Button acceptBtn = view.findViewById(R.id.accept_button);
@@ -106,7 +97,6 @@ public class TodoItemDetailFragment extends Fragment {
                 mListener.onAcceptClick(todoTask);
             }
         });
-
     }
 
 
@@ -117,7 +107,7 @@ public class TodoItemDetailFragment extends Fragment {
             mListener = (OnTodoItemDetailInteraction) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
+                    + " must implement OnTodoItemDetailInteraction");
         }
     }
 
