@@ -32,7 +32,7 @@ public class DetailTodoItemActivity extends AppCompatActivity implements TodoIte
     }
 
     private void createFragment(){
-        detailFragment = TodoItemDetailFragment.newInstance(todoItem, "eheheh");
+        detailFragment = TodoItemDetailFragment.newInstance(todoItem, "eheheh", "ahahaha");
     }
 
     private void displayFragment(){

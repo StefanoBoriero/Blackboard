@@ -1,6 +1,8 @@
 package dima.it.polimi.blackboard.activities;
 
 
+import android.app.SearchManager;
+import android.content.Context;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
@@ -8,6 +10,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.transition.ArcMotion;
 import android.transition.Fade;
@@ -74,6 +77,30 @@ TodoItemDetailFragment.OnTodoItemDetailInteraction{
         getMenuInflater().inflate(R.menu.menu_group_list, menu);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
+
+
+        SearchManager searchManager = (SearchManager)getSystemService(Context.SEARCH_SERVICE);
+        SearchView searchView = (SearchView)menu.findItem(R.id.action_search)
+                .getActionView();
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        searchView.setMaxWidth(Integer.MAX_VALUE);
+
+        final TodoListAdapter adapter = ((TodoItemListFragment)listFragment).getAdapter();
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                adapter.getFilter().filter(query);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                adapter.getFilter().filter(newText);
+                return false;
+            }
+        });
+
         return true;
     }
 
@@ -113,9 +140,11 @@ TodoItemDetailFragment.OnTodoItemDetailInteraction{
      * @param itemRow  the view row that has been clicked
      */
     private void swapFragments(TodoItem todoItem, View itemRow){
-        final View sharedElement = itemRow.findViewById(R.id.user_icon);
+        final View sharedElementIcon = itemRow.findViewById(R.id.user_icon);
+        final View sharedElementName = itemRow.findViewById(R.id.item_name);
         final Fragment listFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_list_container);
-        final Fragment detailFragment = TodoItemDetailFragment.newInstance(todoItem, sharedElement.getTransitionName());
+        final Fragment detailFragment = TodoItemDetailFragment.newInstance(todoItem, sharedElementIcon.getTransitionName(),
+                sharedElementName.getTransitionName());
 
         findViewById(R.id.background_row).setVisibility(View.GONE);
 
@@ -127,7 +156,8 @@ TodoItemDetailFragment.OnTodoItemDetailInteraction{
         // Swap the fragments
         getSupportFragmentManager().beginTransaction()
                 .addToBackStack(detailFragment.getTag())
-                .addSharedElement(sharedElement, sharedElement.getTransitionName())
+                .addSharedElement(sharedElementIcon, sharedElementIcon.getTransitionName())
+                .addSharedElement(sharedElementName, sharedElementName.getTransitionName())
                 .replace(R.id.fragment_list_container, detailFragment)
                 .commit();
     }

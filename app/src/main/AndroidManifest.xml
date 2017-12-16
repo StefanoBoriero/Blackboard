@@ -31,7 +31,13 @@
             <!-- Parent activity meta-data to support 4.0 and lower -->
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="dima.it.polimi.blackboard.activities.MainActivity" />
+                android:value="dima.it.polimi.blackboard.activities.MainActivity"
+                android:resource="@xml/searchable"/>
+
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+
         </activity>
     </application>
 

@@ -6,30 +6,36 @@ import android.transition.TransitionManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import dima.it.polimi.blackboard.R;
 import dima.it.polimi.blackboard.model.TodoItem;
 
 /**
- *
+ * Adapter class for a list of todoItems
  * Created by Stefano on 30/11/2017.
  */
 
-public class TodoListAdapter extends RecyclerView.Adapter<TodoListAdapter.ViewHolder> {
+public class TodoListAdapter extends RecyclerView.Adapter<TodoListAdapter.ViewHolder>
+    implements Filterable{
     private Context mContext;
     private List<TodoItem> todoItems;
+    private List<TodoItem> todoItemsFiltered;
     private TodoListAdapterListener mListener;
     private ViewGroup parent;
 
     public TodoListAdapter(Context context, List<TodoItem> todoItems, TodoListAdapterListener listener){
         this.mContext = context;
         this.todoItems = todoItems;
+        this.todoItemsFiltered = todoItems;
         this.mListener = listener;
     }
 
@@ -43,12 +49,12 @@ public class TodoListAdapter extends RecyclerView.Adapter<TodoListAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        final TodoItem todoItem = todoItems.get(position);
+        final TodoItem todoItem = todoItemsFiltered.get(position);
 
         holder.todoItemName.setText(todoItem.getName());
         holder.todoItemType.setText(todoItem.getType());
-        holder.todoItemName.setTransitionName(todoItem.getName());
-        holder.userIcon.setTransitionName(todoItem.getName() + "Icon");
+        holder.todoItemName.setTransitionName(todoItem.getName() + "Name" + todoItem.getId());
+        holder.userIcon.setTransitionName(todoItem.getName() + "Icon" + todoItem.getId());
         //TODO get user icon and todoItem timestamp
 
 
@@ -63,17 +69,49 @@ public class TodoListAdapter extends RecyclerView.Adapter<TodoListAdapter.ViewHo
 
     @Override
     public int getItemCount() {
-        return todoItems.size();
+        return todoItemsFiltered.size();
     }
 
     public void removeItem(int position){
-        todoItems.remove(position);
+        todoItemsFiltered.remove(position);
         notifyItemRemoved(position);
     }
 
     public void insertItem(TodoItem item, int position){
-        todoItems.add(position, item);
+        todoItemsFiltered.add(position, item);
         notifyItemInserted(position);
+    }
+
+    @Override
+    public Filter getFilter() {
+        return new Filter() {
+            @Override
+            protected FilterResults performFiltering(CharSequence constraint) {
+                String expression = constraint.toString();
+                if(expression.isEmpty()){
+                    todoItemsFiltered = todoItems;
+                }
+                else {
+                    List<TodoItem> filteredItems = new ArrayList<>();
+                    for (TodoItem item : todoItems) {
+                        if(item.getName().toLowerCase().contains(expression.toLowerCase())
+                                || item.getType().toLowerCase().contains(expression.toLowerCase())){
+                            filteredItems.add(item);
+                        }
+                    }
+                    todoItemsFiltered = filteredItems;
+                }
+                FilterResults results = new FilterResults();
+                results.values = todoItemsFiltered;
+                return results;
+            }
+
+            @Override
+            protected void publishResults(CharSequence constraint, FilterResults results) {
+                todoItemsFiltered = (List<TodoItem>)results.values;
+                notifyDataSetChanged();
+            }
+        };
     }
 
     public interface TodoListAdapterListener {

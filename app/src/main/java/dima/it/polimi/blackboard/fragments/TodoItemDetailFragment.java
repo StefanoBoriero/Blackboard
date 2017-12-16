@@ -47,11 +47,12 @@ public class TodoItemDetailFragment extends Fragment {
      * @param transitionNameIcon Transition name for shared element transitions
      * @return A new instance of fragment TodoItemDetailFragment.
      */
-    public static Fragment newInstance(TodoItem todoItem, String transitionNameIcon) {
+    public static Fragment newInstance(TodoItem todoItem, String transitionNameIcon, String transitionNameName) {
         TodoItemDetailFragment fragment = new TodoItemDetailFragment();
         Bundle args = new Bundle();
         args.putParcelable(ARG_TODO, todoItem);
         args.putString(ARG_TR_ICON, transitionNameIcon);
+        args.putString(ARG_TR_NAME, transitionNameName);
         fragment.setArguments(args);
         return fragment;
     }
@@ -62,6 +63,7 @@ public class TodoItemDetailFragment extends Fragment {
         if (getArguments() != null) {
             todoTask = getArguments().getParcelable(ARG_TODO);
             transitionNameIcon = getArguments().getString(ARG_TR_ICON);
+            transitionName = getArguments().getString(ARG_TR_NAME);
         }
 
     }
@@ -80,6 +82,10 @@ public class TodoItemDetailFragment extends Fragment {
         // Gets the text views to populate them
         TextView descriptionView = view.findViewById(R.id.item_description);
         descriptionView.setText(todoTask.getDescription());
+
+        TextView nameView = view.findViewById(R.id.item_name);
+        nameView.setText(todoTask.getName());
+        nameView.setTransitionName(transitionName);
 
         // Binds dynamically the shared element through transition name
         //titleView.setTransitionName(transitionName);

@@ -8,22 +8,27 @@ import android.os.Parcelable;
  */
 
 public class TodoItem implements Parcelable {
+    private long id;
     private String name;
     private String type;
     private String description;
 
     protected TodoItem(Parcel in) {
         //Order must be the same of writeToParcel
+        this.id = in.readLong();
         this.name = in.readString();
         this.type = in.readString();
         this.description = in.readString();
     }
 
-    public TodoItem(String name, String type, String description){
+    public TodoItem(long id, String name, String type, String description){
+        this.id = id;
         this.name = name;
         this.type = type;
         this.description = description;
     }
+
+    public long getId(){return this.id;}
 
     public String getName(){
         return this.name;
@@ -39,6 +44,7 @@ public class TodoItem implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeLong(this.id);
         dest.writeString(this.name);
         dest.writeString(this.type);
         dest.writeString(this.description);
