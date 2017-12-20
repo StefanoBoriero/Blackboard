@@ -2,15 +2,19 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_height="wrap_content"
     android:layout_width="match_parent"
+    android:clipToPadding="false"
+    android:clipChildren="false"
+    android:background="@drawable/background_list_row"
+    android:focusable="true"
     android:clickable="true"
-    android:focusable="true">
+    >
 
     <RelativeLayout
         android:id="@+id/background_row"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/greenAccept"
-        android:visibility="invisible">
+        android:visibility="visible">
 
         <ImageView
             android:id="@+id/tick_icon"
@@ -38,7 +42,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/background_list_row"
-        android:focusable="true"
+        android:clickable="false"
+        android:focusable="false"
         android:orientation="vertical"
         android:paddingBottom="@dimen/padding_list_row"
         android:paddingStart="?listPreferredItemPaddingLeft"

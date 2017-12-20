@@ -2,11 +2,15 @@ package dima.it.polimi.blackboard.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,7 +31,7 @@ import dima.it.polimi.blackboard.model.TodoItem;
  * interface.
  */
 public class TodoItemListFragment extends Fragment implements TodoListAdapter.TodoListAdapterListener,
-        TodoItemTouchHelper.TodoItemTouchHelperListener{
+        TodoItemTouchHelper.TodoItemTouchHelperListener, SwipeRefreshLayout.OnRefreshListener{
 
 
     private static final String ARG_COLUMN_COUNT = "column-count";
@@ -37,6 +41,14 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
     private OnListFragmentInteractionListener mListener;
     private TodoListAdapter adapter;
     private List<TodoItem> todoItems;
+
+    // Attributes for onStop() onStart() consistency
+    private CharSequence savedQuery;
+    private int position;
+
+    private AppCompatActivity parentActivity;
+    private View rootView;
+    private SearchView searchView;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -63,32 +75,36 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
             todoItems = getArguments().getParcelableArrayList(ARG_TODO_ITEMS);
+            adapter = new TodoListAdapter(getContext(),todoItems, this);
         }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.content_group_list, container, false);
-        RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
+        View view = inflater.inflate(R.layout.fragment_list, container, false);
 
+
+        parentActivity = ((AppCompatActivity)getActivity());
+        rootView = parentActivity.findViewById(R.id.root_view);
+
+        // Setting up the RecyclerView adapter and helpers
+        RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
         Context context = view.getContext();
         if (mColumnCount <= 1) {
             recyclerView.setLayoutManager(new LinearLayoutManager(context));
         } else {
             recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
         }
-        adapter = new TodoListAdapter(getContext(),todoItems, this);
         recyclerView.setAdapter(adapter);
         recyclerView.addItemDecoration(new DividerItemDecoration(this.getActivity(), LinearLayoutManager.VERTICAL));
         ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new TodoItemTouchHelper(0,
-                ItemTouchHelper.RIGHT | ItemTouchHelper.LEFT, this);
+                ItemTouchHelper.LEFT, this);
         new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(recyclerView);
 
-        /*TODO fetch data on swipe refresh
-        swipeRefreshLayout = findViewById(R.id.swipe_refresh_layout);
+        // Setting up the refresh layout
+        SwipeRefreshLayout swipeRefreshLayout = view.findViewById(R.id.swipe_refresh_layout);
         swipeRefreshLayout.setOnRefreshListener(this);
-        */
 
         return view;
     }
@@ -101,7 +117,7 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
             mListener = (OnListFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement TodoListAdapterListener");
+                    + " must implement OnListFragmentInteractionListener");
         }
     }
 
@@ -110,20 +126,77 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
         super.onDetach();
         mListener = null;
     }
-
-    public TodoListAdapter getAdapter(){
-        return this.adapter;
+/*
+    @Override
+    public void onStart(){
+        super.onStart();
+        if(searchView != null){
+            searchView.setQuery(savedQuery, true);
+        }
     }
-
+*/
+    @Override
+    public void onStop(){
+        savedQuery = searchView.getQuery();
+        super.onStop();
+    }
 
     @Override
     public void onTodoItemClicked(TodoItem todoItem, View view) {
         mListener.onItemClick(todoItem, view);
     }
 
+    public void setSearchView(SearchView searchView){
+        this.searchView = searchView;
+        this.searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                adapter.getFilter().filter(query);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                adapter.getFilter().filter(newText);
+                return false;
+            }
+        });
+    }
+
+    /**
+     * Implementation of the interface to delegate swap.
+     * It removes the item from the list, giving opportunity for undo the operation through a
+     * Snackbar message
+     * @param viewHolder the view holder that has been swiped
+     * @param direction  the direction of the swipe
+     * @param position   the position of the item in the list filtered
+     */
     @Override
     public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction, int position) {
-        mListener.onSwiped(viewHolder, direction, position);
+
+        final int removedIndex = position;
+        final TodoItem removedItem = adapter.getItem(removedIndex);
+
+        final RecyclerView recyclerView = rootView.findViewById(R.id.recycler_view);
+        adapter.removeItem(removedIndex);
+
+        Snackbar.make(rootView, "You took charge of the activity",
+                Snackbar.LENGTH_LONG)
+                .setAction("UNDO", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        int itemCount = adapter.getItemCount();
+                        adapter.insertItem(removedItem, removedIndex);
+                        if(removedIndex == 0 || removedIndex == itemCount){
+                            recyclerView.scrollToPosition(removedIndex);
+                        }
+                    }
+                }).show();
+    }
+
+    @Override
+    public void onRefresh() {
+        //TODO implement refreshing through Firebase. Add setter for network source
     }
 
     /**
@@ -138,6 +211,5 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
      */
     public interface OnListFragmentInteractionListener {
         void onItemClick(TodoItem item, View view);
-        void onSwiped(RecyclerView.ViewHolder viewHolder, int direction, int position);
     }
 }

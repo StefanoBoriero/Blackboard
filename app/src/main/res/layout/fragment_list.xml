@@ -3,6 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/fragment_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:mContext="dima.it.polimi.blackboard.fragments.TodoItemListFragment"
@@ -19,22 +20,9 @@
             android:layout_height="match_parent"
             android:scrollbars="vertical"
             tools:listitem="@layout/todo_item_row"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
             />
 
     </android.support.v4.widget.SwipeRefreshLayout>
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
-        android:clickable="true"
-        android:focusable="true"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/fab_margin"
-        android:onClick="fabListener"
-        app:backgroundTint="@color/colorAccent"
-        app:srcCompat="@drawable/ic_fab_add_white_24dp"
-        tools:layout_editor_absoluteX="341dp"
-        tools:layout_editor_absoluteY="491dp" />
 
 </FrameLayout>

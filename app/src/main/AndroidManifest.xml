@@ -20,13 +20,13 @@
             </intent-filter>
         </activity>
         <activity android:name=".activities.DetailTodoItemActivity"
-            android:theme="@style/AppTheme.NoActionBar"
+            android:theme="@style/AppTheme.Detail"
             android:label="@string/title_activity_detail"/>
         <activity android:name=".activities.NewToDoTaskActivity" />
         <activity
             android:name=".activities.GroupListActivity"
             android:label="@string/title_activity_group_list"
-            android:theme="@style/AppTheme.NoActionBar"
+            android:theme="@style/AppTheme.GroupList"
             android:parentActivityName=".activities.MainActivity">
             <!-- Parent activity meta-data to support 4.0 and lower -->
             <meta-data
@@ -37,7 +37,6 @@
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
-
         </activity>
     </application>
 

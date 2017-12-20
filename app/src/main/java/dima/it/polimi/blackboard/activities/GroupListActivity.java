@@ -3,23 +3,15 @@ package dima.it.polimi.blackboard.activities;
 
 import android.app.SearchManager;
 import android.content.Context;
-import android.support.design.widget.FloatingActionButton;
+import android.content.Intent;
+import android.net.Uri;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
-import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v4.util.Pair;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
-import android.transition.ArcMotion;
-import android.transition.Fade;
-import android.transition.Slide;
-import android.transition.Transition;
-import android.transition.TransitionInflater;
-import android.transition.TransitionSet;
-import android.transition.Visibility;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.View;
 
@@ -27,7 +19,6 @@ import android.view.View;
 import java.util.List;
 
 import dima.it.polimi.blackboard.R;
-import dima.it.polimi.blackboard.adapters.TodoListAdapter;
 import dima.it.polimi.blackboard.fragments.TodoItemDetailFragment;
 import dima.it.polimi.blackboard.fragments.TodoItemListFragment;
 import dima.it.polimi.blackboard.model.TodoItem;
@@ -42,24 +33,20 @@ import dima.it.polimi.blackboard.utils.DataGeneratorUtil;
 public class GroupListActivity extends AppCompatActivity implements TodoItemListFragment.OnListFragmentInteractionListener,
 TodoItemDetailFragment.OnTodoItemDetailInteraction{
 
-    private static final int FADE_DURATION = 400;
-    private static final int MOVE_DURATION = 400;
-    private static final int SLIDE_DURATION = 400;
+    private static final String EXTRA_TODO_ITEM = "todo_item";
 
     private Fragment detailFragment;
-    private Fragment listFragment;
-    private List<TodoItem> items;
+    private TodoItemListFragment listFragment;
+
+    //
+    private boolean isDetailShowed;
+    private TodoItem clickedItem;
+    private int clickedPosition;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_group_list);
-
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        //Todo remove this call
-        items = DataGeneratorUtil.generateTodoItems(30);
 
         displayListFragment();
         detailFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_detail);
@@ -67,44 +54,14 @@ TodoItemDetailFragment.OnTodoItemDetailInteraction{
             displayDetailFragment();
         }
 
-
-
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_group_list, menu);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
-
-
-        SearchManager searchManager = (SearchManager)getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView = (SearchView)menu.findItem(R.id.action_search)
-                .getActionView();
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-        searchView.setMaxWidth(Integer.MAX_VALUE);
-
-        final TodoListAdapter adapter = ((TodoItemListFragment)listFragment).getAdapter();
-
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                adapter.getFilter().filter(query);
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                adapter.getFilter().filter(newText);
-                return false;
-            }
-        });
-
-        return true;
-    }
 
     private void displayListFragment(){
+        //Todo remove this call
+        List<TodoItem> items = DataGeneratorUtil.generateTodoItems(30);
         listFragment = TodoItemListFragment.newInstance(1, items);
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_list_container, listFragment)
@@ -114,6 +71,27 @@ TodoItemDetailFragment.OnTodoItemDetailInteraction{
 
     private void displayDetailFragment(){
         //TODO set detail of first todoItem
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu){
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_group_list, menu);
+
+        // Adding back navigation on toolbar
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        // Implementing the search functionality
+        SearchManager searchManager = (SearchManager)getSystemService(Context.SEARCH_SERVICE);
+        SearchView searchView = (SearchView)menu.findItem(R.id.action_search)
+                .getActionView();
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        searchView.setMaxWidth(Integer.MAX_VALUE);
+        listFragment.setSearchView(searchView);
+
+        super.onCreateOptionsMenu(menu);
+        return true;
     }
 
 
@@ -126,117 +104,30 @@ TodoItemDetailFragment.OnTodoItemDetailInteraction{
     @Override
     public void onItemClick(TodoItem todoItem, View view) {
         if(detailFragment == null){
-            swapFragments(todoItem, view);
+            View sharedImage = view.findViewById(R.id.user_icon);
+            View sharedElementName = view.findViewById(R.id.item_name);
+            final Intent intent = new Intent(GroupListActivity.this, DetailTodoItemActivity.class);
+            intent.putExtra(getResources().getString(R.string.todo_item), todoItem);
+            intent.putExtra(getResources().getString(R.string.icon_tr_name), sharedImage.getTransitionName());
+            intent.putExtra(getResources().getString(R.string.name_tr_name),sharedElementName.getTransitionName() );
+
+            Pair<View, String> sharedImagePair = Pair.create(sharedImage, sharedImage.getTransitionName());
+            Pair<View, String> sharedNamePair = Pair.create(sharedElementName, sharedElementName.getTransitionName());
+
+            final ActivityOptionsCompat options = ActivityOptionsCompat.
+                    makeSceneTransitionAnimation(this, sharedImagePair, sharedNamePair);
+
+            startActivity(intent, options.toBundle());
         }
         else{
             //TODO implement the fragment update for bigger screens
         }
     }
-
-    /**
-     * This method is called on devices with smaller screens. It swaps the fragment containing
-     * the list of all items with one containing the details of the one that has been clicked
-     * @param todoItem the item which details have to be displayed
-     * @param itemRow  the view row that has been clicked
-     */
-    private void swapFragments(TodoItem todoItem, View itemRow){
-        final View sharedElementIcon = itemRow.findViewById(R.id.user_icon);
-        final View sharedElementName = itemRow.findViewById(R.id.item_name);
-        final Fragment listFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_list_container);
-        final Fragment detailFragment = TodoItemDetailFragment.newInstance(todoItem, sharedElementIcon.getTransitionName(),
-                sharedElementName.getTransitionName());
-
-        findViewById(R.id.background_row).setVisibility(View.GONE);
-
-        // Set proper transitions
-        listFragment.setExitTransition(createExitTransition());
-        detailFragment.setEnterTransition(createEnterTransition());
-        detailFragment.setSharedElementEnterTransition(createSharedElementTransitions());
-
-        // Swap the fragments
-        getSupportFragmentManager().beginTransaction()
-                .addToBackStack(detailFragment.getTag())
-                .addSharedElement(sharedElementIcon, sharedElementIcon.getTransitionName())
-                .addSharedElement(sharedElementName, sharedElementName.getTransitionName())
-                .replace(R.id.fragment_list_container, detailFragment)
-                .commit();
-    }
-
-    private Transition createExitTransition(){
-        //Fading the old content out
-        Fade fade = new Fade();
-        fade.setMode(Visibility.MODE_OUT);
-        fade.setDuration(FADE_DURATION);
-        return fade;
-    }
-
-    private TransitionSet createEnterTransition(){
-        TransitionSet enterSet = new TransitionSet();
-
-        //Fading the new content in
-        Fade fadeIn = new Fade();
-        fadeIn.setMode(Visibility.MODE_IN);
-        fadeIn.setDuration(FADE_DURATION);
-
-        //Sliding in the header
-        Slide enterSlide = new Slide();
-        enterSlide.setSlideEdge(Gravity.TOP);
-        enterSlide.setDuration(SLIDE_DURATION);
-        enterSlide.addTarget(R.id.header);
-
-        enterSet.addTransition(fadeIn);
-        enterSet.addTransition(enterSlide);
-        enterSet.setOrdering(TransitionSet.ORDERING_SEQUENTIAL);
-
-        return enterSet;
-    }
-
-    private TransitionSet createSharedElementTransitions(){
-        TransitionSet set = new TransitionSet();
-
-        // Create image transition
-        Transition moveImage = TransitionInflater.from(this).inflateTransition(android.R.transition.move);
-        moveImage.setPathMotion(new ArcMotion());
-        moveImage.setDuration(MOVE_DURATION);
-
-        set.addTransition(moveImage);
-        return set;
-    }
-
-    /**
-     * Implementation of the interface to delegate swap.
-     * It removes the item from the list, giving opportunity for undo the operation through a
-     * Snackbar message
-     * @param viewHolder the view holder that has been swiped
-     * @param direction  the direction of the swipe
-     * @param position   the position of the item in the list
-     */
     @Override
-    public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction, int position){
-        //TODO implement take in charge  network functionality
-        TodoItemListFragment listFragment = (TodoItemListFragment)getSupportFragmentManager()
-                .findFragmentById(R.id.fragment_list_container);
-        View view = findViewById(R.id.root_view);
-        final int removedIndex = viewHolder.getAdapterPosition();
-        final TodoItem removedItem = items.get(removedIndex);
-
-        final RecyclerView recyclerView = findViewById(R.id.recycler_view);
-        final TodoListAdapter adapter= listFragment.getAdapter();
-        adapter.removeItem(removedIndex);
-
-        Snackbar.make(view, "You took charge of the activity",
-                Snackbar.LENGTH_LONG)
-                .setAction("UNDO", new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        int itemCount = adapter.getItemCount();
-                        adapter.insertItem(removedItem, removedIndex);
-                        if(removedIndex == 0 || removedIndex == itemCount){
-                            recyclerView.scrollToPosition(removedIndex);
-                        }
-                    }
-                }).show();
+    public void onBackPressed(){
+        super.onBackPressed();
     }
+
 
     @Override
     public void onAcceptClick(TodoItem todoItem) {
@@ -248,13 +139,16 @@ TodoItemDetailFragment.OnTodoItemDetailInteraction{
         //onBackPressed();
     }
 
-
     /*
     FAB listener set in XML layout
      */
     public void fabListener(View v){
         //TODO display BRUNITTI activity with circular Reveal
+
+        /*
         View view = findViewById(R.id.root_view);
         Snackbar.make(view, "Replace with Brunitti's Action", Snackbar.LENGTH_LONG).show();
+*/
+        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.youtube.com/watch?v=dQw4w9WgXcQ")));
     }
 }

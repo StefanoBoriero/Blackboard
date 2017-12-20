@@ -27,12 +27,21 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
+    <style name="AppTheme.GroupList" parent="AppTheme.NoActionBar">
+
+    </style>
+
+    <style name="AppTheme.Detail" parent="AppTheme.NoActionBar">
+        <item name="android:windowEnterTransition">@transition/detail_in</item>
+        <item name="android:windowExitTransition">@transition/detail_in</item>
+        <item name="android:windowSharedElementEnterTransition">@transition/shared_element_detail</item>
+    </style>
+
     <style name="spinnerItemStyle">
         <item name="android:padding">10dp</item>
         <item name="android:paddingStart">38dp</item>
         <item name="android:textSize">20sp</item>
         <item name="android:textColor">#333131</item>
-
     </style>
 
 

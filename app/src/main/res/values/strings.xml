@@ -25,6 +25,9 @@
     <!-- Grouplist Activity strings -->
     <string name="todo_item">TodoItem</string>
 
+    <!-- Transition Names -->
+    <string name="icon_tr_name">Icon Transition Name</string>
+    <string name="name_tr_name">Name Transition Name</string>
 
 
 
