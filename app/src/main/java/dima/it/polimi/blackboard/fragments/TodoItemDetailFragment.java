@@ -2,6 +2,7 @@ package dima.it.polimi.blackboard.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.transition.Transition;
 import android.transition.TransitionInflater;
@@ -72,7 +73,7 @@ public class TodoItemDetailFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.content_todo_item_detail, container, false);
+        return inflater.inflate(R.layout.fragment_detail, container, false);
     }
 
     @Override
@@ -80,7 +81,7 @@ public class TodoItemDetailFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         // Gets the text views to populate them
-        TextView descriptionView = view.findViewById(R.id.item_description);
+        TextView descriptionView = view.findViewById(R.id.description);
         descriptionView.setText(todoTask.getDescription());
 
         TextView nameView = view.findViewById(R.id.item_name);
@@ -93,7 +94,7 @@ public class TodoItemDetailFragment extends Fragment {
         userIconView.setTransitionName(transitionNameIcon);
 
         //Binds the button click action to parent activity
-        Button acceptBtn = view.findViewById(R.id.accept_button);
+        View acceptBtn = view.findViewById(R.id.accept_button);
         acceptBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

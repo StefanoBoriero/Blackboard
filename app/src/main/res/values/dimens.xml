@@ -28,6 +28,11 @@
     <dimen name="row_margin_start">16dp</dimen>
     <dimen name="row_margin_end">16dp</dimen>
 
+    <dimen name="margin_start_icon">32dp</dimen>
+    <dimen name="margin_start_text">16dp</dimen>
+    <dimen name="margin_top_icon">20dp</dimen>
+    <dimen name="margin_top_text">24dp</dimen>
+
     <dimen name="swipe_text_size">20dp</dimen>
 
 

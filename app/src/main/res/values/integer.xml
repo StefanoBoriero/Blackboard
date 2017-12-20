@@ -2,5 +2,5 @@
 <resources>
     <integer name="on_reveal_duration">400</integer>
     <integer name="slide_duration">500</integer>
-    <integer name="fade_duration">500</integer>
+    <integer name="fade_duration">200</integer>
 </resources>
