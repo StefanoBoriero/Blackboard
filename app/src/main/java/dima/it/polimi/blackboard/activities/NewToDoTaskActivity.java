@@ -172,7 +172,7 @@ public class NewToDoTaskActivity extends AppCompatActivity {
     private void animateRevealShow(final View viewRoot) {
         int cx = (viewRoot.getLeft() + viewRoot.getRight()) / 2;
         int cy = (viewRoot.getTop() + viewRoot.getBottom()) / 2;
-        GUIUtils.animateRevealShow(this, viewRoot, mFab.getWidth() / 2, R.color.white,
+        GUIUtils.animateRevealShow(this, viewRoot, mFab.getWidth() / 2, R.color.colorAccent,
                 cx, cy, new OnRevealAnimationListener() {
                     @Override
                     public void onRevealHide() {
@@ -199,7 +199,7 @@ public class NewToDoTaskActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        GUIUtils.animateRevealHide(this, myConstraintLayout, R.color.white, mFab.getWidth() / 2,
+        GUIUtils.animateRevealHide(this, myConstraintLayout, R.color.colorAccent, mFab.getWidth() / 2,
                 new OnRevealAnimationListener() {
                     @Override
                     public void onRevealHide() {
@@ -223,7 +223,7 @@ public class NewToDoTaskActivity extends AppCompatActivity {
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         myConstraintLayout.setVisibility(View.VISIBLE);
-        myRelativeLayout.setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
+        myRelativeLayout.setBackgroundColor(getResources().getColor(R.color.colorAccent));
         mFab.setVisibility(View.INVISIBLE);
     }
 }
