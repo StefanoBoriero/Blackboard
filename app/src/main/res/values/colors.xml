@@ -3,6 +3,7 @@
     <color name="colorPrimary">#FFC107</color>
     <color name="colorPrimaryDark">#FFA000</color>
     <color name="colorAccent">#448AFF</color>
+    <color name ="white">#FFF</color>
 
     <color name="greenAccept">#00C853</color>
 </resources>

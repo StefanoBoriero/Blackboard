@@ -4,23 +4,33 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.constraint.ConstraintLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.transition.Transition;
+import android.transition.TransitionInflater;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MenuInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import dima.it.polimi.blackboard.R;
+import dima.it.polimi.blackboard.utils.GUIUtils;
+import dima.it.polimi.blackboard.utils.OnRevealAnimationListener;
 
 public class NewToDoTaskActivity extends AppCompatActivity {
 
@@ -28,8 +38,13 @@ public class NewToDoTaskActivity extends AppCompatActivity {
     public EditText editText;
     public TextView costView;
     public EditText costEditText;
+    private FloatingActionButton mFab;
+    private LinearLayout linearLayout;
+    private RelativeLayout myRelativeLayout;
 
-    ConstraintLayout myConstraintLayout;
+
+
+    private ConstraintLayout myConstraintLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +57,10 @@ public class NewToDoTaskActivity extends AppCompatActivity {
         myConstraintLayout = (ConstraintLayout) findViewById(R.id.constraintLayout);
         costEditText = (EditText) findViewById(R.id.costEditText);
         costView = (TextView) findViewById(R.id.costTextView);
-
+        mFab = (FloatingActionButton) findViewById((R.id.activity_contact_fab));
+        mFab.setTransitionName("revealCircular");
+        linearLayout = findViewById(R.id.newLinLayout);
+        myRelativeLayout = findViewById((R.id.newRelativeLayout));
 
         //initialize context menu
         typeButton.setOnClickListener(new View.OnClickListener() {
@@ -57,6 +75,8 @@ public class NewToDoTaskActivity extends AppCompatActivity {
         //hide cost field
         costEditText.setVisibility(View.GONE);
         costView.setVisibility(View.GONE);
+
+        setupEnterAnimation();
 
     }
 
@@ -93,21 +113,21 @@ public class NewToDoTaskActivity extends AppCompatActivity {
 
 
     public boolean onContextItemSelected (MenuItem item){
-        // TODO Auto-generated method stub
+
         typeButton.setText(item.toString());
-        
+
         if(item.toString().equals(getString(R.string.bills)))
         {
             //show cost field
-            costEditText.setVisibility(View.VISIBLE);
-            costView.setVisibility(View.VISIBLE);
+            costEditText.setVisibility(LinearLayout.VISIBLE);
+            costView.setVisibility(LinearLayout.VISIBLE);
         }
         else
         {
             //hide cost field
-            costEditText.setVisibility(View.GONE);
+            costEditText.setVisibility(LinearLayout.GONE);
             costEditText.setText("");
-            costView.setVisibility(View.GONE);
+            costView.setVisibility(LinearLayout.GONE);
 
         }
     return true;
@@ -116,4 +136,94 @@ public class NewToDoTaskActivity extends AppCompatActivity {
     //TODO manage the case where the user doesn't select anything in priority
 
 
+    private void setupEnterAnimation() {
+        Transition transition = TransitionInflater.from(this)
+                .inflateTransition(R.transition.changebounds_with_arcmotion);
+        getWindow().setSharedElementEnterTransition(transition);
+        transition.addListener(new Transition.TransitionListener() {
+            @Override
+            public void onTransitionStart(Transition transition) {
+
+            }
+
+            @Override
+            public void onTransitionEnd(Transition transition) {
+                transition.removeListener(this);
+                animateRevealShow(myRelativeLayout);
+            }
+
+            @Override
+            public void onTransitionCancel(Transition transition) {
+
+            }
+
+            @Override
+            public void onTransitionPause(Transition transition) {
+
+            }
+
+            @Override
+            public void onTransitionResume(Transition transition) {
+
+            }
+        });
+    }
+
+    private void animateRevealShow(final View viewRoot) {
+        int cx = (viewRoot.getLeft() + viewRoot.getRight()) / 2;
+        int cy = (viewRoot.getTop() + viewRoot.getBottom()) / 2;
+        GUIUtils.animateRevealShow(this, viewRoot, mFab.getWidth() / 2, R.color.colorPrimaryDark,
+                cx, cy, new OnRevealAnimationListener() {
+                    @Override
+                    public void onRevealHide() {
+
+                    }
+
+                    @Override
+                    public void onRevealShow() {
+                        initViews();
+                    }
+                });
+    }
+
+
+    private void initViews() {
+        new Handler(Looper.getMainLooper()).post(() -> {
+            Animation animation = AnimationUtils.loadAnimation(this, android.R.anim.fade_in);
+            animation.setDuration(300);
+            myConstraintLayout.startAnimation(animation);
+            myConstraintLayout.setVisibility(View.VISIBLE);
+            mFab.setVisibility(View.GONE);
+        });
+    }
+
+    @Override
+    public void onBackPressed() {
+        GUIUtils.animateRevealHide(this, myConstraintLayout, R.color.colorPrimaryDark, mFab.getWidth() / 2,
+                new OnRevealAnimationListener() {
+                    @Override
+                    public void onRevealHide() {
+                        mFab.setVisibility(View.VISIBLE);
+                        backPressed();
+                    }
+
+                    @Override
+                    public void onRevealShow() {
+
+                    }
+                });
+    }
+
+    private void backPressed() {
+        super.onBackPressed();
+
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        myConstraintLayout.setVisibility(View.VISIBLE);
+        myRelativeLayout.setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
+        mFab.setVisibility(View.INVISIBLE);
+    }
 }

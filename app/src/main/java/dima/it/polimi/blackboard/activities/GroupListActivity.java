@@ -1,10 +1,12 @@
 package dima.it.polimi.blackboard.activities;
 
 
+import android.app.ActivityOptions;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
@@ -42,12 +44,16 @@ TodoItemDetailFragment.OnTodoItemDetailInteraction{
     private boolean isDetailShowed;
     private TodoItem clickedItem;
     private int clickedPosition;
+    private FloatingActionButton mFab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_group_list);
 
+
+        mFab = (FloatingActionButton) findViewById(R.id.add_fab);
+        mFab.setTransitionName("revealCircular");
         displayListFragment();
         detailFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_detail);
         if(detailFragment != null){
@@ -143,12 +149,11 @@ TodoItemDetailFragment.OnTodoItemDetailInteraction{
     FAB listener set in XML layout
      */
     public void fabListener(View v){
-        //TODO display BRUNITTI activity with circular Reveal
+        Intent intent = new Intent(this, NewToDoTaskActivity.class);
 
-        /*
-        View view = findViewById(R.id.root_view);
-        Snackbar.make(view, "Replace with Brunitti's Action", Snackbar.LENGTH_LONG).show();
-*/
-        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.youtube.com/watch?v=dQw4w9WgXcQ")));
+
+        ActivityOptions options = ActivityOptions.
+                makeSceneTransitionAnimation(this, mFab, mFab.getTransitionName());
+        startActivity(intent, options.toBundle());;
     }
 }
