@@ -172,7 +172,7 @@ public class NewToDoTaskActivity extends AppCompatActivity {
     private void animateRevealShow(final View viewRoot) {
         int cx = (viewRoot.getLeft() + viewRoot.getRight()) / 2;
         int cy = (viewRoot.getTop() + viewRoot.getBottom()) / 2;
-        GUIUtils.animateRevealShow(this, viewRoot, mFab.getWidth() / 2, R.color.colorPrimaryDark,
+        GUIUtils.animateRevealShow(this, viewRoot, mFab.getWidth() / 2, R.color.white,
                 cx, cy, new OnRevealAnimationListener() {
                     @Override
                     public void onRevealHide() {
@@ -199,7 +199,7 @@ public class NewToDoTaskActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        GUIUtils.animateRevealHide(this, myConstraintLayout, R.color.colorPrimaryDark, mFab.getWidth() / 2,
+        GUIUtils.animateRevealHide(this, myConstraintLayout, R.color.white, mFab.getWidth() / 2,
                 new OnRevealAnimationListener() {
                     @Override
                     public void onRevealHide() {
