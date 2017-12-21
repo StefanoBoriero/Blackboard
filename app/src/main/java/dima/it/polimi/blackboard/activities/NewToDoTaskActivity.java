@@ -126,7 +126,7 @@ public class NewToDoTaskActivity extends AppCompatActivity {
         {
             //hide cost field
             costEditText.setVisibility(LinearLayout.GONE);
-            costEditText.setText("");
+            costEditText.setText("0.00");
             costView.setVisibility(LinearLayout.GONE);
 
         }
@@ -135,7 +135,7 @@ public class NewToDoTaskActivity extends AppCompatActivity {
 
     //TODO manage the case where the user doesn't select anything in priority
 
-
+    //setUp the initial animation for this activity
     private void setupEnterAnimation() {
         Transition transition = TransitionInflater.from(this)
                 .inflateTransition(R.transition.changebounds_with_arcmotion);
@@ -186,7 +186,7 @@ public class NewToDoTaskActivity extends AppCompatActivity {
                 });
     }
 
-
+    //fade in the views
     private void initViews() {
         new Handler(Looper.getMainLooper()).post(() -> {
             Animation animation = AnimationUtils.loadAnimation(this, android.R.anim.fade_in);
@@ -197,6 +197,7 @@ public class NewToDoTaskActivity extends AppCompatActivity {
         });
     }
 
+    //when the back button is pressed, we need to start the back animation
     @Override
     public void onBackPressed() {
         GUIUtils.animateRevealHide(this, myConstraintLayout, R.color.colorAccent, mFab.getWidth() / 2,
@@ -219,6 +220,7 @@ public class NewToDoTaskActivity extends AppCompatActivity {
 
     }
 
+    //used to keep the state of the application when changing the orientation
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);

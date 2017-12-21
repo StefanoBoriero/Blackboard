@@ -3,6 +3,7 @@ package dima.it.polimi.blackboard.utils;
 import java.util.ArrayList;
 import java.util.List;
 
+import dima.it.polimi.blackboard.model.PaymentItem;
 import dima.it.polimi.blackboard.model.TodoItem;
 
 /**
@@ -15,6 +16,8 @@ public class DataGeneratorUtil {
     private static final String[] priorities = {"High","Medium","Low"};
     private static final String[] types = {"Housing", "Billing", "Shopping"};
     private static final String[] names = {"Pay Netflix", "Fancy Hat", "Name"};
+    private static final String[] froms = {"Ezio Greggio", "Enzo Iacchetti" , "Fabio Fazio", "Stefy & Simo"};
+    private static final String[] tos = {"Ezio Greggio", "Enzo Iacchetti" , "Fabio Fazio", "Stefy & Simo"};
 
     public static List<TodoItem> generateTodoItems(int amount){
         List<TodoItem> out = new ArrayList<>();
@@ -23,8 +26,25 @@ public class DataGeneratorUtil {
         for(i=0; i<amount; i++){
             int name = (int)(Math.random() * 3);
             int type = (int)(Math.random() * 3);
+            double price = (double) (Math.random() * 3);
 
-            TodoItem item = new TodoItem(i,names[name], types[type], "Lorem ipsum dolor sit amet");
+            TodoItem item = new TodoItem(i,names[name], types[type], "Lorem ipsum dolor sit amet",price);
+            out.add(item);
+        }
+        return out;
+    }
+
+    public static List<PaymentItem> generatePaymentItems(int amount){
+        List<PaymentItem> out = new ArrayList<>();
+        int i=0;
+
+        for(i=0; i<amount; i++){
+            int name = (int)(Math.random() * 3);
+            int from = (int)(Math.random() * 4);
+            int to = (int)(Math.random() * 4);
+            double price = (double) (Math.random() * 4);
+
+            PaymentItem item = new PaymentItem(i,names[name],froms[from],tos[to] ,price);
             out.add(item);
         }
         return out;

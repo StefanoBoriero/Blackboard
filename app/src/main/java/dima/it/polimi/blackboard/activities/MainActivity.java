@@ -78,7 +78,7 @@ public class MainActivity extends AppCompatActivity
             Intent intent = new Intent(MainActivity.this, GroupListActivity.class);
             startActivity(intent);
         } else if (id == R.id.nav_balance) {
-            Intent intent = new Intent(MainActivity.this, NewToDoTaskActivity.class);
+            Intent intent = new Intent(MainActivity.this, BalanceActivity.class);
             startActivity(intent);
         } else if (id == R.id.nav_manage) {
 

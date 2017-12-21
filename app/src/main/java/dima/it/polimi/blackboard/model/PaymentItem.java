@@ -4,30 +4,30 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 /**
- * Created by Stefano on 27/11/2017.
+ * Created by simone on 21/12/2017.
  */
 
-public class TodoItem implements Parcelable {
+public class PaymentItem implements Parcelable{
     private long id;
     private String name;
-    private String type;
-    private String description;
+    private String from;
+    private String to;
     private double price;
 
-    protected TodoItem(Parcel in) {
+    protected PaymentItem(Parcel in) {
         //Order must be the same of writeToParcel
         this.id = in.readLong();
         this.name = in.readString();
-        this.type = in.readString();
-        this.description = in.readString();
+        this.from = in.readString();
+        this.to = in.readString();
         this.price = in.readDouble();
     }
 
-    public TodoItem(long id, String name, String type, String description, Double price){
+    public PaymentItem(long id, String name, String from, String to, Double price){
         this.id = id;
         this.name = name;
-        this.type = type;
-        this.description = description;
+        this.from = from;
+        this.to = to;
         this.price = price;
     }
 
@@ -37,12 +37,12 @@ public class TodoItem implements Parcelable {
         return this.name;
     }
 
-    public String getType(){
-        return this.type;
+    public String getEmitter(){
+        return this.from;
     }
 
-    public String getDescription(){
-        return this.description;
+    public String getReceiver(){
+        return this.to;
     }
 
     public Double getPrice(){return this.price;}
@@ -51,8 +51,8 @@ public class TodoItem implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeLong(this.id);
         dest.writeString(this.name);
-        dest.writeString(this.type);
-        dest.writeString(this.description);
+        dest.writeString(this.from);
+        dest.writeString(this.to);
         dest.writeDouble(this.price);
     }
 
