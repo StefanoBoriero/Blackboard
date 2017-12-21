@@ -1,6 +1,7 @@
 package dima.it.polimi.blackboard.activities;
 
 
+import android.annotation.SuppressLint;
 import android.app.ActivityOptions;
 import android.app.SearchManager;
 import android.content.Context;
@@ -12,6 +13,7 @@ import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v4.util.Pair;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -21,6 +23,7 @@ import android.view.View;
 import java.util.List;
 
 import dima.it.polimi.blackboard.R;
+import dima.it.polimi.blackboard.adapters.TodoListAdapter;
 import dima.it.polimi.blackboard.fragments.TodoItemDetailFragment;
 import dima.it.polimi.blackboard.fragments.TodoItemListFragment;
 import dima.it.polimi.blackboard.model.TodoItem;
@@ -36,6 +39,7 @@ public class GroupListActivity extends AppCompatActivity implements TodoItemList
 TodoItemDetailFragment.OnTodoItemDetailInteraction{
 
     private static final String EXTRA_TODO_ITEM = "todo_item";
+    private static final int ACCEPT_TASK_REQUEST = 1;
 
     private Fragment detailFragment;
     private TodoItemListFragment listFragment;
@@ -107,8 +111,9 @@ TodoItemDetailFragment.OnTodoItemDetailInteraction{
      * @param todoItem the item clicked
      * @param view the view clicked
      */
+    @SuppressLint("RestrictedApi")
     @Override
-    public void onItemClick(TodoItem todoItem, View view) {
+    public void onItemClick(TodoItem todoItem, View view, int clickedPosition) {
         if(detailFragment == null){
             View sharedImage = view.findViewById(R.id.user_icon);
             View sharedElementName = view.findViewById(R.id.item_name);
@@ -116,6 +121,7 @@ TodoItemDetailFragment.OnTodoItemDetailInteraction{
             intent.putExtra(getResources().getString(R.string.todo_item), todoItem);
             intent.putExtra(getResources().getString(R.string.icon_tr_name), sharedImage.getTransitionName());
             intent.putExtra(getResources().getString(R.string.name_tr_name),sharedElementName.getTransitionName() );
+            intent.putExtra(getResources().getString(R.string.position), clickedPosition);
 
             Pair<View, String> sharedImagePair = Pair.create(sharedImage, sharedImage.getTransitionName());
             Pair<View, String> sharedNamePair = Pair.create(sharedElementName, sharedElementName.getTransitionName());
@@ -123,10 +129,24 @@ TodoItemDetailFragment.OnTodoItemDetailInteraction{
             final ActivityOptionsCompat options = ActivityOptionsCompat.
                     makeSceneTransitionAnimation(this, sharedImagePair, sharedNamePair);
 
-            startActivity(intent, options.toBundle());
+            startActivityForResult(intent, ACCEPT_TASK_REQUEST, options.toBundle());
         }
         else{
             //TODO implement the fragment update for bigger screens
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // Check which request we're responding to
+        if (requestCode == ACCEPT_TASK_REQUEST) {
+            // Make sure the request was successful
+            if (resultCode == RESULT_OK) {
+                RecyclerView recyclerView = findViewById(R.id.recycler_view);
+                TodoListAdapter adapter = (TodoListAdapter)recyclerView.getAdapter();
+                int position = data.getIntExtra(getResources().getString(R.string.position),0);
+                adapter.removeItem(position);
+            }
         }
     }
     @Override

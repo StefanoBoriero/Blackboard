@@ -142,8 +142,8 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
     }
 
     @Override
-    public void onTodoItemClicked(TodoItem todoItem, View view) {
-        mListener.onItemClick(todoItem, view);
+    public void onTodoItemClicked(TodoItem todoItem, View view, int clickedPostion) {
+        mListener.onItemClick(todoItem, view, clickedPostion);
     }
 
     public void setSearchView(SearchView searchView){
@@ -210,6 +210,6 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnListFragmentInteractionListener {
-        void onItemClick(TodoItem item, View view);
+        void onItemClick(TodoItem item, View view, int clickedPosition);
     }
 }

@@ -101,6 +101,15 @@ public class TodoItemDetailFragment extends Fragment {
                 mListener.onAcceptClick(todoTask);
             }
         });
+
+        View closeBtn = view.findViewById(R.id.close_button);
+        closeBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mListener.onCloseClick();
+            }
+        });
+
     }
 
 

@@ -61,7 +61,7 @@ public class TodoListAdapter extends RecyclerView.Adapter<TodoListAdapter.ViewHo
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mListener.onTodoItemClicked(todoItem, v);
+                mListener.onTodoItemClicked(todoItem, v, holder.getAdapterPosition());
             }
         });
     }
@@ -117,7 +117,7 @@ public class TodoListAdapter extends RecyclerView.Adapter<TodoListAdapter.ViewHo
     }
 
     public interface TodoListAdapterListener {
-        void onTodoItemClicked(TodoItem todoItem, View todoItemView);
+        void onTodoItemClicked(TodoItem todoItem, View todoItemView, int clickedPosition);
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder{

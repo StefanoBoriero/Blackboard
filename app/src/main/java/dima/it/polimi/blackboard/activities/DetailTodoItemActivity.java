@@ -23,7 +23,9 @@ import dima.it.polimi.blackboard.model.TodoItem;
 public class DetailTodoItemActivity extends AppCompatActivity implements TodoItemDetailFragment.OnTodoItemDetailInteraction{
     private TodoItem todoItem;
     private Fragment detailFragment;
+    private int position;
     private static final int MOVE_DURATION = 400;
+    private static final int ACCEPT_TASK_REQUEST = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,10 +36,10 @@ public class DetailTodoItemActivity extends AppCompatActivity implements TodoIte
         todoItem = intent.getParcelableExtra(getResources().getString(R.string.todo_item));
         String iconTransitionName = intent.getStringExtra(getResources().getString(R.string.icon_tr_name));
         String nameTransitionName = intent.getStringExtra(getResources().getString(R.string.name_tr_name));
+        position = intent.getIntExtra(getResources().getString(R.string.position),0);
 
         createFragment(todoItem, iconTransitionName, nameTransitionName);
         displayFragment();
-        setTransitions();
     }
 
     private void createFragment(TodoItem todoItem, String iconTransitionName, String nameTransitionName){
@@ -50,21 +52,17 @@ public class DetailTodoItemActivity extends AppCompatActivity implements TodoIte
                 .commit();
     }
 
-    private void setTransitions(){
-        Transition moveImage = TransitionInflater.from(this).inflateTransition(android.R.transition.move);
-        moveImage.setPathMotion(new ArcMotion());
-        moveImage.setInterpolator(new AccelerateDecelerateInterpolator());
-        moveImage.setDuration(MOVE_DURATION);
-
-    }
 
     @Override
     public void onAcceptClick(TodoItem todoItem) {
-
+        Intent resultData = new Intent();
+        resultData.putExtra(getResources().getString(R.string.position), position);
+        setResult(RESULT_OK, resultData);
+        onBackPressed();
     }
 
     @Override
     public void onCloseClick() {
-
+        onBackPressed();
     }
 }

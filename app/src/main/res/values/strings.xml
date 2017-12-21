@@ -28,6 +28,7 @@
     <!-- Transition Names -->
     <string name="icon_tr_name">Icon Transition Name</string>
     <string name="name_tr_name">Name Transition Name</string>
+    <string name="position">Position</string>
 
 
 
