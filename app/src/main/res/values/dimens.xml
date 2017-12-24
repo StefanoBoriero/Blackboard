@@ -8,6 +8,18 @@
     <dimen name="text_margin">8dp</dimen>
     <dimen name="app_bar_height">180dp</dimen>
 
+    <!-- Dimensions for initial splash screen -->
+    <dimen name="title_size">32sp</dimen>
+
+    <!-- Dimensions for MainActivity -->
+    <dimen name="margin_surface">16dp</dimen>
+    <dimen name="elevation_surface">16dp</dimen>
+    <dimen name="size_items_my_list">150sp</dimen>
+    <dimen name="size_comment_good_boi">16sp</dimen>
+    <dimen name="size_item_text">24sp</dimen>
+    <dimen name="size_balance_left">100sp</dimen>
+    <dimen name="size_suggestion_number">100sp</dimen>
+
     <!-- Dimensions for TodoItemList RecyclerView -->
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="padding_list_row">16dp</dimen>
