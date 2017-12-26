@@ -49,7 +49,7 @@ public class PaymentListAdapter extends RecyclerView.Adapter<PaymentListAdapter.
     public PaymentViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         this.parent = parent;
         View itemView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.todo_item_row, parent, false);
+                .inflate(R.layout.payment_item_row, parent, false);
         return new PaymentViewHolder(itemView);
     }
 
@@ -62,10 +62,16 @@ public class PaymentListAdapter extends RecyclerView.Adapter<PaymentListAdapter.
 
        // holder.todoItemName.setText(paymentItem.getName());
         //TODO change all this
+        if(paymentItem.getEmitter().equals("Stefy & Simo") ) {
+            holder.todoItemName.setText("To: " + paymentItem.getReceiver());
+            holder.positiveNegativeIconContainer.setBackground(mContext.getResources().getDrawable(R.drawable.grey_euro));
+        }
+        else if(paymentItem.getReceiver().equals("Stefy & Simo")) {
+            holder.todoItemName.setText("From: " + paymentItem.getEmitter());
+            holder.positiveNegativeIconContainer.setBackground(mContext.getResources().getDrawable(R.drawable.grey_euro));
+        }
 
-            holder.todoItemName.setText("From: " + paymentItem.getEmitter()+" To: "+ paymentItem.getReceiver()  );
-
-        holder.todoItemPrice.setText("Amount: " + paymentItem.getPrice().toString() +" €");
+        holder.todoItemPrice.setText("Amount: " + String.format("%.2f", paymentItem.getPrice()) +" €");
 
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -101,10 +107,12 @@ public class PaymentListAdapter extends RecyclerView.Adapter<PaymentListAdapter.
     }
 
     public class PaymentViewHolder extends RecyclerView.ViewHolder{
+
+
         private TextView todoItemName;
         private TextView todoItemPrice;
         private LinearLayout todoItemContainer;
-        private RelativeLayout userIconContainer;
+        private RelativeLayout positiveNegativeIconContainer;
 
         public RelativeLayout viewForeground;
         public RelativeLayout viewBackground;
@@ -113,10 +121,10 @@ public class PaymentListAdapter extends RecyclerView.Adapter<PaymentListAdapter.
             super(itemView);
             viewForeground = itemView.findViewById(R.id.foreground_row);
             viewBackground = itemView.findViewById(R.id.background_row);
-            todoItemName = itemView.findViewById(R.id.item_name);
-            todoItemPrice = itemView.findViewById(R.id.item_type);
-            todoItemContainer = itemView.findViewById(R.id.todo_item_container);
-            userIconContainer = itemView.findViewById(R.id.user_icon_container);
+            todoItemName = itemView.findViewById(R.id.payment_info);
+            todoItemPrice = itemView.findViewById(R.id.amount_info);
+            todoItemContainer = itemView.findViewById(R.id.payment_item_container);
+            positiveNegativeIconContainer = itemView.findViewById(R.id.positive_negative_icon_container);
         }
     }
 }

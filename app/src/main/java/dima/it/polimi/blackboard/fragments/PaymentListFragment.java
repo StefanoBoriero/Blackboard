@@ -2,6 +2,7 @@ package dima.it.polimi.blackboard.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -21,10 +22,8 @@ import java.util.List;
 
 import dima.it.polimi.blackboard.R;
 import dima.it.polimi.blackboard.adapters.PaymentListAdapter;
-import dima.it.polimi.blackboard.adapters.TodoListAdapter;
-import dima.it.polimi.blackboard.helper.TodoItemTouchHelper;
 import dima.it.polimi.blackboard.model.PaymentItem;
-import dima.it.polimi.blackboard.model.TodoItem;
+
 
 /**
  * A fragment representing a list of Payments.
@@ -33,7 +32,7 @@ import dima.it.polimi.blackboard.model.TodoItem;
  * interface.
  */
 public class PaymentListFragment extends Fragment implements PaymentListAdapter.PaymentListAdapterListener,
-        TodoItemTouchHelper.TodoItemTouchHelperListener, SwipeRefreshLayout.OnRefreshListener{
+         SwipeRefreshLayout.OnRefreshListener{
 
 
     private static final String ARG_COLUMN_COUNT = "column-count";
@@ -43,6 +42,7 @@ public class PaymentListFragment extends Fragment implements PaymentListAdapter.
     private OnListFragmentInteractionListener mListener;
     private PaymentListAdapter adapter;
     private List<PaymentItem> paymentItems;
+    private CollapsingToolbarLayout balanceToolbar;
 
     // Attributes for onStop() onStart() consistency
     private CharSequence savedQuery;
@@ -64,6 +64,7 @@ public class PaymentListFragment extends Fragment implements PaymentListAdapter.
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
 
+
         //TODO change this with network fetching
         args.putParcelableArrayList(ARG_TODO_ITEMS, (ArrayList)paymentItems);
         fragment.setArguments(args);
@@ -84,7 +85,7 @@ public class PaymentListFragment extends Fragment implements PaymentListAdapter.
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_list, container, false);
+        View view = inflater.inflate(R.layout.fragment_payment_list, container, false);
 
 
         parentActivity = ((AppCompatActivity)getActivity());
@@ -100,10 +101,6 @@ public class PaymentListFragment extends Fragment implements PaymentListAdapter.
         }
         recyclerView.setAdapter(adapter);
         recyclerView.addItemDecoration(new DividerItemDecoration(this.getActivity(), LinearLayoutManager.VERTICAL));
-        ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new TodoItemTouchHelper(0,
-                ItemTouchHelper.LEFT, this);
-        new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(recyclerView);
-
         // Setting up the refresh layout
         SwipeRefreshLayout swipeRefreshLayout = view.findViewById(R.id.swipe_refresh_layout);
         swipeRefreshLayout.setOnRefreshListener(this);
@@ -128,53 +125,14 @@ public class PaymentListFragment extends Fragment implements PaymentListAdapter.
         super.onDetach();
         mListener = null;
     }
-    /*
-        @Override
-        public void onStart(){
-            super.onStart();
-            if(searchView != null){
-                searchView.setQuery(savedQuery, true);
-            }
-        }
-    */
 
 
 
-
-    /**
-     * Implementation of the interface to delegate swap.
-     * It removes the item from the list, giving opportunity for undo the operation through a
-     * Snackbar message
-     * @param viewHolder the view holder that has been swiped
-     * @param direction  the direction of the swipe
-     * @param position   the position of the item in the list filtered
-     */
-    @Override
-    public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction, int position) {
-
-        final int removedIndex = position;
-        final PaymentItem removedItem = adapter.getItem(removedIndex);
-
-        final RecyclerView recyclerView = rootView.findViewById(R.id.recycler_view);
-        adapter.removeItem(removedIndex);
-
-        Snackbar.make(rootView, "You took charge of the activity",
-                Snackbar.LENGTH_LONG)
-                .setAction("UNDO", new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        int itemCount = adapter.getItemCount();
-                        adapter.insertItem(removedItem, removedIndex);
-                        if(removedIndex == 0 || removedIndex == itemCount){
-                            recyclerView.scrollToPosition(removedIndex);
-                        }
-                    }
-                }).show();
-    }
 
     @Override
     public void onRefresh() {
         //TODO implement refreshing through Firebase. Add setter for network source
+        mListener.onRefresh();
     }
 
     /**
@@ -188,6 +146,6 @@ public class PaymentListFragment extends Fragment implements PaymentListAdapter.
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnListFragmentInteractionListener {
-        void onItemClick(PaymentItem item, View view);
+        void onRefresh();
     }
 }
