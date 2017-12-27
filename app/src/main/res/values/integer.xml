@@ -3,4 +3,5 @@
     <integer name="on_reveal_duration">400</integer>
     <integer name="slide_duration">500</integer>
     <integer name="fade_duration">200</integer>
+    <integer name="explode_duration">300</integer>
 </resources>

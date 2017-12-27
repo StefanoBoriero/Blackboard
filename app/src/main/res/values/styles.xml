@@ -28,11 +28,11 @@
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
     <style name="AppTheme.GroupList" parent="AppTheme.NoActionBar">
-
+        <item name="android:windowEnterTransition">@android:transition/fade</item>
     </style>
 
     <style name="AppTheme.MainActivity" parent="AppTheme.NoActionBar">
-        <item name="android:windowExitTransition">@transition/explode</item>
+        <item name="android:windowExitTransition">@android:transition/fade</item>
     </style>
 
     <style name="AppTheme.Detail" parent="AppTheme.NoActionBar">

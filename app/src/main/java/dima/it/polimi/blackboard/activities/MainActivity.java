@@ -10,6 +10,8 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.transition.Explode;
+import android.transition.TransitionManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -76,7 +78,8 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_my_list) {
-            // Handle the camera action
+            Intent intent = new Intent(MainActivity.this, MyListActivity.class);
+            startActivity(intent);
         } else if (id == R.id.nav_group_list) {
             Intent intent = new Intent(MainActivity.this, GroupListActivity.class);
             startActivity(intent);
@@ -97,6 +100,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void onSuggestionSurfaceClick(View v){
+
         Intent intent = new Intent(MainActivity.this, GroupListActivity.class);
         startActivity(intent);
     }

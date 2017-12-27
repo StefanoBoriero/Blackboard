@@ -1,16 +1,12 @@
 package dima.it.polimi.blackboard.activities;
 
-
 import android.annotation.SuppressLint;
-import android.app.ActivityOptions;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
-import android.support.design.widget.FloatingActionButton;
+import android.os.Bundle;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
-import android.os.Bundle;
 import android.support.v4.util.Pair;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
@@ -18,7 +14,6 @@ import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.View;
-
 
 import java.util.List;
 
@@ -30,30 +25,23 @@ import dima.it.polimi.blackboard.model.TodoItem;
 import dima.it.polimi.blackboard.utils.DataGeneratorUtil;
 
 /**
- * This activity presents the list of todo_items that have been added to the group but nobody has
- * taken in charge. It displays at first a fragment with the list in a RecyclerView, and on click of
- * one item displays the details in another fragment; if the device is large enough, the detail
- * fragment will be displayed permanently on the side of the screen
+ * This class shows the list of activities a user has taken charge of.
+ * Created by Stefano on 27/12/2017.
  */
-public class GroupListActivity extends AppCompatActivity implements TodoItemListFragment.OnListFragmentInteractionListener,
-TodoItemDetailFragment.OnTodoItemDetailInteraction{
 
+public class MyListActivity extends AppCompatActivity implements TodoItemListFragment.OnListFragmentInteractionListener,
+        TodoItemDetailFragment.OnTodoItemDetailInteraction{
     private static final int ACCEPT_TASK_REQUEST = 1;
 
     private Fragment detailFragment;
     private TodoItemListFragment listFragment;
 
-
-    private FloatingActionButton mFab;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_group_list);
+        setContentView(R.layout.activity_my_list);
 
 
-        mFab = findViewById(R.id.add_fab);
-        mFab.setTransitionName("revealCircular");
         displayListFragment();
         detailFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_detail);
         if(detailFragment != null){
@@ -63,7 +51,6 @@ TodoItemDetailFragment.OnTodoItemDetailInteraction{
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
     }
-
 
     private void displayListFragment(){
         //Todo remove this call
@@ -80,12 +67,11 @@ TodoItemDetailFragment.OnTodoItemDetailInteraction{
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(Menu menu){
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_group_list, menu);
 
         // Adding back navigation on toolbar
-
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -101,7 +87,6 @@ TodoItemDetailFragment.OnTodoItemDetailInteraction{
         return true;
     }
 
-
     /**
      * This method is called when an item in the list displayed by the fragment is clicked.
      * The activity creates a new fragment containing the details of the item clicked and shows it
@@ -114,7 +99,7 @@ TodoItemDetailFragment.OnTodoItemDetailInteraction{
         if(detailFragment == null){
             View sharedImage = view.findViewById(R.id.user_icon);
             View sharedElementName = view.findViewById(R.id.item_name);
-            final Intent intent = new Intent(GroupListActivity.this, DetailTodoItemActivity.class);
+            final Intent intent = new Intent(MyListActivity.this, DetailTodoItemActivity.class);
             intent.putExtra(getResources().getString(R.string.todo_item), todoItem);
             intent.putExtra(getResources().getString(R.string.icon_tr_name), sharedImage.getTransitionName());
             intent.putExtra(getResources().getString(R.string.name_tr_name),sharedElementName.getTransitionName() );
@@ -162,15 +147,5 @@ TodoItemDetailFragment.OnTodoItemDetailInteraction{
         //onBackPressed();
     }
 
-    /*
-    FAB listener set in XML layout
-     */
-    public void fabListener(View v){
-        Intent intent = new Intent(this, NewToDoTaskActivity.class);
 
-
-        ActivityOptions options = ActivityOptions.
-                makeSceneTransitionAnimation(this, mFab, mFab.getTransitionName());
-        startActivity(intent, options.toBundle());
-    }
 }

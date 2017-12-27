@@ -11,7 +11,9 @@
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/AppTheme.AppBarOverlay">
+        android:theme="@style/AppTheme.AppBarOverlay"
+        android:id="@+id/toolbar_container"
+        >
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
@@ -22,17 +24,5 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <fragment class="dima.it.polimi.blackboard.fragments.TodoItemListFragment"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        android:id="@+id/fragment_list"
-        android:layout_width="300dp"
-        android:layout_height="match_parent"/>
-
-    <fragment
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        android:id="@+id/fragment_detail"
-        android:layout_width="300dp"
-        android:layout_height="match_parent"
-        android:layout_gravity="top|end"/>
-
+    <include layout="@layout/content_my_list"/>
 </android.support.design.widget.CoordinatorLayout>
