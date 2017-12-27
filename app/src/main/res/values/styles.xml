@@ -31,6 +31,10 @@
 
     </style>
 
+    <style name="AppTheme.MainActivity" parent="AppTheme.NoActionBar">
+        <item name="android:windowExitTransition">@transition/explode</item>
+    </style>
+
     <style name="AppTheme.Detail" parent="AppTheme.NoActionBar">
         <item name="android:windowEnterTransition">@transition/detail_in</item>
         <item name="android:windowExitTransition">@transition/detail_in</item>
