@@ -40,11 +40,14 @@ TodoItemDetailFragment.OnTodoItemDetailInteraction{
 
     private static final int ACCEPT_TASK_REQUEST = 1;
 
-    private Fragment detailFragment;
+    private TodoItemDetailFragment detailFragment;
     private TodoItemListFragment listFragment;
 
 
     private FloatingActionButton mFab;
+
+    //TODO remove this attribute
+    List<TodoItem> items;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +58,7 @@ TodoItemDetailFragment.OnTodoItemDetailInteraction{
         mFab = findViewById(R.id.add_fab);
         mFab.setTransitionName("revealCircular");
         displayListFragment();
-        detailFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_detail);
+        detailFragment = (TodoItemDetailFragment)getSupportFragmentManager().findFragmentById(R.id.fragment_detail);
         if(detailFragment != null){
             displayDetailFragment();
         }
@@ -67,7 +70,7 @@ TodoItemDetailFragment.OnTodoItemDetailInteraction{
 
     private void displayListFragment(){
         //Todo remove this call
-        List<TodoItem> items = DataGeneratorUtil.generateTodoItems(30);
+        items = DataGeneratorUtil.generateTodoItems(30);
         listFragment = TodoItemListFragment.newInstance(1, items);
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_list_container, listFragment)
@@ -77,6 +80,7 @@ TodoItemDetailFragment.OnTodoItemDetailInteraction{
 
     private void displayDetailFragment(){
         //TODO set detail of first todoItem
+        detailFragment.updateFragment(items.get(0));
     }
 
     @Override
@@ -129,7 +133,7 @@ TodoItemDetailFragment.OnTodoItemDetailInteraction{
             startActivityForResult(intent, ACCEPT_TASK_REQUEST, options.toBundle());
         }
         else{
-            //TODO implement the fragment update for bigger screens
+            detailFragment.updateFragment(todoItem);
         }
     }
 

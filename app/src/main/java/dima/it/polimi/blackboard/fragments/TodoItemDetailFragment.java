@@ -34,6 +34,8 @@ public class TodoItemDetailFragment extends Fragment {
     private String transitionName;
     private String transitionNameIcon;
 
+    private View rootView;
+
     private OnTodoItemDetailInteraction mListener;
 
     public TodoItemDetailFragment() {
@@ -79,6 +81,7 @@ public class TodoItemDetailFragment extends Fragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        rootView = view;
 
         // Gets the text views to populate them
         TextView descriptionView = view.findViewById(R.id.description);
@@ -101,15 +104,6 @@ public class TodoItemDetailFragment extends Fragment {
                 mListener.onAcceptClick(todoTask);
             }
         });
-
-        View closeBtn = view.findViewById(R.id.close_button);
-        closeBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mListener.onCloseClick();
-            }
-        });
-
     }
 
 
@@ -128,6 +122,23 @@ public class TodoItemDetailFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    public void updateFragment(TodoItem todoItem){
+        TextView descriptionView = rootView.findViewById(R.id.description);
+        descriptionView.setText(todoTask.getDescription());
+
+        TextView nameView = rootView.findViewById(R.id.item_name);
+        nameView.setText(todoTask.getName());
+
+        //Binds the button click action to parent activity
+        View acceptBtn = rootView.findViewById(R.id.accept_button);
+        acceptBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mListener.onAcceptClick(todoTask);
+            }
+        });
     }
 
     /**
