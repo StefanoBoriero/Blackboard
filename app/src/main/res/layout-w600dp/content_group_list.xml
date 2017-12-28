@@ -16,7 +16,7 @@
 
     <fragment class="dima.it.polimi.blackboard.fragments.TodoItemListFragment"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        android:id="@+id/fragment_list"
+        android:id="@+id/fragment_list_container"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintEnd_toStartOf="@id/vertical_guideline"
