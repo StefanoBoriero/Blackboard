@@ -80,7 +80,8 @@ TodoItemDetailFragment.OnTodoItemDetailInteraction{
 
     private void displayDetailFragment(){
         //TODO set detail of first todoItem
-        detailFragment.updateFragment(items.get(0));
+        detailFragment = (TodoItemDetailFragment)TodoItemDetailFragment
+                .newInstance(items.get(0), "ehehe", "hahah");
     }
 
     @Override
