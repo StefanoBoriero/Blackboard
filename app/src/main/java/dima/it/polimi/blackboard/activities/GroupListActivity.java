@@ -82,6 +82,9 @@ TodoItemDetailFragment.OnTodoItemDetailInteraction{
         //TODO set detail of first todoItem
         detailFragment = (TodoItemDetailFragment)TodoItemDetailFragment
                 .newInstance(items.get(0), "ehehe", "hahah");
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_detail, detailFragment)
+                .commit();
     }
 
     @Override
