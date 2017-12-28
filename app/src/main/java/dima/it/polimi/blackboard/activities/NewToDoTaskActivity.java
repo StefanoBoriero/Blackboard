@@ -10,6 +10,7 @@ import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.transition.Transition;
 import android.transition.TransitionInflater;
 import android.view.ContextMenu;
@@ -41,6 +42,7 @@ public class NewToDoTaskActivity extends AppCompatActivity {
     private FloatingActionButton mFab;
     private LinearLayout linearLayout;
     private RelativeLayout myRelativeLayout;
+    private RelativeLayout container_layout;
 
 
 
@@ -61,6 +63,7 @@ public class NewToDoTaskActivity extends AppCompatActivity {
         mFab.setTransitionName("revealCircular");
         linearLayout = findViewById(R.id.newLinLayout);
         myRelativeLayout = findViewById((R.id.newRelativeLayout));
+        container_layout = findViewById(R.id.container_layout);
 
         //initialize context menu
         typeButton.setOnClickListener(new View.OnClickListener() {
@@ -75,6 +78,8 @@ public class NewToDoTaskActivity extends AppCompatActivity {
         //hide cost field
         costEditText.setVisibility(View.GONE);
         costView.setVisibility(View.GONE);
+
+
 
         setupEnterAnimation();
 
@@ -149,7 +154,7 @@ public class NewToDoTaskActivity extends AppCompatActivity {
             @Override
             public void onTransitionEnd(Transition transition) {
                 transition.removeListener(this);
-                animateRevealShow(myRelativeLayout);
+                animateRevealShow();
             }
 
             @Override
@@ -169,10 +174,11 @@ public class NewToDoTaskActivity extends AppCompatActivity {
         });
     }
 
-    private void animateRevealShow(final View viewRoot) {
-        int cx = (viewRoot.getLeft() + viewRoot.getRight()) / 2;
-        int cy = (viewRoot.getTop() + viewRoot.getBottom()) / 2;
-        GUIUtils.animateRevealShow(this, viewRoot, mFab.getWidth() / 2, R.color.colorAccent,
+    private void animateRevealShow() {
+        View view = container_layout;
+        int cx = (myConstraintLayout.getWidth()) / 2;
+        int cy = (myConstraintLayout.getHeight()) / 2;
+        GUIUtils.animateRevealShow(this, view, mFab.getWidth() / 2, R.color.colorAccent,
                 cx, cy, new OnRevealAnimationListener() {
                     @Override
                     public void onRevealHide() {
@@ -225,7 +231,7 @@ public class NewToDoTaskActivity extends AppCompatActivity {
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         myConstraintLayout.setVisibility(View.VISIBLE);
-        myRelativeLayout.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+        container_layout.setBackgroundColor(getResources().getColor(R.color.colorAccent));
         mFab.setVisibility(View.INVISIBLE);
     }
 }

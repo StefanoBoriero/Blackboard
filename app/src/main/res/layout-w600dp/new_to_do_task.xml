@@ -5,6 +5,10 @@
     android:id="@+id/newRelativeLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:gravity="center"
+    android:background="#90CAF9"
+
+
 
 
 
@@ -13,17 +17,31 @@
 
     <RelativeLayout
         android:id="@+id/container_layout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:elevation="10dp"
+        android:gravity="center"
+        android:visibility="visible"
+        >
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/activity_contact_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+
+            android:transitionName="reveal_circular"
+            app:elevation="-1dp"
+            app:fabSize="normal" />
 
         <android.support.constraint.ConstraintLayout
             android:id="@+id/constraintLayout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentStart="true"
+            android:layout_height="wrap_content"
             android:animateLayoutChanges="true"
             android:descendantFocusability="beforeDescendants"
+
             android:focusable="true"
             android:focusableInTouchMode="true"
             android:maxWidth="500dp"
@@ -254,17 +272,8 @@
 
                 </LinearLayout>
             </ScrollView>
+
         </android.support.constraint.ConstraintLayout>
     </RelativeLayout>
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/activity_contact_fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:transitionName="reveal_circular"
-        app:elevation="-1dp"
-        app:fabSize="normal" />
 
 </RelativeLayout>

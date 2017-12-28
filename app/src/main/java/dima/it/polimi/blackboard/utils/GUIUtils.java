@@ -44,8 +44,8 @@ public class GUIUtils {
 
     public static void animateRevealHide(final Context ctx, final View view, @ColorRes int color,
                                          final int finalRadius, OnRevealAnimationListener listener) {
-        int cx = (view.getLeft() + view.getRight()) / 2;
-        int cy = (view.getTop() + view.getBottom()) / 2;
+        int cx = (view.getWidth()) / 2;
+        int cy = (view.getHeight()) / 2;
         int initialRadius = view.getWidth();
 
         Animator anim =
