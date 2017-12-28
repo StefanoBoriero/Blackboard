@@ -14,7 +14,7 @@
         app:layout_constraintGuide_begin="20dp"
         app:layout_constraintGuide_percent="0.4" />
 
-    <fragment class="dima.it.polimi.blackboard.fragments.TodoItemListFragment"
+    <FrameLayout class="dima.it.polimi.blackboard.fragments.TodoItemListFragment"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         android:id="@+id/fragment_list_container"
         android:layout_width="0dp"
@@ -25,7 +25,7 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:layout="@layout/fragment_list" />
 
-    <fragment
+    <FrameLayout
         android:id="@+id/fragment_detail"
         android:layout_width="0dp"
         android:layout_height="0dp"
