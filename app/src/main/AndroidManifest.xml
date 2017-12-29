@@ -9,7 +9,8 @@
         android:roundIcon="@mipmap/ic_launcher_custom_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activities.SplashActivity"
+        <activity
+            android:name=".activities.SplashActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -20,9 +21,7 @@
         <activity
             android:name=".activities.MainActivity"
             android:label="@string/title_activity_main"
-            android:theme="@style/AppTheme.MainActivity">
-
-        </activity>
+            android:theme="@style/AppTheme.MainActivity"></activity>
         <activity
             android:name=".activities.DetailTodoItemActivity"
             android:label="@string/title_activity_detail"
@@ -44,7 +43,6 @@
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".activities.MyListActivity"
             android:label="@string/title_activity_group_list"
@@ -61,7 +59,8 @@
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
         </activity>
-        <activity android:name=".activities.BalanceActivity"></activity>
+        <activity android:name=".activities.BalanceActivity" />
+        <activity android:name=".activities.NewPaymentActivity"></activity>
     </application>
 
 </manifest>

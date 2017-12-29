@@ -53,5 +53,19 @@
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/add_fab"
+        android:clickable="true"
+        android:focusable="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/fab_margin"
+        android:onClick="fabListener"
+        android:layout_gravity="right|bottom"
+        app:backgroundTint="@color/colorAccent"
+        app:srcCompat="@drawable/ic_fab_add_white_24dp"
+
+        />
+
 
 </android.support.design.widget.CoordinatorLayout>

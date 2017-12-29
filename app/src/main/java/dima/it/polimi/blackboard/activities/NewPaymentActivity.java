@@ -1,87 +1,48 @@
 package dima.it.polimi.blackboard.activities;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
 import android.transition.Transition;
 import android.transition.TransitionInflater;
-import android.view.ContextMenu;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.MenuInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import dima.it.polimi.blackboard.R;
 import dima.it.polimi.blackboard.utils.GUIUtils;
 import dima.it.polimi.blackboard.utils.OnRevealAnimationListener;
 
-public class NewToDoTaskActivity extends AppCompatActivity {
+public class NewPaymentActivity extends AppCompatActivity {
 
-    public Button typeButton;
-    public EditText editText;
-    public TextView costView;
-    public EditText costEditText;
+
     private FloatingActionButton mFab;
-    private LinearLayout linearLayout;
-    private RelativeLayout myRelativeLayout;
     private RelativeLayout container_layout;
-
-
-
     private ConstraintLayout myConstraintLayout;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.new_to_do_task);
+        setContentView(R.layout.activity_new_payment);
 
-        //initialize views
-        typeButton = (Button) findViewById(R.id.typeButton);
-        editText = (EditText) findViewById(R.id.nameEditText);
-        myConstraintLayout = (ConstraintLayout) findViewById(R.id.constraintLayout);
-        costEditText = (EditText) findViewById(R.id.costEditText);
-        costView = (TextView) findViewById(R.id.costTextView);
-        mFab = (FloatingActionButton) findViewById((R.id.activity_contact_fab));
-        mFab.setTransitionName("revealCircular");
-        linearLayout = findViewById(R.id.newLinLayout);
-        myRelativeLayout = findViewById((R.id.newRelativeLayout));
         container_layout = findViewById(R.id.container_layout);
+        mFab = (FloatingActionButton) findViewById((R.id.activity_contact_fab));
+        myConstraintLayout = (ConstraintLayout) findViewById(R.id.constraintLayout);
 
-        //initialize context menu
-        typeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                registerForContextMenu(typeButton);
-                openContextMenu(typeButton);
-            }
-        });
-        editText.clearFocus();
-
-        //hide cost field
-        costEditText.setVisibility(View.GONE);
-        costView.setVisibility(View.GONE);
-
+        mFab.setTransitionName("revealCircular");
 
 
         setupEnterAnimation();
+
 
     }
 
@@ -107,38 +68,6 @@ public class NewToDoTaskActivity extends AppCompatActivity {
 
         return super.dispatchTouchEvent(ev);
     }
-
-    //this creates a context menu to use when selecting the type of a task
-    @Override
-    public void onCreateContextMenu (ContextMenu menu, View
-            v, ContextMenu.ContextMenuInfo menuInfo){
-        MenuInflater menuInflater = getMenuInflater();
-        menuInflater.inflate(R.menu.task_type_selection_menu,menu);
-    }
-
-
-    public boolean onContextItemSelected (MenuItem item){
-
-        typeButton.setText(item.toString());
-
-        if(item.toString().equals(getString(R.string.bills)))
-        {
-            //show cost field
-            costEditText.setVisibility(LinearLayout.VISIBLE);
-            costView.setVisibility(LinearLayout.VISIBLE);
-        }
-        else
-        {
-            //hide cost field
-            costEditText.setVisibility(LinearLayout.GONE);
-            costEditText.setText("0.00");
-            costView.setVisibility(LinearLayout.GONE);
-
-        }
-    return true;
-    }
-
-
 
     //setUp the initial animation for this activity
     private void setupEnterAnimation() {

@@ -1,6 +1,9 @@
 package dima.it.polimi.blackboard.activities;
 
+import android.app.ActivityOptions;
+import android.content.Intent;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
@@ -26,11 +29,15 @@ public class BalanceActivity extends AppCompatActivity  implements PaymentListFr
     private PaymentListFragment listFragmentNegative;
     private CollapsingToolbarLayout collapsingToolbar;
     private List<PaymentItem> items = DataGeneratorUtil.generatePaymentItems(30);
+    private FloatingActionButton mFab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_balance);
+
+        mFab = findViewById(R.id.add_fab);
+        mFab.setTransitionName("revealCircular");
 
         displayListFragment();
         collapsingToolbar = findViewById(R.id.balance_toolbar);
@@ -134,5 +141,14 @@ public class BalanceActivity extends AppCompatActivity  implements PaymentListFr
             collapsingToolbar.setCollapsedTitleTextAppearance(R.style.CollapsedAppBarnegative);
             collapsingToolbar.setExpandedTitleTextAppearance(R.style.ExpandedAppBarNegative);
         }
+    }
+
+    public void fabListener(View v){
+        Intent intent = new Intent(this, NewPaymentActivity.class);
+
+
+        ActivityOptions options = ActivityOptions.
+                makeSceneTransitionAnimation(this, mFab, mFab.getTransitionName());
+        startActivity(intent, options.toBundle());
     }
 }
