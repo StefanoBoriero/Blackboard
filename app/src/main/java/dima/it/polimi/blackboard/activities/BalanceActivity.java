@@ -151,4 +151,6 @@ public class BalanceActivity extends AppCompatActivity  implements PaymentListFr
                 makeSceneTransitionAnimation(this, mFab, mFab.getTransitionName());
         startActivity(intent, options.toBundle());
     }
+
+
 }

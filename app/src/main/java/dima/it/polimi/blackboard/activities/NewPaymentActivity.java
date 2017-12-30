@@ -27,6 +27,8 @@ public class NewPaymentActivity extends AppCompatActivity {
     private FloatingActionButton mFab;
     private RelativeLayout container_layout;
     private ConstraintLayout myConstraintLayout;
+    public EditText editText;
+
 
 
     @Override
@@ -36,9 +38,11 @@ public class NewPaymentActivity extends AppCompatActivity {
 
         container_layout = findViewById(R.id.container_layout);
         mFab = (FloatingActionButton) findViewById((R.id.activity_contact_fab));
+        editText = (EditText) findViewById(R.id.nameEditText);
         myConstraintLayout = (ConstraintLayout) findViewById(R.id.constraintLayout);
 
         mFab.setTransitionName("revealCircular");
+        editText.clearFocus();
 
 
         setupEnterAnimation();
@@ -125,9 +129,10 @@ public class NewPaymentActivity extends AppCompatActivity {
     private void initViews() {
         new Handler(Looper.getMainLooper()).post(() -> {
             Animation animation = AnimationUtils.loadAnimation(this, android.R.anim.fade_in);
-            animation.setDuration(300);
+            animation.setDuration(200);
             myConstraintLayout.startAnimation(animation);
             myConstraintLayout.setVisibility(View.VISIBLE);
+            container_layout.setBackground(getResources().getDrawable(R.drawable.background_addition));
             mFab.setVisibility(View.GONE);
         });
     }
@@ -162,5 +167,7 @@ public class NewPaymentActivity extends AppCompatActivity {
         myConstraintLayout.setVisibility(View.VISIBLE);
         container_layout.setBackgroundColor(getResources().getColor(R.color.colorAccent));
         mFab.setVisibility(View.INVISIBLE);
+        container_layout.setBackground(getResources().getDrawable(R.drawable.background_addition));
+        editText.clearFocus();
     }
 }
