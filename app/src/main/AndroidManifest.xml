@@ -10,7 +10,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".activities.SplashActivity"
+            android:name=".activities.LoginActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -21,7 +21,7 @@
         <activity
             android:name=".activities.MainActivity"
             android:label="@string/title_activity_main"
-            android:theme="@style/AppTheme.MainActivity"></activity>
+            android:theme="@style/AppTheme.MainActivity"/>
         <activity
             android:name=".activities.DetailTodoItemActivity"
             android:label="@string/title_activity_detail"
@@ -60,7 +60,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".activities.BalanceActivity" />
-        <activity android:name=".activities.NewPaymentActivity"></activity>
-    </application>
+        <activity android:name=".activities.NewPaymentActivity"/>
 
+        <activity android:name=".activities.SettingsActivity"/>
+    </application>
 </manifest>

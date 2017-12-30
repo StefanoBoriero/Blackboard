@@ -55,7 +55,5 @@
     <dimen name="swipe_text_size">20dp</dimen>
 
 
-    <item name="match_parent"
-        format="integer"
-        type="dimen">-1</item>
+    <item name="match_parent" format="integer" type="dimen">-1</item>
 </resources>
