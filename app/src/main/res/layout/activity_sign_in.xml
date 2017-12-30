@@ -10,7 +10,7 @@
     android:focusableInTouchMode="true"
     >
 
-    <include layout="@layout/logo"
+    <include layout="@layout/sign_up_string"
         android:id="@+id/logo"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -21,11 +21,12 @@
         app:layout_constraintBottom_toTopOf="@id/guideline"/>
 
     <include
-        android:id="@+id/content_login"
-        layout="@layout/content_login"
+        android:id="@+id/content_sign_in"
+        layout="@layout/content_sign_up"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:visibility="invisible"
+        android:layout_marginTop="32dp"
+        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -36,6 +37,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.4"/>
+        app:layout_constraintGuide_percent="0.2"/>
 
 </android.support.constraint.ConstraintLayout>

@@ -38,8 +38,11 @@
     <!-- Login strings -->
     <string name="email_hint">Email</string>
     <string name="password_hint">Password</string>
-    <string name="sign_up_message">Not a member yet? Sing up!</string>
+    <string name="repeat_password_hint">Repeat password</string>
+    <string name="sign_up_message">Not a member yet? Sign up!</string>
     <string name="button_string">LOGIN</string>
+    <string name="signi_up_string">SIGN UP</string>
+    <string name="signi_up_string_small">Sign Up</string>
 
 
     <!-- Grouplist Activity strings -->

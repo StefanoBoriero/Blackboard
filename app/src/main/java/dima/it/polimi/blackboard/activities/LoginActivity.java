@@ -13,10 +13,14 @@ import android.transition.ChangeBounds;
 import android.transition.Transition;
 import android.transition.TransitionInflater;
 import android.transition.TransitionManager;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.OvershootInterpolator;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
+import android.widget.TextView;
 
 import dima.it.polimi.blackboard.R;
 
@@ -31,6 +35,7 @@ public class LoginActivity extends AppCompatActivity {
     ConstraintLayout mConstraintLayout;
     View contentLogin;
 
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,6 +45,7 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login_splash);
         mConstraintLayout = findViewById(R.id.root_layout);
         contentLogin = findViewById(R.id.content_login);
+
 
         new Handler().postDelayed(() -> {
             Transition transition = new ChangeBounds();
@@ -79,6 +85,7 @@ public class LoginActivity extends AppCompatActivity {
         }, ANIMATION_DELAY);
 
 
+
     }
 
 
@@ -97,6 +104,30 @@ public class LoginActivity extends AppCompatActivity {
         startActivity(i);
     }
 
+    public void onClick(View v)
+    {
+        Intent intent = new Intent(LoginActivity.this, SignInActivity.class);
+        startActivity(intent);
+    }
 
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        View view = getCurrentFocus();
+
+        if (view != null && (ev.getAction() == MotionEvent.ACTION_UP || ev.getAction() == MotionEvent.ACTION_MOVE) && view instanceof EditText && !view.getClass().getName().startsWith("android.webkit.")) {
+            int scrcoords[] = new int[2];
+            view.getLocationOnScreen(scrcoords);
+            float x = ev.getRawX() + view.getLeft() - scrcoords[0];
+            float y = ev.getRawY() + view.getTop() - scrcoords[1];
+            if (x < view.getLeft() || x > view.getRight() || y < view.getTop() || y > view.getBottom()) {
+                ((InputMethodManager) this.getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow((this.getWindow().getDecorView().getApplicationWindowToken()), 0);
+                view.clearFocus();
+                //give focus to constraint layout
+                mConstraintLayout.requestFocus();
+            }
+
+        }
+
+        return super.dispatchTouchEvent(ev);
+    }
 
 }
