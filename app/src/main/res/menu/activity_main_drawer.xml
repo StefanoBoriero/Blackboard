@@ -16,11 +16,25 @@
             android:id="@+id/nav_balance"
             android:icon="@drawable/ic_menu_balance_24dp"
             android:title="@string/navigation_drawer_balance" />
-        <item
-            android:id="@+id/nav_manage"
-            android:icon="@drawable/ic_menu_manage"
-            android:title="Tools" />
     </group>
+
+    <item android:title="@string/navigation_drawer_settings">
+        <menu>
+            <item
+                android:id="@+id/nav_account"
+                android:icon="@drawable/ic_account_circle_black_24dp"
+                android:title="@string/account" />
+            <item
+                android:id="@+id/nav_settings"
+                android:icon="@drawable/ic_settings_black_24dp"
+                android:title="@string/navigation_drawer_settings" />
+            <item
+                android:id="@+id/nav_logout"
+                android:icon="@drawable/ic_logout_24dp"
+                android:title="@string/log_out" />
+        </menu>
+    </item>
+
 
     <item android:title="Communicate">
         <menu>
@@ -34,5 +48,4 @@
                 android:title="Send" />
         </menu>
     </item>
-
 </menu>

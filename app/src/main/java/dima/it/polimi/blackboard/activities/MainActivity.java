@@ -83,6 +83,9 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_balance) {
             Intent intent = new Intent(MainActivity.this, BalanceActivity.class);
             startActivity(intent);
+        } else if(id == R.id.nav_account){
+            Intent intent = new Intent(MainActivity.this, AccountActivity.class);
+            startActivity(intent);
         } else if (id == R.id.nav_share) {
 
         } else if (id == R.id.nav_send) {

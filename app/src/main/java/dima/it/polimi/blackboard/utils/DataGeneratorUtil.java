@@ -3,6 +3,7 @@ package dima.it.polimi.blackboard.utils;
 import java.util.ArrayList;
 import java.util.List;
 
+import dima.it.polimi.blackboard.model.Achievement;
 import dima.it.polimi.blackboard.model.PaymentItem;
 import dima.it.polimi.blackboard.model.TodoItem;
 
@@ -18,6 +19,8 @@ public class DataGeneratorUtil {
     private static final String[] names = {"Pay Netflix", "Fancy Hat", "Name"};
     private static final String[] froms = {"Ezio Greggio", "Enzo Iacchetti" , "Fabio Fazio", "Stefy & Simo"};
     private static final String[] tos = {"Ezio Greggio", "Enzo Iacchetti" , "Fabio Fazio", "Stefy & Simo"};
+    private static final String[] titles = {"Vorwerk Folletto", "Donald Trump"};
+    private static final String[] descriptions = {"You completed 10 Housekeeping items", "You completed 10 Shopping items"};
 
     public static List<TodoItem> generateTodoItems(int amount){
         List<TodoItem> out = new ArrayList<>();
@@ -48,5 +51,16 @@ public class DataGeneratorUtil {
             out.add(item);
         }
         return out;
+    }
+
+    public static List<Achievement> generateAchievements(int amount){
+        List<Achievement> list = new ArrayList<>();
+
+        for(int i=0; i<amount; i++) {
+            int pos = (int) (Math.random() * 2);
+            Achievement a = new Achievement(titles[pos], descriptions[pos]);
+            list.add(a);
+        }
+        return list;
     }
 }

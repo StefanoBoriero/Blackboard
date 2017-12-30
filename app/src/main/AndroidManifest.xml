@@ -21,7 +21,7 @@
         <activity
             android:name=".activities.MainActivity"
             android:label="@string/title_activity_main"
-            android:theme="@style/AppTheme.MainActivity"/>
+            android:theme="@style/AppTheme.MainActivity" />
         <activity
             android:name=".activities.DetailTodoItemActivity"
             android:label="@string/title_activity_detail"
@@ -60,8 +60,12 @@
             </intent-filter>
         </activity>
         <activity android:name=".activities.BalanceActivity" />
-        <activity android:name=".activities.NewPaymentActivity"/>
-
-        <activity android:name=".activities.SettingsActivity"/>
+        <activity android:name=".activities.NewPaymentActivity" />
+        <activity android:name=".activities.SettingsActivity" />
+        <activity
+            android:name=".activities.AccountActivity"
+            android:label="@string/title_activity_account"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
+
 </manifest>
