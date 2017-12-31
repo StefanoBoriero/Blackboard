@@ -9,6 +9,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.transition.Transition;
 import android.transition.TransitionInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.Animation;
@@ -169,5 +171,27 @@ public class NewPaymentActivity extends AppCompatActivity {
         mFab.setVisibility(View.INVISIBLE);
         container_layout.setBackground(getResources().getDrawable(R.drawable.background_addition));
         editText.clearFocus();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        //getMenuInflater().inflate(R.menu.menu_account, menu);
+
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        //TODO create string
+        getSupportActionBar().setTitle("Add payment");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        return true;
+    }
+
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 }

@@ -44,6 +44,13 @@
     <string name="signi_up_string">SIGN UP</string>
     <string name="signi_up_string_small">Sign Up</string>
 
+    <!-- Stats strings -->
+    <string name="completed_tasks">Completed tasks</string>
+    <string name="average_completion_time">Average completion time</string>
+    <string name="most_task_completed">Most tasks completed in one day</string>
+    <string name="preferred_type">Preferred type</string>
+    <string name="days_in_credit">Days in debt</string>
+    <string name="days_in_debt">Days in credit</string>
 
     <!-- Grouplist Activity strings -->
     <string name="todo_item">TodoItem</string>

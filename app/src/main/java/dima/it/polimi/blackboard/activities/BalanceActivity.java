@@ -9,6 +9,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.support.v7.widget.Toolbar;
 
@@ -39,6 +41,12 @@ public class BalanceActivity extends AppCompatActivity  implements PaymentListFr
         mFab = findViewById(R.id.add_fab);
         mFab.setTransitionName("revealCircular");
 
+
+
+
+
+
+
         displayListFragment();
         collapsingToolbar = findViewById(R.id.balance_toolbar);
         refreshBalanceColor();
@@ -66,6 +74,32 @@ public class BalanceActivity extends AppCompatActivity  implements PaymentListFr
         tabLayout.setupWithViewPager(mViewPager);
     }
 
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        //getMenuInflater().inflate(R.menu.menu_account, menu);
+
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        //TODO create string
+        getSupportActionBar().setTitle("Balance");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        return true;
+    }
+
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                Intent intent = new Intent(BalanceActivity.this, MainActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+                finish();
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 
     private List<PaymentItem> getPosItems()
     {
