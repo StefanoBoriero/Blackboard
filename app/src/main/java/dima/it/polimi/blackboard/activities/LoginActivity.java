@@ -17,6 +17,8 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.OvershootInterpolator;
+import android.view.inputmethod.EditorInfo;
+import android.widget.EditText;
 
 import dima.it.polimi.blackboard.R;
 
@@ -40,6 +42,16 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login_splash);
         mConstraintLayout = findViewById(R.id.root_layout);
         contentLogin = findViewById(R.id.content_login);
+
+        EditText editText = findViewById(R.id.password);
+        editText.setOnEditorActionListener( (v, actionId, event) -> {
+            boolean handled = false;
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                onLogin(v);
+                handled = true;
+            }
+            return handled;
+        });
 
         new Handler().postDelayed(() -> {
             Transition transition = new ChangeBounds();

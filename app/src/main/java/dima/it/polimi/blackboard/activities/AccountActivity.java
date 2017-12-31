@@ -11,11 +11,8 @@ import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-
-import android.widget.TextView;
 
 import dima.it.polimi.blackboard.R;
 import dima.it.polimi.blackboard.fragments.AccountSettingsFragment;
@@ -53,7 +50,7 @@ public class AccountActivity extends AppCompatActivity {
         toolbar.setTitle(R.string.title_activity_account);
         setSupportActionBar(toolbar);
         // Set up the ViewPager with the sections adapter.
-        mViewPager = (ViewPager) findViewById(R.id.container);
+        mViewPager = findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
         TabLayout mTabLayout = findViewById(R.id.sliding_tabs);
@@ -63,29 +60,11 @@ public class AccountActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        //getMenuInflater().inflate(R.menu.menu_account, menu);
-
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         return true;
     }
-/*
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-*/
     /**
      * A placeholder fragment containing a simple view.
      */
@@ -114,10 +93,7 @@ public class AccountActivity extends AppCompatActivity {
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_account, container, false);
-            TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-            textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
-            return rootView;
+            return inflater.inflate(R.layout.fragment_account, container, false);
         }
     }
 
@@ -130,7 +106,7 @@ public class AccountActivity extends AppCompatActivity {
         private String[] titles = {"SETTINGS", "STATS","ACHIEVEMENTS"};
         private Fragment[] fragments;
 
-        public SectionsPagerAdapter(FragmentManager fm) {
+        private SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
             fragments = new Fragment[3];
             fragments[0] = AccountSettingsFragment.newInstance();
@@ -152,7 +128,6 @@ public class AccountActivity extends AppCompatActivity {
 
         @Override
         public int getCount() {
-            // Show 2 total pages.
             return PAGE_NUMBER;
         }
     }

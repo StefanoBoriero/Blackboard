@@ -1,19 +1,28 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@color/white"
-    tools:context="dima.it.polimi.blackboard.fragments.AchievementFragment"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior">
+    android:layout_height="wrap_content"
+    android:layout_width="match_parent"
+    android:scrollbars="none"
+    >
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/recycler_view"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layoutManager="android.support.v7.widget.GridLayoutManager"
-        app:spanCount="2"
-        tools:listitem="@layout/achievement">
-    </android.support.v7.widget.RecyclerView>
+        android:layout_height="wrap_content"
+        android:divider="@drawable/divider_line_simple"
+        android:showDividers="middle"
+        android:background="@color/white"
+        android:orientation="vertical"
+        tools:context="dima.it.polimi.blackboard.fragments.AchievementFragment"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-</FrameLayout>
+        <include layout="@layout/achievement_row"
+            android:id="@+id/general_row"/>
+        <include layout="@layout/achievement_row"
+            android:id="@+id/houseKeeping_row"/>
+        <include layout="@layout/achievement_row"
+            android:id="@+id/shopping_row"/>
+        <include layout="@layout/achievement_row"
+            android:id="@+id/billing_row"/>
+    </LinearLayout>
+</ScrollView>

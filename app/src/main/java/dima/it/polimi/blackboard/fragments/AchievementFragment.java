@@ -8,10 +8,10 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import dima.it.polimi.blackboard.R;
 import dima.it.polimi.blackboard.adapters.AchievementListAdapter;
-import dima.it.polimi.blackboard.model.Achievement;
 import dima.it.polimi.blackboard.utils.DataGeneratorUtil;
 
 /**
@@ -48,9 +48,6 @@ public class AchievementFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-
-        }
     }
 
     @Override
@@ -62,12 +59,25 @@ public class AchievementFragment extends Fragment {
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
+        View generalRow = view.findViewById(R.id.general_row);
+        setupAchievementRow(generalRow,"General");
 
-        AchievementListAdapter adapter = new AchievementListAdapter(DataGeneratorUtil.generateAchievements(10));
-        recyclerView.setAdapter(adapter);
+        View housekeepingRow = view.findViewById(R.id.houseKeeping_row);
+        setupAchievementRow(housekeepingRow, "Housekeeping");
 
+        View billingRow = view.findViewById(R.id.billing_row);
+        setupAchievementRow(billingRow, "Billing");
+
+        View shoppingRow = view.findViewById(R.id.shopping_row);
+        setupAchievementRow(shoppingRow, "Shopping");
 
         super.onViewCreated(view, savedInstanceState);
+    }
+
+    private void setupAchievementRow(View achievementRow, String title){
+        AchievementListAdapter adapter = new AchievementListAdapter(DataGeneratorUtil.generateAchievements(5, title));
+        ((TextView)achievementRow.findViewById(R.id.type)).setText(title);
+        RecyclerView recycler = achievementRow.findViewById(R.id.recycler_view);
+        recycler.setAdapter(adapter);
     }
 }

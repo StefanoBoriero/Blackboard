@@ -19,8 +19,11 @@ public class DataGeneratorUtil {
     private static final String[] names = {"Pay Netflix", "Fancy Hat", "Name"};
     private static final String[] froms = {"Ezio Greggio", "Enzo Iacchetti" , "Fabio Fazio", "Stefy & Simo"};
     private static final String[] tos = {"Ezio Greggio", "Enzo Iacchetti" , "Fabio Fazio", "Stefy & Simo"};
-    private static final String[] titles = {"Vorwerk Folletto", "Donald Trump"};
-    private static final String[] descriptions = {"You completed 10 Housekeeping items", "You completed 10 Shopping items"};
+    private static final String[] titlesHouse = {"Vorwerk Folletto", "Mister Clean"};
+    private static final String[] titlesGeneral = {"Noob", "Pro"};
+    private static final String[] titlesBilling = {"Bill Gates", "Equitalia"};
+    private static final String[] titlesShopping = {"Donald Trump", "Killuminati"};
+    private static final String[] descriptions = {"1 item", "10 items"};
 
     public static List<TodoItem> generateTodoItems(int amount){
         List<TodoItem> out = new ArrayList<>();
@@ -53,8 +56,19 @@ public class DataGeneratorUtil {
         return out;
     }
 
-    public static List<Achievement> generateAchievements(int amount){
+    public static List<Achievement> generateAchievements(int amount, String type){
         List<Achievement> list = new ArrayList<>();
+        String[] titles = null;
+
+        if(type.equals("General")){
+            titles = titlesGeneral;
+        } else if (type.equals("Housekeeping")){
+            titles = titlesHouse;
+        } else if (type.equals("Billing")){
+            titles = titlesBilling;
+        } else if (type.equals("Shopping")){
+            titles = titlesShopping;
+        }
 
         for(int i=0; i<amount; i++) {
             int pos = (int) (Math.random() * 2);
