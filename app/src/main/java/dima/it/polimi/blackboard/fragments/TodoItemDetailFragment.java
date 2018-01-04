@@ -98,12 +98,11 @@ public class TodoItemDetailFragment extends Fragment {
 
         //Binds the button click action to parent activity
         View acceptBtn = view.findViewById(R.id.accept_button);
-        acceptBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        acceptBtn.setOnClickListener((v)->{
+
                 mListener.onAcceptClick(todoTask);
             }
-        });
+        );
     }
 
 
@@ -125,6 +124,7 @@ public class TodoItemDetailFragment extends Fragment {
     }
 
     public void updateFragment(TodoItem todoItem){
+        View rootView = getView();
         TextView descriptionView = rootView.findViewById(R.id.description);
         descriptionView.setText(todoTask.getDescription());
 
@@ -133,12 +133,11 @@ public class TodoItemDetailFragment extends Fragment {
 
         //Binds the button click action to parent activity
         View acceptBtn = rootView.findViewById(R.id.accept_button);
-        acceptBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mListener.onAcceptClick(todoTask);
+        acceptBtn.setOnClickListener( (v) -> {
+
+            mListener.onAcceptClick(todoTask);
             }
-        });
+        );
     }
 
     /**
