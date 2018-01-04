@@ -178,9 +178,10 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
         final TodoItem removedItem = adapter.getItem(removedIndex);
 
         final RecyclerView recyclerView = rootView.findViewById(R.id.recycler_view);
+        View fab = rootView.findViewById(R.id.add_fab);
         adapter.removeItem(removedIndex);
 
-        Snackbar.make(rootView, "You took charge of the activity",
+        Snackbar.make(fab, "You took charge of the activity",
                 Snackbar.LENGTH_LONG)
                 .setAction("UNDO", new View.OnClickListener() {
                     @Override

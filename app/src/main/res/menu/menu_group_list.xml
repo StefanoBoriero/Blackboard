@@ -7,7 +7,6 @@
     <item
         android:id="@+id/action_search"
         android:icon="@drawable/ic_search_white_24dp"
-        android:orderInCategory="100"
         android:title="@string/action_search"
         app:showAsAction="ifRoom"
         app:actionViewClass="android.support.v7.widget.SearchView"/>
@@ -17,4 +16,11 @@
         android:orderInCategory="100"
         android:title="@string/action_settings"
         app:showAsAction="never" />
+
+    <item android:id="@+id/action_choose_list"
+        android:orderInCategory="1"
+        android:title="@string/action_choose_house"
+        app:showAsAction="never"
+        android:onClick="onChooseHouse"/>
+
 </menu>

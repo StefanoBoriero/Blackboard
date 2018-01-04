@@ -3,27 +3,27 @@ package dima.it.polimi.blackboard.activities;
 
 import android.annotation.SuppressLint;
 import android.app.ActivityOptions;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.net.Uri;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityOptionsCompat;
-import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v4.util.Pair;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
-
 
 import java.util.List;
 
 import dima.it.polimi.blackboard.R;
-import dima.it.polimi.blackboard.adapters.TodoListAdapter;
 import dima.it.polimi.blackboard.fragments.TodoItemDetailFragment;
 import dima.it.polimi.blackboard.fragments.TodoItemListFragment;
 import dima.it.polimi.blackboard.model.TodoItem;
@@ -36,9 +36,12 @@ import dima.it.polimi.blackboard.utils.DataGeneratorUtil;
  * fragment will be displayed permanently on the side of the screen
  */
 public class GroupListActivity extends AppCompatActivity implements TodoItemListFragment.OnListFragmentInteractionListener,
-TodoItemDetailFragment.OnTodoItemDetailInteraction{
+TodoItemDetailFragment.OnTodoItemDetailInteraction, DialogInterface.OnClickListener{
 
     private static final int ACCEPT_TASK_REQUEST = 1;
+
+    // TODO select preferred
+    private int whichHouse = 0;
 
     private TodoItemDetailFragment detailFragment;
     private TodoItemListFragment listFragment;
@@ -58,8 +61,9 @@ TodoItemDetailFragment.OnTodoItemDetailInteraction{
         mFab = findViewById(R.id.add_fab);
         mFab.setTransitionName("revealCircular");
         displayListFragment();
-        detailFragment = (TodoItemDetailFragment)getSupportFragmentManager().findFragmentById(R.id.fragment_detail);
-        if(detailFragment != null){
+        //detailFragment = (TodoItemDetailFragment)getSupportFragmentManager().findFragmentById(R.id.fragment_detail);
+        View detailContainer = findViewById(R.id.fragment_detail);
+        if(detailContainer != null){
             displayDetailFragment();
         }
 
@@ -147,13 +151,23 @@ TodoItemDetailFragment.OnTodoItemDetailInteraction{
         if (requestCode == ACCEPT_TASK_REQUEST) {
             // Make sure the request was successful
             if (resultCode == RESULT_OK) {
+                listFragment.onSwiped(null, 0, data.getIntExtra(getResources().getString(R.string.position),0));
+                /*
                 RecyclerView recyclerView = findViewById(R.id.recycler_view);
                 TodoListAdapter adapter = (TodoListAdapter)recyclerView.getAdapter();
                 int position = data.getIntExtra(getResources().getString(R.string.position),0);
                 adapter.removeItem(position);
+                */
             }
         }
     }
+
+    public void onChooseHouse(MenuItem menuItem){
+        ChooseHouseDialog.mListener = this;
+        DialogFragment houseListDialog = ChooseHouseDialog.newInstance(whichHouse);
+        houseListDialog.show(getFragmentManager(), "dialog");
+    }
+
     @Override
     public void onBackPressed(){
         super.onBackPressed();
@@ -180,5 +194,40 @@ TodoItemDetailFragment.OnTodoItemDetailInteraction{
         ActivityOptions options = ActivityOptions.
                 makeSceneTransitionAnimation(this, mFab, mFab.getTransitionName());
         startActivity(intent, options.toBundle());
+    }
+
+    /**
+     * This method return the chosen house from the list
+     * @param dialog the dialog sending data
+     * @param which the house chosen
+     */
+    @Override
+    public void onClick(DialogInterface dialog, int which) {
+        this.whichHouse = which;
+        dialog.dismiss();
+
+    }
+
+    public static class ChooseHouseDialog extends DialogFragment{
+        public static Dialog.OnClickListener mListener;
+
+        public static ChooseHouseDialog newInstance(int whichHouse) {
+
+            Bundle args = new Bundle();
+            args.putInt("chosen_house", whichHouse);
+            ChooseHouseDialog fragment = new ChooseHouseDialog();
+            fragment.setArguments(args);
+            return fragment;
+        }
+
+        @Override
+        public Dialog onCreateDialog(final Bundle savedInstanceState) {
+            int which = getArguments().getInt("chosen_house");
+            final AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
+            dialog.setTitle(R.string.action_choose_house);
+            CharSequence[] entries = new CharSequence[]{"One", "Two", "Three"};
+            dialog.setSingleChoiceItems(entries, which, mListener);
+            return dialog.create();
+        }
     }
 }

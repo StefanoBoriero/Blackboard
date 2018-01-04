@@ -55,7 +55,8 @@ public class TodoListAdapter extends RecyclerView.Adapter<TodoListAdapter.ViewHo
         holder.todoItemType.setText(todoItem.getType());
         holder.todoItemName.setTransitionName(todoItem.getName() + "Name" + todoItem.getId());
         holder.userIcon.setTransitionName(todoItem.getName() + "Icon" + todoItem.getId());
-        //TODO get user icon and todoItem timestamp
+        holder.timestampView.setText(todoItem.getTimestamp());
+        //TODO get user icon
 
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -124,9 +125,7 @@ public class TodoListAdapter extends RecyclerView.Adapter<TodoListAdapter.ViewHo
         private TextView todoItemName;
         private TextView todoItemType;
         private ImageView userIcon;
-        private LinearLayout todoItemContainer;
-        private RelativeLayout userIconContainer;
-
+        private TextView timestampView;
         public RelativeLayout viewForeground;
         public RelativeLayout viewBackground;
 
@@ -137,8 +136,7 @@ public class TodoListAdapter extends RecyclerView.Adapter<TodoListAdapter.ViewHo
             todoItemName = itemView.findViewById(R.id.item_name);
             todoItemType = itemView.findViewById(R.id.item_type);
             userIcon = itemView.findViewById(R.id.user_icon);
-            todoItemContainer = itemView.findViewById(R.id.todo_item_container);
-            userIconContainer = itemView.findViewById(R.id.user_icon_container);
+            timestampView = itemView.findViewById(R.id.timestamp);
         }
     }
 }
