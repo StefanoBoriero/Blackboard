@@ -4,4 +4,7 @@
     <integer name="slide_duration">500</integer>
     <integer name="fade_duration">200</integer>
     <integer name="explode_duration">300</integer>
+    <item name="visible" type="id"/>
+    <item name="masked" type="id"/>
 </resources>
+

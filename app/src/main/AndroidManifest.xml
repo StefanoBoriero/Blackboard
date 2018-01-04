@@ -67,7 +67,8 @@
             android:label="@string/title_activity_account"
             android:theme="@style/AppTheme.NoActionBar"></activity>
 
-        <activity android:name=".activities.SignInActivity"></activity>
+        <activity android:name=".activities.SignInActivity"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

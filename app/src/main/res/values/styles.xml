@@ -35,6 +35,11 @@
         <item name="android:windowExitTransition">@android:transition/fade</item>
     </style>
 
+    <style name="Theme.noTitleBar" parent="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
     <style name="AppTheme.Detail" parent="AppTheme.NoActionBar">
         <item name="android:windowEnterTransition">@transition/detail_in</item>
         <item name="android:windowExitTransition">@transition/detail_in</item>

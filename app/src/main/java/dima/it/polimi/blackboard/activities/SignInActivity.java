@@ -7,6 +7,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.Window;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
@@ -15,16 +17,29 @@ import dima.it.polimi.blackboard.R;
 public class SignInActivity extends AppCompatActivity {
 
     private ConstraintLayout myConstraintLayout;
+    private EditText repeatEditText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_sign_in);
+        this.setContentView(R.layout.activity_sign_in);
         myConstraintLayout = findViewById(R.id.root_layout);
+        repeatEditText = findViewById(R.id.repeat_password);
 
+
+
+
+        repeatEditText.setOnEditorActionListener( (v, actionId, event) -> {
+            boolean handled = false;
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                onSignUp(v);
+                handled = true;
+            }
+            return handled;
+        });
     }
 
-    public void onLogin(View view){
+    public void onSignUp(View view){
         // TODO check username and password
         Intent i = new Intent(SignInActivity.this, MainActivity.class);
         startActivity(i);
