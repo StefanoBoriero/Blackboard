@@ -15,6 +15,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.View;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import dima.it.polimi.blackboard.R;
@@ -33,8 +34,10 @@ public class MyListActivity extends AppCompatActivity implements TodoItemListFra
         TodoItemDetailFragment.OnTodoItemDetailInteraction{
     private static final int ACCEPT_TASK_REQUEST = 1;
 
-    private Fragment detailFragment;
+    private TodoItemDetailFragment detailFragment;
     private TodoItemListFragment listFragment;
+
+    private List<TodoItem> items;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +46,7 @@ public class MyListActivity extends AppCompatActivity implements TodoItemListFra
 
 
         displayListFragment();
-        detailFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_detail);
+        detailFragment = (TodoItemDetailFragment)getSupportFragmentManager().findFragmentById(R.id.fragment_detail);
         if(detailFragment != null){
             displayDetailFragment();
         }
@@ -54,7 +57,8 @@ public class MyListActivity extends AppCompatActivity implements TodoItemListFra
 
     private void displayListFragment(){
         //Todo remove this call
-        List<TodoItem> items = DataGeneratorUtil.generateTodoItems(30);
+        items = new ArrayList<>();
+        items = DataGeneratorUtil.generateTodoItems(30);
         listFragment = TodoItemListFragment.newInstance(1, items);
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_list_container, listFragment)
@@ -64,6 +68,11 @@ public class MyListActivity extends AppCompatActivity implements TodoItemListFra
 
     private void displayDetailFragment(){
         //TODO set detail of first todoItem
+        detailFragment = (TodoItemDetailFragment)TodoItemDetailFragment
+                .newInstance(items.get(0), "ehehe", "hahah");
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_detail, detailFragment)
+                .commit();
     }
 
     @Override
@@ -72,7 +81,7 @@ public class MyListActivity extends AppCompatActivity implements TodoItemListFra
         getMenuInflater().inflate(R.menu.menu_group_list, menu);
 
         // Adding back navigation on toolbar
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        //getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         // Implementing the search functionality
@@ -114,7 +123,7 @@ public class MyListActivity extends AppCompatActivity implements TodoItemListFra
             startActivityForResult(intent, ACCEPT_TASK_REQUEST, options.toBundle());
         }
         else{
-            //TODO implement the fragment update for bigger screens
+            detailFragment.updateFragment(todoItem);
         }
     }
 
