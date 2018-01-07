@@ -10,7 +10,6 @@ import android.widget.TextView;
 
 import dima.it.polimi.blackboard.R;
 import dima.it.polimi.blackboard.model.TodoItem;
-import dima.it.polimi.blackboard.utils.DataGeneratorUtil;
 
 /**
  * A simple {@link Fragment} subclass.

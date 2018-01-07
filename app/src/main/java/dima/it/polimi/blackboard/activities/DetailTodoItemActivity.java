@@ -4,11 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
-import android.transition.ArcMotion;
-import android.transition.Transition;
-import android.transition.TransitionInflater;
-import android.view.View;
-import android.view.animation.AccelerateDecelerateInterpolator;
 
 import dima.it.polimi.blackboard.R;
 import dima.it.polimi.blackboard.fragments.TodoItemDetailFragment;
@@ -24,8 +19,6 @@ public class DetailTodoItemActivity extends AppCompatActivity implements TodoIte
     private TodoItem todoItem;
     private Fragment detailFragment;
     private int position;
-    private static final int MOVE_DURATION = 400;
-    private static final int ACCEPT_TASK_REQUEST = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

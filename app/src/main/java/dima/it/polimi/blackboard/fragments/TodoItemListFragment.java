@@ -2,7 +2,7 @@ package dima.it.polimi.blackboard.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
+
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -23,7 +23,6 @@ import dima.it.polimi.blackboard.R;
 import dima.it.polimi.blackboard.adapters.TodoListAdapter;
 import dima.it.polimi.blackboard.helper.TodoItemTouchHelper;
 import dima.it.polimi.blackboard.model.TodoItem;
-import dima.it.polimi.blackboard.utils.DataGeneratorUtil;
 
 /**
  * A fragment representing a list of Items.
@@ -42,10 +41,6 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
     private OnListFragmentInteractionListener mListener;
     private TodoListAdapter adapter;
     private List<TodoItem> todoItems;
-
-    // Attributes for onStop() onStart() consistency
-    private CharSequence savedQuery;
-    private int position;
 
     private AppCompatActivity parentActivity;
     private View rootView;
@@ -126,13 +121,9 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
     public void onDetach() {
         super.onDetach();
         mListener = null;
+
     }
 
-    @Override
-    public void onStop(){
-        savedQuery = searchView.getQuery();
-        super.onStop();
-    }
 
     @Override
     public void onTodoItemClicked(TodoItem todoItem, View view, int clickedPostion) {
@@ -166,23 +157,7 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
      */
     @Override
     public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction, int position) {
-
-        final int removedIndex = position;
-        final TodoItem removedItem = adapter.getItem(removedIndex);
-
-        final RecyclerView recyclerView = rootView.findViewById(R.id.recycler_view);
-        View fab = rootView.findViewById(R.id.add_fab);
-        adapter.removeItem(removedIndex);
-
-        Snackbar.make(fab, "You took charge of the activity",
-                Snackbar.LENGTH_LONG)
-                .setAction("UNDO", (v) -> {
-                    int itemCount = adapter.getItemCount();
-                    adapter.insertItem(removedItem, removedIndex);
-                    if(removedIndex == 0 || removedIndex == itemCount){
-                        recyclerView.scrollToPosition(removedIndex);
-                        }
-                }).show();
+        mListener.onItemSwipe(position);
     }
 
     public TodoItem removeItem(int position){
@@ -199,6 +174,11 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
         if(position == 0 || position == itemCount){
             recyclerView.scrollToPosition(position);
         }
+    }
+
+    public TodoItem getItem(int position){
+        // todo throw finished items exception
+        return adapter.getItem(position);
     }
 
     @Override
@@ -218,5 +198,6 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
      */
     public interface OnListFragmentInteractionListener {
         void onItemClick(TodoItem item, View view, int clickedPosition);
+        void onItemSwipe(int swipedPosition);
     }
 }

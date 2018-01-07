@@ -1,27 +1,12 @@
 package dima.it.polimi.blackboard.activities;
 
-import android.annotation.SuppressLint;
-import android.app.SearchManager;
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.ActivityOptionsCompat;
-import android.support.v4.app.Fragment;
-import android.support.v4.util.Pair;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SearchView;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.View;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import dima.it.polimi.blackboard.R;
-import dima.it.polimi.blackboard.adapters.TodoListAdapter;
-import dima.it.polimi.blackboard.fragments.TodoItemDetailFragment;
-import dima.it.polimi.blackboard.fragments.TodoItemListFragment;
 import dima.it.polimi.blackboard.model.TodoItem;
 import dima.it.polimi.blackboard.utils.DataGeneratorUtil;
 
@@ -30,48 +15,17 @@ import dima.it.polimi.blackboard.utils.DataGeneratorUtil;
  * Created by Stefano on 27/12/2017.
  */
 
-public class MyListActivity extends AppCompatActivity implements TodoItemListFragment.OnListFragmentInteractionListener,
-        TodoItemDetailFragment.OnTodoItemDetailInteraction{
-    private static final int ACCEPT_TASK_REQUEST = 1;
-
-    private TodoItemDetailFragment detailFragment;
-    private TodoItemListFragment listFragment;
-
-    private List<TodoItem> items;
+public class MyListActivity extends DoubleFragmentActivity{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_list);
 
-
-        displayListFragment();
-        View detailContainer = findViewById(R.id.fragment_detail);
-        if(detailContainer != null){
-            displayDetailFragment();
-        }
+        super.setItemList(DataGeneratorUtil.generateTodoItems(30));
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-    }
-
-    private void displayListFragment(){
-        //Todo remove this call
-        items = new ArrayList<>();
-        items = DataGeneratorUtil.generateTodoItems(30);
-        listFragment = TodoItemListFragment.newInstance(1, items);
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragment_list_container, listFragment)
-                .commit();
-        getSupportFragmentManager().executePendingTransactions();
-    }
-
-    private void displayDetailFragment(){
-        //TODO set detail of first todoItem
-        detailFragment = (TodoItemDetailFragment)TodoItemDetailFragment.newInstance(items.get(0));
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragment_detail, detailFragment)
-                .commit();
+        super.onCreate(savedInstanceState);
     }
 
     @Override
@@ -79,76 +33,37 @@ public class MyListActivity extends AppCompatActivity implements TodoItemListFra
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_my_list, menu);
 
-        // Adding back navigation on toolbar
-        //getSupportActionBar().setDisplayShowHomeEnabled(true);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-        // Implementing the search functionality
-        SearchManager searchManager = (SearchManager)getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView = (SearchView)menu.findItem(R.id.action_search)
-                .getActionView();
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-        searchView.setMaxWidth(Integer.MAX_VALUE);
-        listFragment.setSearchView(searchView);
-
         super.onCreateOptionsMenu(menu);
+
         return true;
     }
 
-    /**
-     * This method is called when an item in the list displayed by the fragment is clicked.
-     * The activity creates a new fragment containing the details of the item clicked and shows it
-     * @param todoItem the item clicked
-     * @param view the view clicked
-     */
-    @SuppressLint("RestrictedApi")
     @Override
-    public void onItemClick(TodoItem todoItem, View view, int clickedPosition) {
-        if(detailFragment == null){
-            View sharedImage = view.findViewById(R.id.user_icon);
-            View sharedElementName = view.findViewById(R.id.item_name);
-            final Intent intent = new Intent(MyListActivity.this, DetailTodoItemActivity.class);
-            intent.putExtra(getResources().getString(R.string.todo_item), todoItem);
-            intent.putExtra(getResources().getString(R.string.icon_tr_name), sharedImage.getTransitionName());
-            intent.putExtra(getResources().getString(R.string.name_tr_name),sharedElementName.getTransitionName() );
-            intent.putExtra(getResources().getString(R.string.position), clickedPosition);
-
-            Pair<View, String> sharedImagePair = Pair.create(sharedImage, sharedImage.getTransitionName());
-            Pair<View, String> sharedNamePair = Pair.create(sharedElementName, sharedElementName.getTransitionName());
-
-            final ActivityOptionsCompat options = ActivityOptionsCompat.
-                    makeSceneTransitionAnimation(this, sharedImagePair, sharedNamePair);
-
-            startActivityForResult(intent, ACCEPT_TASK_REQUEST, options.toBundle());
-        }
-        else{
-            detailFragment.updateFragment(todoItem);
-        }
+    protected void showUndoMessage(TodoItem removedItem, int position) {
+        View view = findViewById(android.R.id.content);
+        Snackbar.make(view, "You completed the activity!",
+                Snackbar.LENGTH_LONG)
+                .setAction("UNDO", (v) ->
+                    super.insertItem(removedItem, position)
+                )
+                .addCallback(new Snackbar.Callback(){
+                    @Override
+                    public void onDismissed(Snackbar transientBottomBar, int event) {
+                        if(event == DISMISS_EVENT_TIMEOUT) {
+                            handleItemAccepted(removedItem, position);
+                        }
+                    }
+                })
+                .show();
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        // Check which request we're responding to
-        if (requestCode == ACCEPT_TASK_REQUEST) {
-            // Make sure the request was successful
-            if (resultCode == RESULT_OK) {
-                RecyclerView recyclerView = findViewById(R.id.recycler_view);
-                TodoListAdapter adapter = (TodoListAdapter)recyclerView.getAdapter();
-                int position = data.getIntExtra(getResources().getString(R.string.position),0);
-                adapter.removeItem(position);
-            }
-        }
+    protected void callNetwork(TodoItem removedItem) {
+        //TODO update firebase
     }
-    @Override
-    public void onBackPressed(){
-        super.onBackPressed();
-    }
-
 
     @Override
-    public void onAcceptClick(TodoItem todoItem) {
-        //onBackPressed();
+    public void onItemSwipe(int swipedPosition) {
+        super.removeItem(swipedPosition);
     }
-
-
 }
