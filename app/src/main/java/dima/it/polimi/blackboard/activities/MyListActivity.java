@@ -46,8 +46,8 @@ public class MyListActivity extends AppCompatActivity implements TodoItemListFra
 
 
         displayListFragment();
-        detailFragment = (TodoItemDetailFragment)getSupportFragmentManager().findFragmentById(R.id.fragment_detail);
-        if(detailFragment != null){
+        View detailContainer = findViewById(R.id.fragment_detail);
+        if(detailContainer != null){
             displayDetailFragment();
         }
 
@@ -68,8 +68,7 @@ public class MyListActivity extends AppCompatActivity implements TodoItemListFra
 
     private void displayDetailFragment(){
         //TODO set detail of first todoItem
-        detailFragment = (TodoItemDetailFragment)TodoItemDetailFragment
-                .newInstance(items.get(0), "ehehe", "hahah");
+        detailFragment = (TodoItemDetailFragment)TodoItemDetailFragment.newInstance(items.get(0));
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_detail, detailFragment)
                 .commit();
@@ -78,7 +77,7 @@ public class MyListActivity extends AppCompatActivity implements TodoItemListFra
     @Override
     public boolean onCreateOptionsMenu(Menu menu){
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_group_list, menu);
+        getMenuInflater().inflate(R.menu.menu_my_list, menu);
 
         // Adding back navigation on toolbar
         //getSupportActionBar().setDisplayShowHomeEnabled(true);
@@ -148,11 +147,6 @@ public class MyListActivity extends AppCompatActivity implements TodoItemListFra
 
     @Override
     public void onAcceptClick(TodoItem todoItem) {
-        //onBackPressed();
-    }
-
-    @Override
-    public void onCloseClick() {
         //onBackPressed();
     }
 

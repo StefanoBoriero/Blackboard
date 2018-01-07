@@ -2,19 +2,15 @@ package dima.it.polimi.blackboard.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.transition.Transition;
-import android.transition.TransitionInflater;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import dima.it.polimi.blackboard.R;
 import dima.it.polimi.blackboard.model.TodoItem;
+import dima.it.polimi.blackboard.utils.DataGeneratorUtil;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -56,6 +52,16 @@ public class TodoItemDetailFragment extends Fragment {
         args.putParcelable(ARG_TODO, todoItem);
         args.putString(ARG_TR_ICON, transitionNameIcon);
         args.putString(ARG_TR_NAME, transitionNameName);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    public static Fragment newInstance(TodoItem todoItem){
+        TodoItemDetailFragment fragment = new TodoItemDetailFragment();
+        Bundle args = new Bundle();
+        args.putParcelable(ARG_TODO, todoItem);
+        args.putString(ARG_TR_ICON, "");
+        args.putString(ARG_TR_NAME, "");
         fragment.setArguments(args);
         return fragment;
     }
@@ -153,10 +159,5 @@ public class TodoItemDetailFragment extends Fragment {
          * @param todoItem the item accepted
          */
         void onAcceptClick(TodoItem todoItem);
-
-        /**
-         * Closes the detail screen
-         */
-        void onCloseClick();
     }
 }

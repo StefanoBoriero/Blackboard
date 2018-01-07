@@ -23,6 +23,7 @@ import dima.it.polimi.blackboard.R;
 import dima.it.polimi.blackboard.adapters.TodoListAdapter;
 import dima.it.polimi.blackboard.helper.TodoItemTouchHelper;
 import dima.it.polimi.blackboard.model.TodoItem;
+import dima.it.polimi.blackboard.utils.DataGeneratorUtil;
 
 /**
  * A fragment representing a list of Items.
@@ -126,15 +127,7 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
         super.onDetach();
         mListener = null;
     }
-/*
-    @Override
-    public void onStart(){
-        super.onStart();
-        if(searchView != null){
-            searchView.setQuery(savedQuery, true);
-        }
-    }
-*/
+
     @Override
     public void onStop(){
         savedQuery = searchView.getQuery();
@@ -183,16 +176,29 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
 
         Snackbar.make(fab, "You took charge of the activity",
                 Snackbar.LENGTH_LONG)
-                .setAction("UNDO", new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        int itemCount = adapter.getItemCount();
-                        adapter.insertItem(removedItem, removedIndex);
-                        if(removedIndex == 0 || removedIndex == itemCount){
-                            recyclerView.scrollToPosition(removedIndex);
+                .setAction("UNDO", (v) -> {
+                    int itemCount = adapter.getItemCount();
+                    adapter.insertItem(removedItem, removedIndex);
+                    if(removedIndex == 0 || removedIndex == itemCount){
+                        recyclerView.scrollToPosition(removedIndex);
                         }
-                    }
                 }).show();
+    }
+
+    public TodoItem removeItem(int position){
+        final TodoItem removedItem = adapter.getItem(position);
+        adapter.removeItem(position);
+        return removedItem;
+    }
+
+    public void insertItem(TodoItem todoItem, int position){
+        //TODO change this rootView element
+        RecyclerView recyclerView = rootView.findViewById(R.id.recycler_view);
+        int itemCount = adapter.getItemCount();
+        adapter.insertItem(todoItem, position);
+        if(position == 0 || position == itemCount){
+            recyclerView.scrollToPosition(position);
+        }
     }
 
     @Override

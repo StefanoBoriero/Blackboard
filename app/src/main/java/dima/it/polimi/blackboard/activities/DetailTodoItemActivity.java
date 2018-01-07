@@ -60,9 +60,4 @@ public class DetailTodoItemActivity extends AppCompatActivity implements TodoIte
         setResult(RESULT_OK, resultData);
         onBackPressed();
     }
-
-    @Override
-    public void onCloseClick() {
-        onBackPressed();
-    }
 }

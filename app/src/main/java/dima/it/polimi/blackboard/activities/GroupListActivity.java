@@ -61,7 +61,6 @@ TodoItemDetailFragment.OnTodoItemDetailInteraction, DialogInterface.OnClickListe
         mFab = findViewById(R.id.add_fab);
         mFab.setTransitionName("revealCircular");
         displayListFragment();
-        //detailFragment = (TodoItemDetailFragment)getSupportFragmentManager().findFragmentById(R.id.fragment_detail);
         View detailContainer = findViewById(R.id.fragment_detail);
         if(detailContainer != null){
             displayDetailFragment();
@@ -84,8 +83,7 @@ TodoItemDetailFragment.OnTodoItemDetailInteraction, DialogInterface.OnClickListe
 
     private void displayDetailFragment(){
         //TODO set detail of first todoItem
-        detailFragment = (TodoItemDetailFragment)TodoItemDetailFragment
-                .newInstance(items.get(0), "ehehe", "hahah");
+        detailFragment = (TodoItemDetailFragment)TodoItemDetailFragment.newInstance(items.get(0));
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_detail, detailFragment)
                 .commit();
@@ -176,11 +174,6 @@ TodoItemDetailFragment.OnTodoItemDetailInteraction, DialogInterface.OnClickListe
 
     @Override
     public void onAcceptClick(TodoItem todoItem) {
-        //onBackPressed();
-    }
-
-    @Override
-    public void onCloseClick() {
         //onBackPressed();
     }
 

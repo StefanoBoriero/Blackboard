@@ -52,7 +52,7 @@
     <dimen name="margin_button_top">32dp</dimen>
     <dimen name="margin_button_bottom">32dp</dimen>
 
-    <dimen name="swipe_text_size">20dp</dimen>
+    <dimen name="swipe_text_size">20sp</dimen>
 
 
     <item name="match_parent" format="integer" type="dimen">-1</item>

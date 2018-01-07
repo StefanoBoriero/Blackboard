@@ -1,6 +1,9 @@
 package dima.it.polimi.blackboard.adapters;
 
 import android.content.Context;
+import android.content.res.Resources;
+import android.graphics.drawable.Drawable;
+import android.media.Image;
 import android.support.v7.widget.RecyclerView;
 import android.transition.TransitionManager;
 import android.view.LayoutInflater;
@@ -56,15 +59,26 @@ public class TodoListAdapter extends RecyclerView.Adapter<TodoListAdapter.ViewHo
         holder.todoItemName.setTransitionName(todoItem.getName() + "Name" + todoItem.getId());
         holder.userIcon.setTransitionName(todoItem.getName() + "Icon" + todoItem.getId());
         holder.timestampView.setText(todoItem.getTimestamp());
+        holder.todoItemType.setCompoundDrawablesWithIntrinsicBounds(resolveIcon(todoItem.getType()), null, null, null);
         //TODO get user icon
 
 
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mListener.onTodoItemClicked(todoItem, v, holder.getAdapterPosition());
-            }
-        });
+        holder.itemView.setOnClickListener((v) ->
+                mListener.onTodoItemClicked(todoItem, v, holder.getAdapterPosition())
+        );
+    }
+
+    private Drawable resolveIcon(String type){
+        Resources res = parent.getResources();
+        if(type.equals("Housing")){
+            return res.getDrawable(R.drawable.ic_home_black_24dp);
+        }
+        else if(type.equals("Billing")){
+            return res.getDrawable(R.drawable.ic_payment_black_24dp);
+        } else if(type.equals("Shopping")){
+            return res.getDrawable(R.drawable.ic_shopping_cart_black_24dp);
+        }
+        return null;
     }
 
     @Override
