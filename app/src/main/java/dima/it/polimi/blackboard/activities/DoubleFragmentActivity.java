@@ -179,10 +179,17 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
     protected void removeItem(int position){
         TodoItem removedItem = ((TodoItemListFragment)firstFragment).removeItem(position);
         showUndoMessage(removedItem, position);
+        if(isDouble){
+            TodoItem nextItem = ((TodoItemListFragment)firstFragment).getItem(position);
+            ((TodoItemDetailFragment)secondFragment).updateFragment(nextItem);
+        }
     }
 
     protected void insertItem(TodoItem item, int position){
         ((TodoItemListFragment)firstFragment).insertItem(item, position);
+        if(isDouble){
+            ((TodoItemDetailFragment)secondFragment).updateFragment(item);
+        }
     }
 
     /**
@@ -190,10 +197,6 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
      * @param removedItem the item that has been removed
      */
     protected void handleItemAccepted(TodoItem removedItem, int position){
-        if(isDouble){
-            TodoItem nextItem = ((TodoItemListFragment)firstFragment).getItem(position);
-            ((TodoItemDetailFragment)secondFragment).updateFragment(nextItem);
-        }
         callNetwork(removedItem);
     }
 
