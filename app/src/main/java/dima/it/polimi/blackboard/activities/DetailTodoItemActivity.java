@@ -36,7 +36,7 @@ public class DetailTodoItemActivity extends AppCompatActivity implements TodoIte
     }
 
     private void createFragment(TodoItem todoItem, String iconTransitionName, String nameTransitionName){
-        detailFragment = TodoItemDetailFragment.newInstance(todoItem, iconTransitionName, nameTransitionName);
+        detailFragment = TodoItemDetailFragment.newInstance(todoItem, iconTransitionName, nameTransitionName, position);
     }
 
     private void displayFragment(){
@@ -47,7 +47,7 @@ public class DetailTodoItemActivity extends AppCompatActivity implements TodoIte
 
 
     @Override
-    public void onAcceptClick(TodoItem todoItem) {
+    public void onAcceptClick(TodoItem todoItem, int position) {
         Intent resultData = new Intent();
         resultData.putExtra(getResources().getString(R.string.position), position);
         setResult(RESULT_OK, resultData);

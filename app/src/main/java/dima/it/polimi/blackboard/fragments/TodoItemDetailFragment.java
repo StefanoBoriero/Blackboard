@@ -23,11 +23,13 @@ public class TodoItemDetailFragment extends Fragment {
     private static final String ARG_TODO = "todoItem";
     private static final String ARG_TR_NAME = "transitionName";
     private static final String ARG_TR_ICON = "transitionNameIcon";
+    private static final String ARG_POS = "position";
 
 
     private TodoItem todoTask;
     private String transitionName;
     private String transitionNameIcon;
+    private int position;
 
     private View rootView;
 
@@ -45,22 +47,24 @@ public class TodoItemDetailFragment extends Fragment {
      * @param transitionNameIcon Transition name for shared element transitions
      * @return A new instance of fragment TodoItemDetailFragment.
      */
-    public static Fragment newInstance(TodoItem todoItem, String transitionNameIcon, String transitionNameName) {
+    public static Fragment newInstance(TodoItem todoItem, String transitionNameIcon, String transitionNameName, int position) {
         TodoItemDetailFragment fragment = new TodoItemDetailFragment();
         Bundle args = new Bundle();
         args.putParcelable(ARG_TODO, todoItem);
         args.putString(ARG_TR_ICON, transitionNameIcon);
         args.putString(ARG_TR_NAME, transitionNameName);
+        args.putInt(ARG_POS, position);
         fragment.setArguments(args);
         return fragment;
     }
 
-    public static Fragment newInstance(TodoItem todoItem){
+    public static Fragment newInstance(TodoItem todoItem, int position){
         TodoItemDetailFragment fragment = new TodoItemDetailFragment();
         Bundle args = new Bundle();
         args.putParcelable(ARG_TODO, todoItem);
         args.putString(ARG_TR_ICON, "");
         args.putString(ARG_TR_NAME, "");
+        args.putInt(ARG_POS, position);
         fragment.setArguments(args);
         return fragment;
     }
@@ -72,6 +76,7 @@ public class TodoItemDetailFragment extends Fragment {
             todoTask = getArguments().getParcelable(ARG_TODO);
             transitionNameIcon = getArguments().getString(ARG_TR_ICON);
             transitionName = getArguments().getString(ARG_TR_NAME);
+            position = getArguments().getInt(ARG_POS);
         }
 
     }
@@ -104,7 +109,7 @@ public class TodoItemDetailFragment extends Fragment {
         //Binds the button click action to parent activity
         View acceptBtn = view.findViewById(R.id.accept_button);
         acceptBtn.setOnClickListener((v)->
-                mListener.onAcceptClick(todoTask)
+                mListener.onAcceptClick(todoTask, position)
         );
     }
 
@@ -126,8 +131,9 @@ public class TodoItemDetailFragment extends Fragment {
         mListener = null;
     }
 
-    public void updateFragment(TodoItem todoItem){
+    public void updateFragment(TodoItem todoItem, int position){
         View rootView = getView();
+        todoTask = todoItem;
         TextView descriptionView = rootView.findViewById(R.id.description);
         descriptionView.setText(todoItem.getDescription());
 
@@ -137,8 +143,12 @@ public class TodoItemDetailFragment extends Fragment {
         //Binds the button click action to parent activity
         View acceptBtn = rootView.findViewById(R.id.accept_button);
         acceptBtn.setOnClickListener( (v) ->
-            mListener.onAcceptClick(todoTask)
+            mListener.onAcceptClick(todoTask, position)
         );
+    }
+
+    public int getPosition(){
+        return position;
     }
 
     /**
@@ -157,6 +167,6 @@ public class TodoItemDetailFragment extends Fragment {
          * The user accepted the item
          * @param todoItem the item accepted
          */
-        void onAcceptClick(TodoItem todoItem);
+        void onAcceptClick(TodoItem todoItem, int position);
     }
 }

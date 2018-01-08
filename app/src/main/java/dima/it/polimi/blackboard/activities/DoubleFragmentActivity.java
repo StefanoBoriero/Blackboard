@@ -98,7 +98,7 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
     }
 
     private void showSecondFragment(){
-        secondFragment = TodoItemDetailFragment.newInstance(itemList.get(0));
+        secondFragment = TodoItemDetailFragment.newInstance(itemList.get(0), 0);
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_detail_container, secondFragment)
                 .commit();
@@ -107,7 +107,7 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
     @Override
     public void onItemClick(TodoItem item, View view, int clickedPosition) {
         if(isDouble){
-            doubleFragmentClickHandler(item);
+            doubleFragmentClickHandler(item, clickedPosition);
         } else {
             singleFragmentClickHandler(item, view, clickedPosition);
         }
@@ -142,8 +142,8 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
      * Updates the second fragment if shown in the same activity
      * @param item the item selected
      */
-    private void doubleFragmentClickHandler(TodoItem item){
-        ((TodoItemDetailFragment)secondFragment).updateFragment(item);
+    private void doubleFragmentClickHandler(TodoItem item, int position){
+        ((TodoItemDetailFragment)secondFragment).updateFragment(item, position);
     }
 
     /**
@@ -165,8 +165,8 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
     }
 
     @Override
-    public void onAcceptClick(TodoItem todoItem) {
-
+    public void onAcceptClick(TodoItem todoItem, int position) {
+        removeItem(position);
     }
 
     /**
@@ -179,16 +179,20 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
     protected void removeItem(int position){
         TodoItem removedItem = ((TodoItemListFragment)firstFragment).removeItem(position);
         showUndoMessage(removedItem, position);
-        if(isDouble){
+        if(isDouble && checkSelected(position)){
             TodoItem nextItem = ((TodoItemListFragment)firstFragment).getItem(position);
-            ((TodoItemDetailFragment)secondFragment).updateFragment(nextItem);
+            ((TodoItemDetailFragment)secondFragment).updateFragment(nextItem, position);
         }
+    }
+
+    private boolean checkSelected(int position){
+        return position == ((TodoItemDetailFragment)secondFragment).getPosition();
     }
 
     protected void insertItem(TodoItem item, int position){
         ((TodoItemListFragment)firstFragment).insertItem(item, position);
-        if(isDouble){
-            ((TodoItemDetailFragment)secondFragment).updateFragment(item);
+        if(isDouble && checkSelected(position)){
+            ((TodoItemDetailFragment)secondFragment).updateFragment(item, position);
         }
     }
 
