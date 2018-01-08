@@ -227,6 +227,16 @@ public class NewToDoTaskActivity extends AppCompatActivity {
 
     }
 
+    protected void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        savedInstanceState.putString("type", typeButton.getText().toString());
+        boolean activateCost = false;
+        if(costEditText.getVisibility() == LinearLayout.VISIBLE)
+            activateCost = true;
+        savedInstanceState.putBoolean("activated_cost",activateCost);
+        savedInstanceState.putString("cost", (costEditText.getText().toString()));
+    }
+
     //used to keep the state of the application when changing the orientation
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
@@ -235,6 +245,16 @@ public class NewToDoTaskActivity extends AppCompatActivity {
         container_layout.setBackgroundColor(getResources().getColor(R.color.colorAccent));
         mFab.setVisibility(View.INVISIBLE);
         container_layout.setBackground(getResources().getDrawable(R.drawable.background_addition));
+
+        typeButton.setText(savedInstanceState.getString("type"));
+        if(savedInstanceState.getBoolean("activated_cost") == true)
+        {
+            //show cost field
+            costEditText.setVisibility(LinearLayout.VISIBLE);
+            costView.setVisibility(LinearLayout.VISIBLE);
+            costEditText.setText(savedInstanceState.getString("cost"));
+        }
+
     }
 
     @Override
