@@ -134,6 +134,7 @@ public class TodoItemDetailFragment extends Fragment {
     public void updateFragment(TodoItem todoItem, int position){
         View rootView = getView();
         todoTask = todoItem;
+        this.position = position;
         TextView descriptionView = rootView.findViewById(R.id.description);
         descriptionView.setText(todoItem.getDescription());
 
