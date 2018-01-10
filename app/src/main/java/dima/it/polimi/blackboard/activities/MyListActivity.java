@@ -5,6 +5,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.View;
+import android.widget.TextView;
 
 import dima.it.polimi.blackboard.R;
 import dima.it.polimi.blackboard.model.TodoItem;
@@ -26,6 +27,8 @@ public class MyListActivity extends DoubleFragmentActivity{
         Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle(R.string.title_activity_my_list);
         setSupportActionBar(toolbar);
+
+
         super.onCreate(savedInstanceState);
     }
 

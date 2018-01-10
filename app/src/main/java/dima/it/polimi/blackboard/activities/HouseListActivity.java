@@ -13,6 +13,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 
 import dima.it.polimi.blackboard.R;
 import dima.it.polimi.blackboard.model.TodoItem;
@@ -43,6 +44,8 @@ public class HouseListActivity extends DoubleFragmentActivity implements DialogI
         Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle(R.string.title_activity_house_list);
         setSupportActionBar(toolbar);
+
+
         super.onCreate(savedInstanceState);
     }
 

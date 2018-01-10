@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import dima.it.polimi.blackboard.R;
+import dima.it.polimi.blackboard.activities.HouseListActivity;
 import dima.it.polimi.blackboard.adapters.TodoListAdapter;
 import dima.it.polimi.blackboard.helper.TodoItemTouchHelper;
 import dima.it.polimi.blackboard.model.TodoItem;
@@ -94,8 +95,15 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
         }
         recyclerView.setAdapter(adapter);
         recyclerView.addItemDecoration(new DividerItemDecoration(this.getActivity(), LinearLayoutManager.VERTICAL));
+        String swipeMessage;
+        if(parentActivity instanceof HouseListActivity){
+            swipeMessage = getResources().getString(R.string.house_list_swipe_msg);
+        }
+        else{
+            swipeMessage = getResources().getString(R.string.my_list_swipe_msg);
+        }
         ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new TodoItemTouchHelper(0,
-                ItemTouchHelper.LEFT, this);
+                ItemTouchHelper.LEFT, this, swipeMessage);
         new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(recyclerView);
 
         // Setting up the refresh layout

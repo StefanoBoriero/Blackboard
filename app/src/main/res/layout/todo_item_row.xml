@@ -28,12 +28,13 @@
             android:contentDescription="@string/content_description_suggestion"/>
 
         <TextView
+            android:id="@+id/background_swipe_message"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_marginEnd="@dimen/padding_list_row"
             android:layout_toStartOf="@id/tick_icon"
-            android:text="@string/swipe_text"
+            tools:text="@string/swipe_text"
             android:textColor="#ffffff"
             android:textSize="@dimen/swipe_text_size"
             android:textStyle="bold"/>

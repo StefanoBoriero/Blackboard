@@ -4,8 +4,10 @@ import android.graphics.Canvas;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.View;
+import android.widget.TextView;
 
 
+import dima.it.polimi.blackboard.R;
 import dima.it.polimi.blackboard.adapters.TodoListAdapter;
 
 /**
@@ -15,10 +17,12 @@ import dima.it.polimi.blackboard.adapters.TodoListAdapter;
 
 public class TodoItemTouchHelper extends ItemTouchHelper.SimpleCallback {
     private TodoItemTouchHelperListener listener;
+    private String msg;
 
-    public TodoItemTouchHelper(int dragDirs, int swipeDirs, TodoItemTouchHelperListener listener) {
+    public TodoItemTouchHelper(int dragDirs, int swipeDirs, TodoItemTouchHelperListener listener, String msg) {
         super(dragDirs, swipeDirs);
 
+        this.msg = msg;
         this.listener = listener;
     }
     @Override
@@ -37,6 +41,8 @@ public class TodoItemTouchHelper extends ItemTouchHelper.SimpleCallback {
             // Set the hidden background to VISIBLE. The background is by default set to INVISIBLE for visual transition issues
             final View backgroundView = ((TodoListAdapter.ViewHolder) viewHolder).viewBackground;
             backgroundView.setVisibility(View.VISIBLE);
+            TextView swipeMessageView = backgroundView.findViewById(R.id.background_swipe_message);
+            swipeMessageView.setText(msg);
 
             getDefaultUIUtil().onSelected(foregroundView);
         }

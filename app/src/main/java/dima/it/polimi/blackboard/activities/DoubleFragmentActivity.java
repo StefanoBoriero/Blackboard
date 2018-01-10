@@ -4,6 +4,7 @@ package dima.it.polimi.blackboard.activities;
 import android.annotation.SuppressLint;
 import android.app.SearchManager;
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.support.v4.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
@@ -113,12 +114,13 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
 
     @Override
     public void onItemClick(TodoItem item, View view, int clickedPosition) {
-        itemRowClicked = view;
+
 
         if(isDouble){
-            doubleFragmentClickHandler(item, clickedPosition);
+            doubleFragmentClickHandler(view, item, clickedPosition);
         } else {
             //singleFragmentClickHandler(item, view, clickedPosition);
+            itemRowClicked = view;
             isActivityResult = false;
             view.animate()
                     .scaleX(1.06f)
@@ -138,14 +140,6 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
                 .setDuration(ANIM_DURATION)
                 .withEndAction( () -> System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAA"))
                 .start();
-    }
-
-
-
-    private void resizeBrute(View itemRow){
-        itemRow.setScaleX(1f);
-        itemRow.setScaleY(1f);
-        itemRow.setElevation(0f);
     }
 
 
@@ -196,7 +190,15 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
      * Updates the second fragment if shown in the same activity
      * @param item the item selected
      */
-    private void doubleFragmentClickHandler(TodoItem item, int position){
+    private void doubleFragmentClickHandler(View clickedView, TodoItem item, int position){
+        if(clickedView != itemRowClicked) {
+            Drawable background_focused = getResources().getDrawable(R.drawable.background_list_row_focused);
+            clickedView.setBackground(background_focused);
+
+            Drawable background = getResources().getDrawable(R.drawable.background_list_row);
+            itemRowClicked.setBackground(background);
+        }
+        itemRowClicked = clickedView;
         ((TodoItemDetailFragment)secondFragment).updateFragment(item, position);
     }
 

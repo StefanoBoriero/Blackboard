@@ -54,8 +54,9 @@
     <string name="days_in_credit">Days in debt</string>
     <string name="days_in_debt">Days in credit</string>
 
-    <!-- Grouplist Activity strings -->
+    <!-- House List Activity strings -->
     <string name="todo_item">TodoItem</string>
+    <string name="house_list_swipe_msg">Accept Task</string>
 
         <!-- Actions -->
         <string name="action_choose_house">Choose House</string>
@@ -64,6 +65,9 @@
     <string name="icon_tr_name">Icon Transition Name</string>
     <string name="name_tr_name">Name Transition Name</string>
     <string name="position">Position</string>
+
+    <!-- My List Activity strings -->
+    <string name="my_list_swipe_msg">Task Completed</string>
 
 
     <!-- New Item strings -->
