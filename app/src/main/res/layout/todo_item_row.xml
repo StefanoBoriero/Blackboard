@@ -24,7 +24,8 @@
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
             android:layout_marginEnd="@dimen/padding_list_row"
-            android:src="@drawable/ic_my_list_white" />
+            android:src="@drawable/ic_my_list_white"
+            android:contentDescription="@string/content_description_suggestion"/>
 
         <TextView
             android:layout_width="wrap_content"
@@ -72,6 +73,7 @@
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:lines="1"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
             android:textSize="@dimen/msg_text_primary"
             android:textStyle="bold"
             tools:text="Pay Netflix"/>
@@ -99,6 +101,7 @@
                 android:layout_width="@dimen/icon_width_height"
                 android:layout_height="@dimen/icon_width_height"
                 android:background="@drawable/background_user_circle"
+                android:contentDescription="@string/content_description_user_icon"
                 />
 
         </RelativeLayout>
@@ -120,6 +123,7 @@
             android:layout_height="@dimen/icon_star"
             android:layout_alignParentBottom="true"
             android:layout_alignParentEnd="true"
+            android:contentDescription="@string/content_description_priority"
             android:src="@drawable/ic_star_border_black_24dp"
             android:alpha="0.5"/>
 

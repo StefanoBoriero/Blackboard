@@ -16,7 +16,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.view.Menu;
 import android.view.View;
-
 import java.util.List;
 
 import dima.it.polimi.blackboard.R;
@@ -36,12 +35,16 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
             TodoItemDetailFragment.OnTodoItemDetailInteraction{
 
     private static final int ACCEPT_TASK_REQUEST = 1;
+    private static final int ANIM_DURATION = 250;
 
     protected Fragment firstFragment;
     protected Fragment secondFragment;
 
+    private View itemRowClicked;
+
     protected List<TodoItem> itemList;
     boolean isDouble;
+    boolean isActivityResult;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -57,13 +60,17 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Adding back navigation on toolbar
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        if(getSupportActionBar() != null){
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
 
         // Implementing the search functionality
         SearchManager searchManager = (SearchManager)getSystemService(Context.SEARCH_SERVICE);
         SearchView searchView = (SearchView)menu.findItem(R.id.action_search)
                 .getActionView();
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        if(searchManager != null) {
+            searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        }
         searchView.setMaxWidth(Integer.MAX_VALUE);
         ((TodoItemListFragment)firstFragment).setSearchView(searchView);
 
@@ -106,11 +113,51 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
 
     @Override
     public void onItemClick(TodoItem item, View view, int clickedPosition) {
+        itemRowClicked = view;
+
         if(isDouble){
             doubleFragmentClickHandler(item, clickedPosition);
         } else {
-            singleFragmentClickHandler(item, view, clickedPosition);
+            //singleFragmentClickHandler(item, view, clickedPosition);
+            isActivityResult = false;
+            view.animate()
+                    .scaleX(1.06f)
+                    .scaleY(1.06f)
+                    .translationZ(8f)
+                    .setDuration(ANIM_DURATION)
+                    .withEndAction(()->singleFragmentClickHandler(item, view, clickedPosition))
+                    .start();
         }
+    }
+
+    private void resize(View itemRow){
+        itemRow.animate()
+                .scaleX(1f)
+                .scaleY(1f)
+                .translationZ(0f)
+                .setDuration(ANIM_DURATION)
+                .withEndAction( () -> System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAA"))
+                .start();
+    }
+
+
+
+    private void resizeBrute(View itemRow){
+        itemRow.setScaleX(1f);
+        itemRow.setScaleY(1f);
+        itemRow.setElevation(0f);
+    }
+
+
+    @Override
+    protected void onResume() {
+        if(!isActivityResult)
+            if(itemRowClicked != null) {
+                if (!isDouble) {
+                    resize(itemRowClicked);
+                }
+            }
+        super.onResume();
     }
 
     /**
@@ -120,7 +167,10 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
      * @param clickedPosition the position of the item clicked
      */
     @SuppressLint("RestrictedApi")
+    @SuppressWarnings("unchecked")
     private void singleFragmentClickHandler(TodoItem item, View view, int clickedPosition){
+
+        // Preparing the transition elements
         View sharedImage = view.findViewById(R.id.user_icon);
         View sharedElementName = view.findViewById(R.id.item_name);
         final Intent intent = new Intent(this, DetailTodoItemActivity.class);
@@ -129,14 +179,18 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
         intent.putExtra(getResources().getString(R.string.name_tr_name),sharedElementName.getTransitionName() );
         intent.putExtra(getResources().getString(R.string.position), clickedPosition);
 
-        Pair<View, String> sharedImagePair = Pair.create(sharedImage, sharedImage.getTransitionName());
-        Pair<View, String> sharedNamePair = Pair.create(sharedElementName, sharedElementName.getTransitionName());
+        Pair<View, String>[] array = new Pair[]{
+                Pair.create(sharedImage, sharedImage.getTransitionName()),
+                Pair.create(sharedElementName, sharedElementName.getTransitionName())
+        };
 
         final ActivityOptionsCompat options =
-                ActivityOptionsCompat.makeSceneTransitionAnimation(this, sharedImagePair, sharedNamePair);
+                ActivityOptionsCompat.makeSceneTransitionAnimation(this, array);
 
         startActivityForResult(intent, ACCEPT_TASK_REQUEST, options.toBundle());
     }
+
+
 
     /**
      * Updates the second fragment if shown in the same activity
@@ -159,7 +213,15 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
         if (requestCode == ACCEPT_TASK_REQUEST) {
             // Make sure the request was successful
             if (resultCode == RESULT_OK) {
-                removeItem(data.getIntExtra(getResources().getString(R.string.position),0));
+                isActivityResult = true;
+                final int position = data.getIntExtra(getResources().getString(R.string.position),0);
+                itemRowClicked.animate()
+                        .scaleX(1f)
+                        .scaleY(1f)
+                        .translationZ(0f)
+                        .setDuration(ANIM_DURATION)
+                        .withEndAction( () -> removeItem(position))
+                        .start();
             }
         }
     }

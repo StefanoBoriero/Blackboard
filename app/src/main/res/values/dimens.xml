@@ -42,8 +42,11 @@
 
     <dimen name="margin_start_icon">32dp</dimen>
     <dimen name="margin_start_text">16dp</dimen>
-    <dimen name="margin_top_icon">32dp</dimen>
+    <dimen name="margin_top_icon">8dp</dimen>
+    <dimen name="margin_bottom_icon">8dp</dimen>
     <dimen name="margin_top_text">36dp</dimen>
+
+    <dimen name="padding_drawable">15dp</dimen>
 
     <dimen name="margin_divider_start">20dp</dimen>
     <dimen name="margin_divider_end">20dp</dimen>

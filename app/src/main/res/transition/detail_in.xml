@@ -2,16 +2,6 @@
 <transitionSet xmlns:android="http://schemas.android.com/apk/res/android">
     <slide
         android:duration="@integer/slide_duration"
-        android:slideEdge="bottom"
-        android:interpolator="@android:interpolator/fast_out_slow_in">
-        <targets>
-            <target android:excludeId="@android:id/statusBarBackground"/>
-            <target android:excludeId="@id/detail_header"/>
-        </targets>
-    </slide>
-
-    <slide
-        android:duration="@integer/slide_duration"
         android:slideEdge="top"
         android:interpolator="@android:interpolator/fast_out_slow_in">
         <targets>
@@ -20,8 +10,18 @@
         </targets>
     </slide>
 
+    <slide
+        android:duration="@integer/slide_duration"
+        android:slideEdge="bottom"
+        android:interpolator="@android:interpolator/fast_out_slow_in">
+        <targets>
+            <!--<target android:excludeId="@android:id/statusBarBackground"/>-->
+            <target android:targetId="@id/accept_button"/>
+        </targets>
+    </slide>
+
     <fade
-     android:duration="@integer/fade_duration">
+     android:duration="@integer/slide_duration">
     </fade>
 
 </transitionSet>

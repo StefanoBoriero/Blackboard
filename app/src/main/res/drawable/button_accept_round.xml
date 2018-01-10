@@ -4,9 +4,11 @@ xmlns:tools="http://schemas.android.com/tools"
 android:color="#000"
 tools:targetApi="lollipop"> <!-- ripple effect color -->
 <item android:id="@android:id/background">
-    <shape android:shape="oval">
-        <solid android:color="@color/greenAccept"/>
-        <size android:width="150dp" android:height="150dp"/>
+
+    <shape>
+        <solid android:color = "@color/greenAccept"/>
+        <corners android:radius="25dp"/>
     </shape>
+
 </item>
 </ripple>

@@ -1,175 +1,114 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
+<android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
-    <android.support.constraint.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+    android:layout_height="match_parent">
 
-        <include
-            android:id="@+id/detail_header"
-            layout="@layout/detail_header" />
+    <include
+        android:id="@+id/detail_header"
+        layout="@layout/detail_header" />
 
-        <TextView
-            android:id="@+id/item_name"
-            android:layout_width="wrap_content"
+    <ScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/detail_header"
+        app:layout_constraintBottom_toTopOf="@id/guideline_bottom"
+        >
+
+        <LinearLayout
+            android:id="@+id/content_detail"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="24dp"
-            android:text="XXX"
-            android:textSize="@dimen/title_text_size"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/detail_header" />
+            android:divider="@drawable/divider_line_simple"
+            android:dividerPadding="25dp"
+            android:showDividers="middle"
+            android:alpha="0">
 
-        <ImageView
-            android:id="@+id/description_icon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/margin_start_icon"
-            android:src="@drawable/ic_description_black_24dp"
-            app:layout_constraintBottom_toBottomOf="@+id/description"
-            app:layout_constraintEnd_toStartOf="@string/description"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/description" />
+            <TextView
+                android:id="@+id/description"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_start_text"
+                android:layout_marginTop="@dimen/margin_top_icon"
+                android:layout_marginBottom="@dimen/margin_bottom_icon"
+                android:drawableStart="@drawable/ic_description_black_24dp"
+                android:gravity="center"
+                android:singleLine="false"
+                android:textSize="@dimen/description_text_size"
+                android:drawablePadding="@dimen/padding_drawable"
+                tools:text="Lorem ipsum dolet sic amor" />
 
-        <TextView
-            android:id="@+id/description"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/margin_start_text"
-            android:layout_marginTop="@dimen/margin_top_icon"
-            android:singleLine="false"
-            android:text="Lorem ipsum dolet sic amor"
-            android:textSize="@dimen/description_text_size"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/description_icon"
-            app:layout_constraintTop_toBottomOf="@id/item_name" />
+            <TextView
+                android:id="@+id/expiration"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_start_text"
+                android:layout_marginTop="@dimen/margin_top_icon"
+                android:layout_marginBottom="@dimen/margin_bottom_icon"
+                android:drawableStart="@drawable/ic_date_range_black_24dp"
+                android:gravity="center"
+                android:singleLine="false"
+                android:textSize="@dimen/description_text_size"
+                android:drawablePadding="@dimen/padding_drawable"
+                tools:text="6/6/66" />
 
-        <ImageView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/margin_divider_end"
-            android:layout_marginStart="@dimen/margin_divider_start"
-            android:layout_marginTop="@dimen/margin_divider_top"
-            android:src="@drawable/divider_line_simple"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/description" />
+            <TextView
+                android:id="@+id/expense"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_start_text"
+                android:layout_marginBottom="@dimen/margin_bottom_icon"
+                android:layout_marginTop="@dimen/margin_top_icon"
+                android:drawableStart="@drawable/ic_menu_balance_24dp"
+                android:gravity="center"
+                android:singleLine="false"
+                android:textSize="@dimen/description_text_size"
+                android:drawablePadding="@dimen/padding_drawable"
+                tools:text="6,66$" />
 
+            <TextView
+                android:id="@+id/suggestion"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_start_text"
+                android:layout_marginTop="@dimen/margin_top_icon"
+                android:layout_marginBottom="@dimen/margin_bottom_icon"
+                android:drawableStart="@drawable/ic_person_black_24dp"
+                android:gravity="center"
+                android:singleLine="false"
+                android:textSize="@dimen/description_text_size"
+                android:drawablePadding="@dimen/padding_drawable"
+                tools:text="Ezio Greggio" />
+        </LinearLayout>
 
-        <ImageView
-            android:id="@+id/expiration_icon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/margin_start_icon"
-            android:src="@drawable/ic_date_range_black_24dp"
-            app:layout_constraintBottom_toBottomOf="@+id/expiration"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/expiration" />
+    </ScrollView>
 
-        <TextView
-            android:id="@+id/expiration"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/margin_start_text"
-            android:layout_marginTop="@dimen/margin_top_icon"
-            android:singleLine="false"
-            android:text="6/6/66"
-            android:textSize="@dimen/description_text_size"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/expiration_icon"
-            app:layout_constraintTop_toBottomOf="@id/description" />
+    <Button
+        android:id="@+id/accept_button"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/button_accept_round"
+        android:text="Accept"
+        android:textAlignment="center"
+        android:textStyle="bold"
+        android:textColor="@color/white"
+        android:drawableEnd="@drawable/ic_my_list_white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/guideline_bottom" />
 
-        <ImageView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/margin_divider_end"
-            android:layout_marginStart="@dimen/margin_divider_start"
-            android:layout_marginTop="@dimen/margin_divider_top"
-            android:src="@drawable/divider_line_simple"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/expiration" />
+    <android.support.constraint.Guideline
+        android:id="@+id/guideline_bottom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.8" />
 
-        <ImageView
-            android:id="@+id/expense_icon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/margin_start_icon"
-            android:alpha="0.5"
-            android:src="@drawable/ic_menu_balance_24dp"
-            app:layout_constraintBottom_toBottomOf="@+id/expense"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/expense" />
-
-        <TextView
-            android:id="@+id/expense"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/margin_start_text"
-            android:layout_marginTop="@dimen/margin_top_icon"
-            android:singleLine="false"
-            android:text="6,66$"
-            android:textSize="@dimen/description_text_size"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/suggestion_icon"
-            app:layout_constraintTop_toBottomOf="@id/expiration" />
-
-        <ImageView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/margin_divider_end"
-            android:layout_marginStart="@dimen/margin_divider_start"
-            android:layout_marginTop="@dimen/margin_divider_top"
-            android:src="@drawable/divider_line_simple"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/expense" />
-
-
-        <ImageView
-            android:id="@+id/suggestion_icon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/margin_start_icon"
-
-            android:src="@drawable/ic_person_black_24dp"
-            app:layout_constraintBottom_toBottomOf="@+id/suggestion"
-            app:layout_constraintEnd_toStartOf="@+id/suggestion"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/suggestion" />
-
-        <TextView
-            android:id="@+id/suggestion"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/margin_start_text"
-            android:layout_marginTop="@dimen/margin_top_icon"
-            android:singleLine="false"
-            android:text="Ezio Greggio"
-            android:textSize="@dimen/description_text_size"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/suggestion_icon"
-            app:layout_constraintTop_toBottomOf="@id/expense" />
-
-        <Button
-            android:id="@+id/accept_button"
-            android:layout_width="64dp"
-            android:layout_height="64dp"
-            android:layout_marginTop="@dimen/margin_button_top"
-            android:layout_marginBottom="@dimen/margin_button_bottom"
-            android:background="@drawable/button_accept_round"
-            android:foreground="@drawable/ic_my_list_white"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/suggestion"
-            app:layout_constraintBottom_toBottomOf="parent"/>
-
-    </android.support.constraint.ConstraintLayout>
-</ScrollView>
+</android.support.constraint.ConstraintLayout>
