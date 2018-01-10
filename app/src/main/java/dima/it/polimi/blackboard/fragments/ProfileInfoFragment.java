@@ -6,16 +6,15 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import dima.it.polimi.blackboard.R;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link AccountSettingsFragment#newInstance} factory method to
+ * Use the {@link ProfileInfoFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class AccountSettingsFragment extends Fragment {
+public class ProfileInfoFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -26,7 +25,7 @@ public class AccountSettingsFragment extends Fragment {
     private String mParam2;
 
 
-    public AccountSettingsFragment() {
+    public ProfileInfoFragment() {
         // Required empty public constructor
     }
 
@@ -34,11 +33,11 @@ public class AccountSettingsFragment extends Fragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @return A new instance of fragment AccountSettingsFragment.
+     * @return A new instance of fragment ProfileInfoFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static AccountSettingsFragment newInstance() {
-        AccountSettingsFragment fragment = new AccountSettingsFragment();
+    public static ProfileInfoFragment newInstance() {
+        ProfileInfoFragment fragment = new ProfileInfoFragment();
         Bundle args = new Bundle();
         fragment.setArguments(args);
         return fragment;

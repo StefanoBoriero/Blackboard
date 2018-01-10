@@ -4,7 +4,7 @@
     android:id="@+id/constraintLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="dima.it.polimi.blackboard.activities.AccountActivity$PlaceholderFragment"
+    tools:context="dima.it.polimi.blackboard.activities.ProfileActivity$PlaceholderFragment"
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
     <TextView

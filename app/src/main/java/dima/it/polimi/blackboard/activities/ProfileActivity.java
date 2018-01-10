@@ -15,11 +15,11 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import dima.it.polimi.blackboard.R;
-import dima.it.polimi.blackboard.fragments.AccountSettingsFragment;
+import dima.it.polimi.blackboard.fragments.ProfileInfoFragment;
 import dima.it.polimi.blackboard.fragments.AchievementFragment;
 import dima.it.polimi.blackboard.fragments.StatFragment;
 
-public class AccountActivity extends AppCompatActivity {
+public class ProfileActivity extends AppCompatActivity {
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -47,7 +47,7 @@ public class AccountActivity extends AppCompatActivity {
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
         Toolbar toolbar = findViewById(R.id.toolbar);
-        toolbar.setTitle(R.string.title_activity_account);
+        toolbar.setTitle(R.string.title_activity_profile);
         setSupportActionBar(toolbar);
         // Set up the ViewPager with the sections adapter.
         mViewPager = findViewById(R.id.container);
@@ -60,8 +60,10 @@ public class AccountActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        if(getSupportActionBar()!=null) {
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
         return true;
     }
 
@@ -103,13 +105,13 @@ public class AccountActivity extends AppCompatActivity {
      */
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
         private final int PAGE_NUMBER = 3;
-        private String[] titles = {"SETTINGS", "STATS","ACHIEVEMENTS"};
+        private final String[] titles = {"INFO", "STATS","ACHIEVEMENTS"};
         private Fragment[] fragments;
 
         private SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
             fragments = new Fragment[3];
-            fragments[0] = AccountSettingsFragment.newInstance();
+            fragments[0] = ProfileInfoFragment.newInstance();
             fragments[1] = StatFragment.newInstance();
             fragments[2] = AchievementFragment.newInstance();
         }

@@ -5,6 +5,7 @@
     <string name="title_activity_main">Blackboard</string>
     <string name="title_activity_detail">Item Details</string>
     <string name="title_activity_group_list">GroupListActivity</string>
+    <string name="title_activity_profile">Profile</string>
 
 
     <!-- Navigation Drawer strings -->
@@ -15,7 +16,7 @@
     <string name="navigation_drawer_balance">Balance</string>
     <string name="navigation_drawer_my_list">My List</string>
     <string name="navigation_drawer_settings">Settings</string>
-    <string name="account">Account</string>
+    <string name="profile">Profile</string>
     <string name="log_out">Log out</string>
 
 
@@ -184,7 +185,6 @@
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
-    <string name="title_activity_account">Account</string>
 
     <!-- Content description images -->
     <string name="content_description_user_icon">User icon</string>
