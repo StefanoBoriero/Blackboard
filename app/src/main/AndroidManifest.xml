@@ -28,8 +28,8 @@
             android:theme="@style/AppTheme.Detail" />
         <activity android:name=".activities.NewToDoTaskActivity" />
         <activity
-            android:name=".activities.GroupListActivity"
-            android:label="@string/title_activity_group_list"
+            android:name=".activities.HouseListActivity"
+            android:label="@string/title_activity_house_list"
             android:parentActivityName=".activities.MainActivity"
             android:theme="@style/AppTheme.GroupList">
 
@@ -45,7 +45,7 @@
         </activity>
         <activity
             android:name=".activities.MyListActivity"
-            android:label="@string/title_activity_group_list"
+            android:label="@string/title_activity_my_list"
             android:parentActivityName=".activities.MainActivity"
             android:theme="@style/AppTheme.GroupList">
 

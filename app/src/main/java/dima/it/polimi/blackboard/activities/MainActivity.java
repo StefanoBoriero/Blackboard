@@ -78,7 +78,7 @@ public class MainActivity extends AppCompatActivity
             Intent intent = new Intent(MainActivity.this, MyListActivity.class);
             startActivity(intent);
         } else if (id == R.id.nav_group_list) {
-            Intent intent = new Intent(MainActivity.this, GroupListActivity.class);
+            Intent intent = new Intent(MainActivity.this, HouseListActivity.class);
             startActivity(intent);
         } else if (id == R.id.nav_balance) {
             Intent intent = new Intent(MainActivity.this, BalanceActivity.class);
@@ -102,7 +102,7 @@ public class MainActivity extends AppCompatActivity
 
     public void onSuggestionSurfaceClick(View v){
 
-        Intent intent = new Intent(MainActivity.this, GroupListActivity.class);
+        Intent intent = new Intent(MainActivity.this, HouseListActivity.class);
         startActivity(intent);
     }
 

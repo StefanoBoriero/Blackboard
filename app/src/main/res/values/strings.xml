@@ -4,7 +4,8 @@
     <string name="app_name">Blackboard</string>
     <string name="title_activity_main">Blackboard</string>
     <string name="title_activity_detail">Item Details</string>
-    <string name="title_activity_group_list">GroupListActivity</string>
+    <string name="title_activity_house_list">House List</string>
+    <string name="title_activity_my_list">My List</string>
     <string name="title_activity_profile">Profile</string>
 
 
@@ -12,7 +13,7 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
-    <string name="navigation_drawer_group_list">Group List</string>
+    <string name="navigation_drawer_house_list">House List</string>
     <string name="navigation_drawer_balance">Balance</string>
     <string name="navigation_drawer_my_list">My List</string>
     <string name="navigation_drawer_settings">Settings</string>

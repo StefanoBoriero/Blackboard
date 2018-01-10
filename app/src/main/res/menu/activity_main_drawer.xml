@@ -10,8 +10,8 @@
             android:title="@string/navigation_drawer_my_list" />
         <item
             android:id="@+id/nav_group_list"
-            android:icon="@drawable/ic_menu_group_list_24dp"
-            android:title="@string/navigation_drawer_group_list" />
+            android:icon="@drawable/ic_home_black_24dp"
+            android:title="@string/navigation_drawer_house_list" />
         <item
             android:id="@+id/nav_balance"
             android:icon="@drawable/ic_menu_balance_24dp"

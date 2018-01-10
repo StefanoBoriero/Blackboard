@@ -6,7 +6,7 @@
     android:id="@+id/root_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:mContext="dima.it.polimi.blackboard.activities.GroupListActivity">
+    tools:mContext="dima.it.polimi.blackboard.activities.HouseListActivity">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -24,7 +24,7 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <include layout="@layout/content_group_list"
+    <include layout="@layout/content_house_list"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
 </android.support.design.widget.CoordinatorLayout>

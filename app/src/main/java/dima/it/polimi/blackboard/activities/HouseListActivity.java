@@ -24,7 +24,7 @@ import dima.it.polimi.blackboard.utils.DataGeneratorUtil;
  * one item displays the details in another fragment; if the device is large enough, the detail
  * fragment will be displayed permanently on the side of the screen
  */
-public class GroupListActivity extends DoubleFragmentActivity implements DialogInterface.OnClickListener{
+public class HouseListActivity extends DoubleFragmentActivity implements DialogInterface.OnClickListener{
 
     // TODO select preferred
     private int whichHouse = 0;
@@ -34,13 +34,14 @@ public class GroupListActivity extends DoubleFragmentActivity implements DialogI
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        setContentView(R.layout.activity_group_list);
+        setContentView(R.layout.activity_house_list);
         super.setItemList(DataGeneratorUtil.generateTodoItems(30));
 
         mFab = findViewById(R.id.add_fab);
         mFab.setTransitionName("revealCircular");
 
         Toolbar toolbar = findViewById(R.id.toolbar);
+        toolbar.setTitle(R.string.title_activity_house_list);
         setSupportActionBar(toolbar);
         super.onCreate(savedInstanceState);
     }
@@ -48,7 +49,7 @@ public class GroupListActivity extends DoubleFragmentActivity implements DialogI
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_group_list, menu);
+        getMenuInflater().inflate(R.menu.menu_house_list, menu);
 
         super.onCreateOptionsMenu(menu);
         return true;

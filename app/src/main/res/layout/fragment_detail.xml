@@ -65,7 +65,7 @@
                 android:layout_marginStart="@dimen/margin_start_text"
                 android:layout_marginBottom="@dimen/margin_bottom_icon"
                 android:layout_marginTop="@dimen/margin_top_icon"
-                android:drawableStart="@drawable/ic_menu_balance_24dp"
+                android:drawableStart="@drawable/ic_menu_balance_alpha_black_24dp"
                 android:gravity="center"
                 android:singleLine="false"
                 android:textSize="@dimen/description_text_size"

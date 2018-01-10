@@ -24,6 +24,7 @@ public class MyListActivity extends DoubleFragmentActivity{
         super.setItemList(DataGeneratorUtil.generateTodoItems(30));
 
         Toolbar toolbar = findViewById(R.id.toolbar);
+        toolbar.setTitle(R.string.title_activity_my_list);
         setSupportActionBar(toolbar);
         super.onCreate(savedInstanceState);
     }
