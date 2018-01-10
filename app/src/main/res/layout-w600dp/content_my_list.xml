@@ -16,7 +16,7 @@
 
     <FrameLayout
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        android:id="@+id/fragment_list"
+        android:id="@+id/fragment_list_container"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintEnd_toStartOf="@id/vertical_guideline"
@@ -26,7 +26,7 @@
         tools:layout="@layout/fragment_list" />
 
     <FrameLayout
-        android:id="@+id/fragment_detail"
+        android:id="@+id/fragment_detail_container"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintStart_toEndOf="@id/vertical_guideline"

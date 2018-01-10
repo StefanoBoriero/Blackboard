@@ -186,4 +186,11 @@
     </string>
     <string name="title_activity_account">Account</string>
 
+    <!-- Content description images -->
+    <string name="content_description_user_icon">User icon</string>
+    <string name="content_description_detail_icon">Detail icon</string>
+    <string name="content_description_expiration_icon">Expiration icon</string>
+    <string name="content_description_suggestion">Suggestion icon</string>
+    <string name="content_description_priority">Priority icon</string>
+
 </resources>

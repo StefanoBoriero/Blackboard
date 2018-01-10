@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <integer name="on_reveal_duration">400</integer>
-    <integer name="slide_duration">500</integer>
+    <integer name="slide_duration">400</integer>
     <integer name="fade_duration">200</integer>
     <integer name="explode_duration">300</integer>
+    <integer name="item_animation_duration">300</integer>
     <item name="visible" type="id"/>
     <item name="masked" type="id"/>
 </resources>
