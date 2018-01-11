@@ -120,6 +120,7 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
             doubleFragmentClickHandler(view, item, clickedPosition);
         } else {
             //singleFragmentClickHandler(item, view, clickedPosition);
+            ((TodoItemListFragment)firstFragment).disableSwipe();
             itemRowClicked = view;
             isActivityResult = false;
             view.animate()
@@ -145,6 +146,7 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
 
     @Override
     protected void onResume() {
+        ((TodoItemListFragment)firstFragment).enableSwipe();
         if(!isActivityResult)
             if(itemRowClicked != null) {
                 if (!isDouble) {

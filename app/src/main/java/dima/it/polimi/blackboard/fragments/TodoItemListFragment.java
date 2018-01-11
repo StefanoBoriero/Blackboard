@@ -40,8 +40,13 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
 
     private int mColumnCount = 1;
     private OnListFragmentInteractionListener mListener;
+    private RecyclerView recyclerView;
+    private ItemTouchHelper.SimpleCallback itemTouchHelperCallback;
+    private ItemTouchHelper swipeHelper;
     private TodoListAdapter adapter;
+
     private List<TodoItem> todoItems;
+
 
     private AppCompatActivity parentActivity;
     private View rootView;
@@ -59,8 +64,10 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
 
+
+
         //TODO change this with network fetching
-        args.putParcelableArrayList(ARG_TODO_ITEMS, (ArrayList)todoItems);
+        args.putParcelableArrayList(ARG_TODO_ITEMS, new ArrayList<>(todoItems));
         fragment.setArguments(args);
         return fragment;
     }
@@ -86,7 +93,7 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
         rootView = parentActivity.findViewById(R.id.root_view);
 
         // Setting up the RecyclerView adapter and helpers
-        RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
+        recyclerView = view.findViewById(R.id.recycler_view);
         Context context = view.getContext();
         if (mColumnCount <= 1) {
             recyclerView.setLayoutManager(new LinearLayoutManager(context));
@@ -102,9 +109,10 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
         else{
             swipeMessage = getResources().getString(R.string.my_list_swipe_msg);
         }
-        ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new TodoItemTouchHelper(0,
+        itemTouchHelperCallback = new TodoItemTouchHelper(0,
                 ItemTouchHelper.LEFT, this, swipeMessage);
-        new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(recyclerView);
+        swipeHelper = new ItemTouchHelper(itemTouchHelperCallback);
+        swipeHelper.attachToRecyclerView(recyclerView);
 
         // Setting up the refresh layout
         SwipeRefreshLayout swipeRefreshLayout = view.findViewById(R.id.swipe_refresh_layout);
@@ -136,6 +144,14 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
     @Override
     public void onTodoItemClicked(TodoItem todoItem, View view, int clickedPostion) {
         mListener.onItemClick(todoItem, view, clickedPostion);
+    }
+
+    public void disableSwipe(){
+        swipeHelper.attachToRecyclerView(null);
+    }
+
+    public void enableSwipe(){
+        swipeHelper.attachToRecyclerView(recyclerView);
     }
 
     public void setSearchView(SearchView searchView){
