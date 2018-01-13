@@ -1,14 +1,19 @@
 package dima.it.polimi.blackboard.fragments;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.util.List;
+
 import dima.it.polimi.blackboard.R;
+import dima.it.polimi.blackboard.model.Detail;
 import dima.it.polimi.blackboard.model.TodoItem;
 
 /**
@@ -24,6 +29,7 @@ public class TodoItemDetailFragment extends Fragment {
     private static final String ARG_TR_NAME = "transitionName";
     private static final String ARG_TR_ICON = "transitionNameIcon";
     private static final String ARG_POS = "position";
+
 
 
     private TodoItem todoTask;
@@ -85,18 +91,39 @@ public class TodoItemDetailFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_detail, container, false);
+        View view = inflater.inflate(R.layout.fragment_detail, container, false);
+        LinearLayout detailList = view.findViewById(R.id.content_detail);
+        populateDetailList(detailList, inflater);
+
+        return view;
+    }
+
+    private void populateDetailList(LinearLayout layout, LayoutInflater inflater){
+        List<Detail> details = todoTask.getDetails();
+
+        for(Detail d: details){
+            Drawable icon = getResources().getDrawable(d.getIconResId());
+            String content = d.getContent();
+            TextView row = (TextView)inflater.inflate(R.layout.detail_row, layout, false);
+            row.setText(content);
+            row.setCompoundDrawablesWithIntrinsicBounds(icon, null, null, null);
+            layout.addView(row);
+        }
+    }
+
+    private void clearDetails(LinearLayout layout){
+        layout.removeAllViews();
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         rootView = view;
-
+/*
         // Gets the text views to populate them
         TextView descriptionView = view.findViewById(R.id.description);
         descriptionView.setText(todoTask.getDescription());
-
+*/
         TextView nameView = view.findViewById(R.id.item_name);
         nameView.setText(todoTask.getName());
         nameView.setTransitionName(transitionName);
@@ -135,17 +162,25 @@ public class TodoItemDetailFragment extends Fragment {
         View rootView = getView();
         todoTask = todoItem;
         this.position = position;
-        TextView descriptionView = rootView.findViewById(R.id.description);
-        descriptionView.setText(todoItem.getDescription());
 
-        TextView nameView = rootView.findViewById(R.id.item_name);
-        nameView.setText(todoItem.getName());
+        if(rootView != null) {
+            LinearLayout layout = getView().findViewById(R.id.content_detail);
+            clearDetails(layout);
+            populateDetailList(layout, getLayoutInflater());
+            /*
+            TextView descriptionView = rootView.findViewById(R.id.description);
+            descriptionView.setText(todoItem.getDescription());
+            */
+            TextView nameView = rootView.findViewById(R.id.item_name);
+            nameView.setText(todoItem.getName());
 
-        //Binds the button click action to parent activity
-        View acceptBtn = rootView.findViewById(R.id.accept_button);
-        acceptBtn.setOnClickListener( (v) ->
-            mListener.onAcceptClick(todoTask, position)
-        );
+
+            //Binds the button click action to parent activity
+            View acceptBtn = rootView.findViewById(R.id.accept_button);
+            acceptBtn.setOnClickListener((v) ->
+                    mListener.onAcceptClick(todoTask, position)
+            );
+        }
     }
 
     public int getPosition(){

@@ -27,14 +27,20 @@ public class DataGeneratorUtil {
 
     public static List<TodoItem> generateTodoItems(int amount){
         List<TodoItem> out = new ArrayList<>();
-        int i=0;
+        int i;
 
         for(i=0; i<amount; i++){
             int name = (int)(Math.random() * 3);
             int type = (int)(Math.random() * 3);
-            double price = (double) (Math.random() * 3);
+            double price = (Math.random() * 3);
 
-            TodoItem item = new TodoItem(i,names[name], types[type], "Lorem ipsum dolor sit amet",price);
+            TodoItem item;
+            if(Math.random() > 0.5) {
+                item = new TodoItem(i, names[name], types[type], "Lorem ipsum dolor sit amet", price);
+            }
+            else{
+                item = new TodoItem(i, names[name], types[type], "We guajò, bella sta App");
+            }
             out.add(item);
         }
         return out;
@@ -42,13 +48,13 @@ public class DataGeneratorUtil {
 
     public static List<PaymentItem> generatePaymentItems(int amount){
         List<PaymentItem> out = new ArrayList<>();
-        int i=0;
+        int i;
 
         for(i=0; i<amount; i++){
             int name = (int)(Math.random() * 3);
             int from = (int)(Math.random() * 4);
             int to = (int)(Math.random() * 4);
-            double price = (double) (Math.random() * 4);
+            double price = (Math.random() * 4);
 
             PaymentItem item = new PaymentItem(i,names[name],froms[from],tos[to] ,price);
             out.add(item);
@@ -58,16 +64,23 @@ public class DataGeneratorUtil {
 
     public static List<Achievement> generateAchievements(int amount, String type){
         List<Achievement> list = new ArrayList<>();
-        String[] titles = null;
+        String[] titles;
 
-        if(type.equals("General")){
-            titles = titlesGeneral;
-        } else if (type.equals("Housekeeping")){
-            titles = titlesHouse;
-        } else if (type.equals("Billing")){
-            titles = titlesBilling;
-        } else if (type.equals("Shopping")){
+        switch (type) {
+            case ("General"):
+                titles = titlesGeneral;
+                break;
+            case ("Housekeeping"):
+                titles = titlesHouse;
+                break;
+              case("Billing"):
+                titles = titlesBilling;
+                break;
+            case("Shopping"):
             titles = titlesShopping;
+            break;
+            default:
+                titles = titlesGeneral;
         }
 
         for(int i=0; i<amount; i++) {

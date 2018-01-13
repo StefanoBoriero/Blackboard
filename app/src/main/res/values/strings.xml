@@ -69,6 +69,9 @@
     <!-- My List Activity strings -->
     <string name="my_list_swipe_msg">Task Completed</string>
 
+    <!-- Detail strings -->
+    <string name="accept">Accept</string>
+
 
     <!-- New Item strings -->
     <string-array name="priorities">
