@@ -139,7 +139,6 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
                 .scaleY(1f)
                 .translationZ(0f)
                 .setDuration(ANIM_DURATION)
-                .withEndAction( () -> System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAA"))
                 .start();
     }
 

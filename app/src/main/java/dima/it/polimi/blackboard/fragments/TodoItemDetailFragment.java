@@ -1,19 +1,22 @@
 package dima.it.polimi.blackboard.fragments;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import java.util.List;
 
 import dima.it.polimi.blackboard.R;
-import dima.it.polimi.blackboard.model.Detail;
+import dima.it.polimi.blackboard.adapters.DetailAdapter;
 import dima.it.polimi.blackboard.model.TodoItem;
 
 /**
@@ -91,25 +94,9 @@ public class TodoItemDetailFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_detail, container, false);
-        LinearLayout detailList = view.findViewById(R.id.content_detail);
-        populateDetailList(detailList, inflater);
-
-        return view;
+        return inflater.inflate(R.layout.fragment_detail, container, false);
     }
 
-    private void populateDetailList(LinearLayout layout, LayoutInflater inflater){
-        List<Detail> details = todoTask.getDetails();
-
-        for(Detail d: details){
-            Drawable icon = getResources().getDrawable(d.getIconResId());
-            String content = d.getContent();
-            TextView row = (TextView)inflater.inflate(R.layout.detail_row, layout, false);
-            row.setText(content);
-            row.setCompoundDrawablesWithIntrinsicBounds(icon, null, null, null);
-            layout.addView(row);
-        }
-    }
 
     private void clearDetails(LinearLayout layout){
         layout.removeAllViews();
@@ -119,11 +106,12 @@ public class TodoItemDetailFragment extends Fragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         rootView = view;
-/*
-        // Gets the text views to populate them
-        TextView descriptionView = view.findViewById(R.id.description);
-        descriptionView.setText(todoTask.getDescription());
-*/
+        RecyclerView rv = view.findViewById(R.id.recycler_view_detail);
+        RecyclerView.Adapter adapter = new DetailAdapter(todoTask.getDetails());
+        rv.setLayoutManager(new LinearLayoutManager(view.getContext()));
+        rv.addItemDecoration(new DividerItemDecoration(this.getActivity(), LinearLayoutManager.VERTICAL));
+        rv.setAdapter(adapter);
+
         TextView nameView = view.findViewById(R.id.item_name);
         nameView.setText(todoTask.getName());
         nameView.setTransitionName(transitionName);
@@ -133,11 +121,30 @@ public class TodoItemDetailFragment extends Fragment {
         View userIconView = view.findViewById(R.id.user_icon);
         userIconView.setTransitionName(transitionNameIcon);
 
+        TextView typeView = view.findViewById(R.id.type_detail);
+        typeView.setText(todoTask.getType());
+        typeView.setCompoundDrawablesWithIntrinsicBounds(resolveIcon(todoTask.getType()), null, null, null);
+
         //Binds the button click action to parent activity
         View acceptBtn = view.findViewById(R.id.accept_button);
         acceptBtn.setOnClickListener((v)->
                 mListener.onAcceptClick(todoTask, position)
         );
+    }
+
+    //TODO extract this method in Utility class OR put iconResId in todoItem
+    private Drawable resolveIcon(String type){
+        Resources res = getResources();
+        switch (type) {
+            case ("Housing"):
+                return res.getDrawable(R.drawable.ic_home_black_24dp);
+            case("Billing"):
+                return res.getDrawable(R.drawable.ic_payment_black_24dp);
+            case ("Shopping"):
+                return res.getDrawable(R.drawable.ic_shopping_cart_black_24dp);
+            default:
+                return null;
+        }
     }
 
 
@@ -164,13 +171,7 @@ public class TodoItemDetailFragment extends Fragment {
         this.position = position;
 
         if(rootView != null) {
-            LinearLayout layout = getView().findViewById(R.id.content_detail);
-            clearDetails(layout);
-            populateDetailList(layout, getLayoutInflater());
-            /*
-            TextView descriptionView = rootView.findViewById(R.id.description);
-            descriptionView.setText(todoItem.getDescription());
-            */
+
             TextView nameView = rootView.findViewById(R.id.item_name);
             nameView.setText(todoItem.getName());
 

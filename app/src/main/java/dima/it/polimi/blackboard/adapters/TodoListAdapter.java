@@ -68,17 +68,19 @@ public class TodoListAdapter extends RecyclerView.Adapter<TodoListAdapter.ViewHo
         );
     }
 
+    //TODO extract this method in Utility class OR put iconResId in todoItem
     private Drawable resolveIcon(String type){
         Resources res = parent.getResources();
-        if(type.equals("Housing")){
-            return res.getDrawable(R.drawable.ic_home_black_24dp);
+        switch (type) {
+            case ("Housing"):
+                    return res.getDrawable(R.drawable.ic_home_black_24dp);
+            case("Billing"):
+                    return res.getDrawable(R.drawable.ic_payment_black_24dp);
+            case ("Shopping"):
+                    return res.getDrawable(R.drawable.ic_shopping_cart_black_24dp);
+            default:
+                return null;
         }
-        else if(type.equals("Billing")){
-            return res.getDrawable(R.drawable.ic_payment_black_24dp);
-        } else if(type.equals("Shopping")){
-            return res.getDrawable(R.drawable.ic_shopping_cart_black_24dp);
-        }
-        return null;
     }
 
     @Override
@@ -143,7 +145,7 @@ public class TodoListAdapter extends RecyclerView.Adapter<TodoListAdapter.ViewHo
         public RelativeLayout viewForeground;
         public RelativeLayout viewBackground;
 
-        public ViewHolder(View itemView) {
+        private ViewHolder(View itemView) {
             super(itemView);
             viewForeground = itemView.findViewById(R.id.foreground_row);
             viewBackground = itemView.findViewById(R.id.background_row);

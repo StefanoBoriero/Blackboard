@@ -2,35 +2,40 @@
 <android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <include
         android:id="@+id/detail_header"
         layout="@layout/detail_header" />
-
-    <ScrollView
-        android:id="@+id/scrollView"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
+    <TextView
+        android:id="@+id/type_detail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        android:layout_margin="@dimen/margin_type"
+        android:textSize="@dimen/text_size_type"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        android:drawablePadding="@dimen/drawable_padding"
+        android:gravity="center"
+        tools:drawableStart="@drawable/ic_shopping_cart_black_24dp"
+        tools:text="Shopping"
         app:layout_constraintTop_toBottomOf="@id/detail_header"
+        app:layout_constraintBottom_toTopOf="@id/recycler_view_detail"/>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycler_view_detail"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:transitionGroup="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/type_detail"
         app:layout_constraintBottom_toTopOf="@id/guideline_bottom"
-        >
-
-        <LinearLayout
-            android:id="@+id/content_detail"
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:divider="@drawable/divider_line_simple"
-            android:dividerPadding="25dp"
-            android:showDividers="middle"
-            android:alpha="0"/>
-
-    </ScrollView>
-
+        tools:listitem="@layout/detail_row"/>
     <Button
         android:id="@+id/accept_button"
         android:layout_width="100dp"

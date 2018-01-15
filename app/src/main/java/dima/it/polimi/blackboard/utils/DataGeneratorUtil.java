@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import dima.it.polimi.blackboard.model.Achievement;
+import dima.it.polimi.blackboard.model.House;
 import dima.it.polimi.blackboard.model.PaymentItem;
 import dima.it.polimi.blackboard.model.TodoItem;
 
@@ -89,5 +90,17 @@ public class DataGeneratorUtil {
             list.add(a);
         }
         return list;
+    }
+
+    public static List<House> generateHouses(int amount){
+        int i;
+        List<House> houses = new ArrayList<>(amount);
+
+        for(i=0; i<amount; i++){
+            House h = new House("House " + i);
+            houses.add(h);
+        }
+
+        return houses;
     }
 }

@@ -86,7 +86,10 @@
             android:ellipsize="end"
             android:lines="1"
             android:textSize="@dimen/msg_text_secondary"
-            tools:text="Billing" />
+            android:gravity="center"
+            android:drawablePadding="@dimen/drawable_padding"
+            tools:text="Shopping"
+            tools:drawableStart="@drawable/ic_shopping_cart_black_24dp"/>
 
         </LinearLayout>
 

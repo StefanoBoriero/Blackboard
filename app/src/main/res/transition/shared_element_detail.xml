@@ -4,14 +4,5 @@
         android:duration="@integer/slide_duration"
         android:interpolator="@android:interpolator/accelerate_decelerate"
         />
-        <!--
-        <arcMotion
-            android:maximumAngle="45"
-            android:minimumHorizontalAngle="90"
-            android:minimumVerticalAngle="0"
-            />
-
-    </changeBounds>
-     -->
 
 </transitionSet>

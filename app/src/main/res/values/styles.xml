@@ -42,9 +42,8 @@
 
     <style name="AppTheme.Detail" parent="AppTheme.NoActionBar">
         <item name="android:windowEnterTransition">@transition/detail_in</item>
-        <item name="android:windowExitTransition">@transition/detail_in</item>
-        <item name="android:windowSharedElementEnterTransition">@transition/shared_element_detail
-        </item>
+        <item name="android:windowExitTransition">@transition/detail_out</item>
+        <item name="android:windowSharedElementEnterTransition">@transition/shared_element_detail</item>
     </style>
 
     <style name="spinnerItemStyle">
