@@ -94,7 +94,7 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
         if(secondFragmentContainer != null){
             result = true;
         }
-        return  result;
+        return result;
     }
 
     protected void showFirstFragment(){
@@ -193,14 +193,15 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
      */
     private void doubleFragmentClickHandler(View clickedView, TodoItem item, int position){
         if(clickedView != itemRowClicked) {
-            Drawable background_focused = getResources().getDrawable(R.drawable.background_list_row_focused);
-            clickedView.setBackground(background_focused);
-
-            Drawable background = getResources().getDrawable(R.drawable.background_list_row);
-            itemRowClicked.setBackground(background);
+            Drawable selected = getDrawable(R.color.colorAccent);
+            clickedView.findViewById(R.id.selected_flag).setBackground(selected);
+            if(itemRowClicked != null) {
+                itemRowClicked.findViewById(R.id.selected_flag).setBackground(null);
+            }
+            ((TodoItemDetailFragment)secondFragment).updateFragment(item, position);
         }
         itemRowClicked = clickedView;
-        ((TodoItemDetailFragment)secondFragment).updateFragment(item, position);
+
     }
 
     /**

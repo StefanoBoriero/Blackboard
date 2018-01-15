@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.media.Image;
+import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.RecyclerView;
 import android.transition.TransitionManager;
 import android.view.LayoutInflater;
@@ -16,6 +17,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -102,6 +104,7 @@ public class TodoListAdapter extends RecyclerView.Adapter<TodoListAdapter.ViewHo
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Filter getFilter() {
         return new Filter() {
             @Override
@@ -142,8 +145,8 @@ public class TodoListAdapter extends RecyclerView.Adapter<TodoListAdapter.ViewHo
         private TextView todoItemType;
         private ImageView userIcon;
         private TextView timestampView;
-        public RelativeLayout viewForeground;
-        public RelativeLayout viewBackground;
+        public ConstraintLayout viewForeground;
+        public ConstraintLayout viewBackground;
 
         private ViewHolder(View itemView) {
             super(itemView);

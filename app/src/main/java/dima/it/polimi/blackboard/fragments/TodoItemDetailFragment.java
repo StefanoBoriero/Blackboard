@@ -11,7 +11,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 
@@ -28,19 +27,17 @@ import dima.it.polimi.blackboard.model.TodoItem;
  * create an instance of this fragment.
  */
 public class TodoItemDetailFragment extends Fragment {
+    private static final int FADE_DURATION = 300;
+    private static final int FADE_DELAY = 150;
     private static final String ARG_TODO = "todoItem";
     private static final String ARG_TR_NAME = "transitionName";
     private static final String ARG_TR_ICON = "transitionNameIcon";
     private static final String ARG_POS = "position";
 
-
-
     private TodoItem todoTask;
     private String transitionName;
     private String transitionNameIcon;
     private int position;
-
-    private View rootView;
 
     private OnTodoItemDetailInteraction mListener;
 
@@ -97,27 +94,17 @@ public class TodoItemDetailFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_detail, container, false);
     }
 
-
-    private void clearDetails(LinearLayout layout){
-        layout.removeAllViews();
-    }
-
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        rootView = view;
         RecyclerView rv = view.findViewById(R.id.recycler_view_detail);
-        RecyclerView.Adapter adapter = new DetailAdapter(todoTask.getDetails());
-        rv.setLayoutManager(new LinearLayoutManager(view.getContext()));
-        rv.addItemDecoration(new DividerItemDecoration(this.getActivity(), LinearLayoutManager.VERTICAL));
-        rv.setAdapter(adapter);
+        populateRecyclerView(rv);
 
         TextView nameView = view.findViewById(R.id.item_name);
         nameView.setText(todoTask.getName());
         nameView.setTransitionName(transitionName);
 
         // Binds dynamically the shared element through transition name
-        //titleView.setTransitionName(transitionName);
         View userIconView = view.findViewById(R.id.user_icon);
         userIconView.setTransitionName(transitionNameIcon);
 
@@ -130,6 +117,29 @@ public class TodoItemDetailFragment extends Fragment {
         acceptBtn.setOnClickListener((v)->
                 mListener.onAcceptClick(todoTask, position)
         );
+    }
+
+    private void populateRecyclerView(RecyclerView recyclerView){
+        RecyclerView.Adapter adapter = new DetailAdapter(todoTask.getDetails());
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.addItemDecoration(new DividerItemDecoration(this.getActivity(), LinearLayoutManager.VERTICAL));
+        recyclerView.setAdapter(adapter);
+    }
+
+    private void hideRecyclerView(RecyclerView recyclerView){
+        recyclerView.animate()
+                .alpha(0f)
+                .setDuration(FADE_DURATION)
+                .withEndAction(()-> showRecyclerView(recyclerView))
+                .start();
+    }
+
+    private void showRecyclerView(RecyclerView recyclerView){
+        recyclerView.animate()
+                .alpha(1f)
+                .setDuration(FADE_DURATION)
+                .setStartDelay(FADE_DELAY)
+                .start();
     }
 
     //TODO extract this method in Utility class OR put iconResId in todoItem
@@ -171,10 +181,12 @@ public class TodoItemDetailFragment extends Fragment {
         this.position = position;
 
         if(rootView != null) {
-
             TextView nameView = rootView.findViewById(R.id.item_name);
             nameView.setText(todoItem.getName());
 
+            RecyclerView rv = rootView.findViewById(R.id.recycler_view_detail);
+            hideRecyclerView(rv);
+            populateRecyclerView(rv);
 
             //Binds the button click action to parent activity
             View acceptBtn = rootView.findViewById(R.id.accept_button);

@@ -207,5 +207,6 @@
     <string name="content_description_priority">Priority icon</string>
     <string name="content_description_house">House icon</string>
     <string name="content_description_dots">Menu dots</string>
+    <string name="content_description_selected">Visual feedback for selection</string>
 
 </resources>
