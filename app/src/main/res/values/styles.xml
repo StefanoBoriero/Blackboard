@@ -54,25 +54,25 @@
     </style>
 
     <style name="ExpandedAppBarPositive" parent="@android:style/TextAppearance.Medium">
-        <item name="android:textSize">60sp</item>
+        <item name="android:textSize">70sp</item>
         <item name="android:textColor">#4CAF50</item>
         <item name="android:textStyle">bold</item>
     </style>
 
     <style name="CollapsedAppBarPositive" parent="@android:style/TextAppearance.Medium">
-        <item name="android:textSize">0sp</item>
+        <item name="android:textSize">30sp</item>
         <item name="android:textColor">#4CAF50</item>
         <item name="android:textStyle">normal</item>
     </style>
 
     <style name="ExpandedAppBarNegative" parent="@android:style/TextAppearance.Medium">
-        <item name="android:textSize">60sp</item>
+        <item name="android:textSize">70sp</item>
         <item name="android:textColor">#D32F2F</item>
         <item name="android:textStyle">bold</item>
     </style>
 
     <style name="CollapsedAppBarnegative" parent="@android:style/TextAppearance.Medium">
-        <item name="android:textSize">0sp</item>
+        <item name="android:textSize">30sp</item>
         <item name="android:textColor">#D32F2F</item>
         <item name="android:textStyle">normal</item>
     </style>
