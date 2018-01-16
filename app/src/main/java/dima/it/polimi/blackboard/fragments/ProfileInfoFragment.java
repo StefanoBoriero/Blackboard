@@ -1,6 +1,7 @@
 package dima.it.polimi.blackboard.fragments;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -15,6 +16,9 @@ import android.view.ViewGroup;
 import java.util.List;
 
 import dima.it.polimi.blackboard.R;
+import dima.it.polimi.blackboard.activities.MainActivity;
+import dima.it.polimi.blackboard.activities.MyListActivity;
+import dima.it.polimi.blackboard.activities.PhotoDialogActivity;
 import dima.it.polimi.blackboard.adapters.HouseListAdapter;
 import dima.it.polimi.blackboard.model.House;
 import dima.it.polimi.blackboard.utils.DataGeneratorUtil;
@@ -71,6 +75,13 @@ public class ProfileInfoFragment extends Fragment {
                 (this::onMenuExpand)
         );
 
+        View button = getView().findViewById(R.id.user_icon);
+        button.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), PhotoDialogActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     public void onMenuExpand(View v){
