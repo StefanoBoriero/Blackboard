@@ -1,7 +1,9 @@
 package dima.it.polimi.blackboard.fragments;
 
 
+import android.app.ActivityOptions;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -29,6 +31,8 @@ import dima.it.polimi.blackboard.utils.DataGeneratorUtil;
  * create an instance of this fragment.
  */
 public class ProfileInfoFragment extends Fragment {
+
+
 
     public ProfileInfoFragment() {
         // Required empty public constructor
@@ -76,10 +80,16 @@ public class ProfileInfoFragment extends Fragment {
         );
 
         View button = getView().findViewById(R.id.user_icon);
+        button.setTransitionName("profileTransition");
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity(), PhotoDialogActivity.class);
-                startActivity(intent);
+                Bitmap bitmap = Bitmap.createBitmap(v.getWidth(),v.getHeight(),Bitmap.Config.ARGB_8888);
+
+                ActivityOptions options = ActivityOptions.
+                        makeThumbnailScaleUpAnimation(v, bitmap, 0,0);
+                startActivity(intent, options.toBundle());
+
             }
         });
     }
