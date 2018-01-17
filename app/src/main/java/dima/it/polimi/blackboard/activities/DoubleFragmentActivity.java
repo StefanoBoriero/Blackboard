@@ -193,8 +193,7 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
      */
     private void doubleFragmentClickHandler(View clickedView, TodoItem item, int position){
         if(clickedView != itemRowClicked) {
-            Drawable selected = getDrawable(R.color.colorAccent);
-            clickedView.findViewById(R.id.selected_flag).setBackground(selected);
+            setFocusedItem(clickedView);
             if(itemRowClicked != null) {
                 itemRowClicked.findViewById(R.id.selected_flag).setBackground(null);
             }
@@ -202,6 +201,11 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
         }
         itemRowClicked = clickedView;
 
+    }
+
+    private void setFocusedItem(View view){
+        Drawable selected = getDrawable(R.color.colorAccent);
+        view.findViewById(R.id.selected_flag).setBackground(selected);
     }
 
     /**
@@ -243,10 +247,13 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
     protected abstract void showUndoMessage(TodoItem removedItem, int position);
 
     protected void removeItem(int position){
+        View nextItemView = ((TodoItemListFragment)firstFragment).getViewHolder(position + 1);
         TodoItem removedItem = ((TodoItemListFragment)firstFragment).removeItem(position);
         showUndoMessage(removedItem, position);
         if(isDouble && checkSelected(position)){
             TodoItem nextItem = ((TodoItemListFragment)firstFragment).getItem(position);
+            setFocusedItem(nextItemView);
+            itemRowClicked = nextItemView;
             ((TodoItemDetailFragment)secondFragment).updateFragment(nextItem, position);
         }
     }

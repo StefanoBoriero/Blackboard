@@ -205,6 +205,10 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
         return adapter.getItem(position);
     }
 
+    public View getViewHolder(int position){
+        return recyclerView.getLayoutManager().getChildAt(position);
+    }
+
     @Override
     public void onRefresh() {
         //TODO implement refreshing through Firebase. Add setter for network source
