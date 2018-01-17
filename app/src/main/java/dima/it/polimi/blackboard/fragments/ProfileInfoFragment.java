@@ -1,6 +1,9 @@
 package dima.it.polimi.blackboard.fragments;
 
 
+import android.app.ActivityOptions;
+import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -15,6 +18,9 @@ import android.view.ViewGroup;
 import java.util.List;
 
 import dima.it.polimi.blackboard.R;
+import dima.it.polimi.blackboard.activities.MainActivity;
+import dima.it.polimi.blackboard.activities.MyListActivity;
+import dima.it.polimi.blackboard.activities.PhotoDialogActivity;
 import dima.it.polimi.blackboard.adapters.HouseListAdapter;
 import dima.it.polimi.blackboard.model.House;
 import dima.it.polimi.blackboard.utils.DataGeneratorUtil;
@@ -25,6 +31,8 @@ import dima.it.polimi.blackboard.utils.DataGeneratorUtil;
  * create an instance of this fragment.
  */
 public class ProfileInfoFragment extends Fragment {
+
+
 
     public ProfileInfoFragment() {
         // Required empty public constructor
@@ -71,6 +79,19 @@ public class ProfileInfoFragment extends Fragment {
                 (this::onMenuExpand)
         );
 
+        View button = getView().findViewById(R.id.user_icon);
+        button.setTransitionName("profileTransition");
+        button.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), PhotoDialogActivity.class);
+                Bitmap bitmap = Bitmap.createBitmap(v.getWidth(),v.getHeight(),Bitmap.Config.ARGB_8888);
+
+                ActivityOptions options = ActivityOptions.
+                        makeThumbnailScaleUpAnimation(v, bitmap, 0,0);
+                startActivity(intent, options.toBundle());
+
+            }
+        });
     }
 
     public void onMenuExpand(View v){

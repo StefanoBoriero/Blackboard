@@ -73,6 +73,12 @@
                 android:value="dima.it.polimi.blackboard.activities.MainActivity" />
         </activity>
 
+        <activity
+            android:name="dima.it.polimi.blackboard.activities.PhotoDialogActivity"
+            android:theme="@android:style/Theme.Material.Light.Dialog.NoActionBar" >
+        </activity>
+
+
         <activity android:name=".activities.SignInActivity"
             android:theme="@style/AppTheme.NoActionBar"/>
     </application>
