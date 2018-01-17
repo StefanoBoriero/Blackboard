@@ -2,6 +2,7 @@ package dima.it.polimi.blackboard.fragments;
 
 
 import android.app.ActivityOptions;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -23,6 +24,8 @@ import dima.it.polimi.blackboard.activities.MyListActivity;
 import dima.it.polimi.blackboard.activities.PhotoDialogActivity;
 import dima.it.polimi.blackboard.adapters.HouseListAdapter;
 import dima.it.polimi.blackboard.model.House;
+import dima.it.polimi.blackboard.model.RoomMate;
+import dima.it.polimi.blackboard.model.TodoItem;
 import dima.it.polimi.blackboard.utils.DataGeneratorUtil;
 
 /**
@@ -30,9 +33,9 @@ import dima.it.polimi.blackboard.utils.DataGeneratorUtil;
  * Use the {@link ProfileInfoFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ProfileInfoFragment extends Fragment {
+public class ProfileInfoFragment extends Fragment implements HouseListAdapter.HouseListAdapterListener{
 
-
+    private ProfileInfoFragment.OnHouseListFragmentInteractionListener mListener;
 
     public ProfileInfoFragment() {
         // Required empty public constructor
@@ -71,7 +74,7 @@ public class ProfileInfoFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         List<House> myHouses = DataGeneratorUtil.generateHouses(5);
         RecyclerView rv = view.findViewById(R.id.recycler_view_house);
-        RecyclerView.Adapter adapter = new HouseListAdapter(myHouses);
+        RecyclerView.Adapter adapter = new HouseListAdapter(myHouses,this);
         rv.setLayoutManager(new GridLayoutManager(getContext(), 3));
         rv.setAdapter(adapter);
 
@@ -80,18 +83,38 @@ public class ProfileInfoFragment extends Fragment {
         );
 
         View button = getView().findViewById(R.id.user_icon);
-        button.setTransitionName("profileTransition");
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity(), PhotoDialogActivity.class);
-                Bitmap bitmap = Bitmap.createBitmap(v.getWidth(),v.getHeight(),Bitmap.Config.ARGB_8888);
-
                 ActivityOptions options = ActivityOptions.
-                        makeThumbnailScaleUpAnimation(v, bitmap, 0,0);
+                        makeScaleUpAnimation(v,0,0,0, 0);
                 startActivity(intent, options.toBundle());
 
             }
         });
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof ProfileInfoFragment.OnHouseListFragmentInteractionListener) {
+            mListener = (ProfileInfoFragment.OnHouseListFragmentInteractionListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnHouseListFragmentInteractionListener");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
+
+    }
+
+    @Override
+    public void onHouseClicked(House house, View view, int clickedPostion) {
+        mListener.onItemClick(house, view, clickedPostion);
     }
 
     public void onMenuExpand(View v){
@@ -99,5 +122,9 @@ public class ProfileInfoFragment extends Fragment {
         MenuInflater inflater = popupMenu.getMenuInflater();
         inflater.inflate(R.menu.menu_my_houses, popupMenu.getMenu());
         popupMenu.show();
+    }
+
+    public interface OnHouseListFragmentInteractionListener {
+        void onItemClick(House item, View view, int clickedPosition);
     }
 }

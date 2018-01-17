@@ -6,6 +6,7 @@ import java.util.List;
 import dima.it.polimi.blackboard.model.Achievement;
 import dima.it.polimi.blackboard.model.House;
 import dima.it.polimi.blackboard.model.PaymentItem;
+import dima.it.polimi.blackboard.model.RoomMate;
 import dima.it.polimi.blackboard.model.TodoItem;
 
 /**
@@ -102,5 +103,17 @@ public class DataGeneratorUtil {
         }
 
         return houses;
+    }
+
+    public static List<RoomMate> generateRoomMates(int amount) {
+        int i;
+        List<RoomMate> roomMates = new ArrayList<>(amount);
+
+        for(i=0; i<amount; i++){
+            RoomMate h = new RoomMate("Maharez " + i);
+            roomMates.add(h);
+        }
+
+        return roomMates;
     }
 }

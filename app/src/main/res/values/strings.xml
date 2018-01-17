@@ -58,8 +58,8 @@
     <string name="todo_item">TodoItem</string>
     <string name="house_list_swipe_msg">Accept Task</string>
 
-        <!-- Actions -->
-        <string name="action_choose_house">Choose House</string>
+    <!-- Actions -->
+    <string name="action_choose_house">Choose House</string>
 
     <!-- Transition Names -->
     <string name="icon_tr_name">Icon Transition Name</string>

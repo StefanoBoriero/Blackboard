@@ -11,6 +11,7 @@ import java.util.List;
 
 import dima.it.polimi.blackboard.R;
 import dima.it.polimi.blackboard.model.House;
+import dima.it.polimi.blackboard.model.TodoItem;
 
 /**
  * Adapter for display houses in a Recycler View
@@ -19,9 +20,11 @@ import dima.it.polimi.blackboard.model.House;
 
 public class HouseListAdapter extends RecyclerView.Adapter<HouseListAdapter.ViewHolder> {
     private List<House> myHouses;
+    private HouseListAdapterListener mListener;
 
-    public HouseListAdapter(List<House> houses){
+    public HouseListAdapter(List<House> houses, HouseListAdapterListener listener){
         myHouses = houses;
+        this.mListener = listener;
     }
 
     @Override
@@ -36,11 +39,19 @@ public class HouseListAdapter extends RecyclerView.Adapter<HouseListAdapter.View
     public void onBindViewHolder(ViewHolder holder, int position) {
         House house = myHouses.get(position);
         holder.houseName.setText(house.getName());
+
+        holder.itemView.setOnClickListener((v) ->
+                mListener.onHouseClicked(house, v, holder.getAdapterPosition())
+        );
     }
 
     @Override
     public int getItemCount() {
         return myHouses.size();
+    }
+
+    public interface HouseListAdapterListener {
+        void onHouseClicked(House house, View houseView, int clickedPosition);
     }
 
     protected class ViewHolder extends RecyclerView.ViewHolder{

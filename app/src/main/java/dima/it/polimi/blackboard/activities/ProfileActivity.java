@@ -1,5 +1,7 @@
 package dima.it.polimi.blackboard.activities;
 
+import android.app.ActivityOptions;
+import android.content.Intent;
 import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -18,8 +20,9 @@ import dima.it.polimi.blackboard.R;
 import dima.it.polimi.blackboard.fragments.ProfileInfoFragment;
 import dima.it.polimi.blackboard.fragments.AchievementFragment;
 import dima.it.polimi.blackboard.fragments.StatFragment;
+import dima.it.polimi.blackboard.model.House;
 
-public class ProfileActivity extends AppCompatActivity {
+public class ProfileActivity extends AppCompatActivity implements ProfileInfoFragment.OnHouseListFragmentInteractionListener{
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -65,6 +68,15 @@ public class ProfileActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
         return true;
+    }
+
+    @Override
+    public void onItemClick(House item, View view, int clickedPosition) {
+        Intent intent = new Intent(this, HouseDialogActivity.class);
+        ActivityOptions options = ActivityOptions.
+                makeScaleUpAnimation(view,0,0,0, 0);
+        startActivity(intent, options.toBundle());
+
     }
 
     /**
