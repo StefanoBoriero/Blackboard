@@ -20,7 +20,6 @@
             app:contentScrim="?attr/colorPrimary"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
             app:expandedTitleGravity="center"
-            app:collapsedTitleGravity="right"
             app:toolbarId="@+id/toolbar">
 
 
@@ -56,7 +55,8 @@
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/fab_margin"
         android:onClick="fabListener"
-        android:layout_gravity="right|bottom"
+        app:layout_anchor="@id/balance_toolbar"
+        app:layout_anchorGravity="bottom|right|end"
         app:backgroundTint="@color/colorAccent"
         app:srcCompat="@drawable/ic_fab_add_white_24dp"
 
