@@ -16,7 +16,6 @@ import dima.it.polimi.blackboard.model.TodoItem;
  */
 
 public class DetailTodoItemActivity extends AppCompatActivity implements TodoItemDetailFragment.OnTodoItemDetailInteraction{
-    private TodoItem todoItem;
     private Fragment detailFragment;
     private int position;
 
@@ -26,7 +25,7 @@ public class DetailTodoItemActivity extends AppCompatActivity implements TodoIte
         setContentView(R.layout.activity_detail);
 
         Intent intent = getIntent();
-        todoItem = intent.getParcelableExtra(getResources().getString(R.string.todo_item));
+        TodoItem todoItem = intent.getParcelableExtra(getResources().getString(R.string.todo_item));
         String iconTransitionName = intent.getStringExtra(getResources().getString(R.string.icon_tr_name));
         String nameTransitionName = intent.getStringExtra(getResources().getString(R.string.name_tr_name));
         position = intent.getIntExtra(getResources().getString(R.string.position),0);
@@ -56,13 +55,6 @@ public class DetailTodoItemActivity extends AppCompatActivity implements TodoIte
 
     @Override
     public void onBackPressed() {
-        /*
-        View contentDetail = findViewById(R.id.recycler_view_detail);
-        contentDetail.animate()
-                .alpha(0.0f)
-                .setDuration(300)
-                .start();
-                */
         super.onBackPressed();
     }
 }

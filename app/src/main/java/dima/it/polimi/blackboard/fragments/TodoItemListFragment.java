@@ -41,16 +41,11 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
     private int mColumnCount = 1;
     private OnListFragmentInteractionListener mListener;
     private RecyclerView recyclerView;
-    private ItemTouchHelper.SimpleCallback itemTouchHelperCallback;
     private ItemTouchHelper swipeHelper;
     private TodoListAdapter adapter;
 
-    private List<TodoItem> todoItems;
 
-
-    private AppCompatActivity parentActivity;
     private View rootView;
-    private SearchView searchView;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -78,8 +73,8 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
 
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
-            todoItems = getArguments().getParcelableArrayList(ARG_TODO_ITEMS);
-            adapter = new TodoListAdapter(getContext(),todoItems, this);
+            List<TodoItem> todoItems = getArguments().getParcelableArrayList(ARG_TODO_ITEMS);
+            adapter = new TodoListAdapter(todoItems, this);
         }
     }
 
@@ -89,7 +84,7 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
         View view = inflater.inflate(R.layout.fragment_list, container, false);
 
 
-        parentActivity = ((AppCompatActivity)getActivity());
+        AppCompatActivity parentActivity = ((AppCompatActivity)getActivity());
         rootView = parentActivity.findViewById(R.id.root_view);
 
         // Setting up the RecyclerView adapter and helpers
@@ -109,7 +104,7 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
         else{
             swipeMessage = getResources().getString(R.string.my_list_swipe_msg);
         }
-        itemTouchHelperCallback = new TodoItemTouchHelper(0,
+        ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new TodoItemTouchHelper(0,
                 ItemTouchHelper.LEFT, this, swipeMessage);
         swipeHelper = new ItemTouchHelper(itemTouchHelperCallback);
         swipeHelper.attachToRecyclerView(recyclerView);
@@ -155,8 +150,7 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
     }
 
     public void setSearchView(SearchView searchView){
-        this.searchView = searchView;
-        this.searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 adapter.getFilter().filter(query);

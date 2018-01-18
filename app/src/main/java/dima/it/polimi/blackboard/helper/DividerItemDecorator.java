@@ -20,8 +20,8 @@ public class DividerItemDecorator extends RecyclerView.ItemDecoration {
             android.R.attr.listDivider
     };
 
-    public static final int HORIZONTAL_LIST = LinearLayoutManager.HORIZONTAL;
-    public static final int VERTICAL_LIST = LinearLayoutManager.VERTICAL;
+    private static final int HORIZONTAL_LIST = LinearLayoutManager.HORIZONTAL;
+    private static final int VERTICAL_LIST = LinearLayoutManager.VERTICAL;
     private Drawable mDivider;
     private int mOrientation;
 
@@ -33,7 +33,7 @@ public class DividerItemDecorator extends RecyclerView.ItemDecoration {
         setOrientation(orientation);
     }
 
-    public void setOrientation(int orientation){
+    private void setOrientation(int orientation){
         if (orientation != HORIZONTAL_LIST && orientation != VERTICAL_LIST) {
             throw new IllegalArgumentException("invalid orientation");
         }
@@ -59,10 +59,10 @@ public class DividerItemDecorator extends RecyclerView.ItemDecoration {
 
     /**
      * Draws the divider in a vertical fashion
-     * @param c
-     * @param parent
+     * @param c Canvas
+     * @param parent RecyclerView parent
      */
-    public void drawVertical(Canvas c, RecyclerView parent){
+    private void drawVertical(Canvas c, RecyclerView parent){
         final int left = parent.getPaddingLeft();
         final int right = parent.getWidth() - parent.getPaddingRight();
 
@@ -82,10 +82,10 @@ public class DividerItemDecorator extends RecyclerView.ItemDecoration {
 
     /**
      * Draws the divider in a horizontal fashion
-     * @param c
-     * @param parent
+     * @param c Canvas
+     * @param parent RecyclerView parent
      */
-    public void drawHorizontal(Canvas c, RecyclerView parent){
+    private void drawHorizontal(Canvas c, RecyclerView parent){
         final int top = parent.getPaddingTop();
         final int bottom = parent.getHeight() - parent.getPaddingBottom();
 

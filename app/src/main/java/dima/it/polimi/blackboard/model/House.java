@@ -16,7 +16,7 @@ public class House implements Parcelable {
         this.name = name;
     }
 
-    protected House(Parcel in) {
+    private House(Parcel in) {
         name = in.readString();
     }
 

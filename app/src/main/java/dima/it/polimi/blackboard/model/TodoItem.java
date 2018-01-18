@@ -22,7 +22,7 @@ public class TodoItem implements Parcelable {
     private String timestamp;
     private List<Detail> details;
 
-    protected TodoItem(Parcel in) {
+    TodoItem(Parcel in) {
         //Order must be the same of writeToParcel
         id = in.readLong();
         name = in.readString();

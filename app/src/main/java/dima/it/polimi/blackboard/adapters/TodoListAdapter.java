@@ -31,14 +31,12 @@ import dima.it.polimi.blackboard.model.TodoItem;
 
 public class TodoListAdapter extends RecyclerView.Adapter<TodoListAdapter.ViewHolder>
     implements Filterable{
-    private Context mContext;
     private List<TodoItem> todoItems;
     private List<TodoItem> todoItemsFiltered;
     private TodoListAdapterListener mListener;
     private ViewGroup parent;
 
-    public TodoListAdapter(Context context, List<TodoItem> todoItems, TodoListAdapterListener listener){
-        this.mContext = context;
+    public TodoListAdapter(List<TodoItem> todoItems, TodoListAdapterListener listener){
         this.todoItems = todoItems;
         this.todoItemsFiltered = todoItems;
         this.mListener = listener;

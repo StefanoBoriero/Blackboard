@@ -38,14 +38,14 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
     private static final int ACCEPT_TASK_REQUEST = 1;
     private static final int ANIM_DURATION = 250;
 
-    protected Fragment firstFragment;
-    protected Fragment secondFragment;
+    private Fragment firstFragment;
+    private Fragment secondFragment;
 
     private View itemRowClicked;
 
-    protected List<TodoItem> itemList;
-    boolean isDouble;
-    boolean isActivityResult;
+    private List<TodoItem> itemList;
+    private boolean isDouble;
+    private boolean isActivityResult;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -79,7 +79,7 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
         return true;
     }
 
-    public void setItemList(List<TodoItem> items){
+    void setItemList(List<TodoItem> items){
         itemList = items;
     }
 
@@ -97,7 +97,7 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
         return result;
     }
 
-    protected void showFirstFragment(){
+    private void showFirstFragment(){
         firstFragment = TodoItemListFragment.newInstance(1, itemList);
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_list_container, firstFragment)
@@ -257,7 +257,7 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
      * Removes an item at a given position and sets the environment for showing next one
      * @param position the position to remove
      */
-    protected void removeItem(int position){
+    void removeItem(int position){
         View nextItemView = ((TodoItemListFragment)firstFragment).getViewHolder(position + 1);
         TodoItem removedItem = ((TodoItemListFragment)firstFragment).removeItem(position);
         showUndoMessage(removedItem, position);
@@ -283,7 +283,7 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
      * @param item the item to insert
      * @param position the position where to insert it
      */
-    protected void insertItem(TodoItem item, int position){
+    void insertItem(TodoItem item, int position){
         ((TodoItemListFragment)firstFragment).insertItem(item, position);
         if(isDouble && checkSelected(position)){
             ((TodoItemDetailFragment)secondFragment).updateFragment(item, position);
@@ -294,7 +294,7 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
      * Handles the item's final acceptance after the Snackbar message
      * @param removedItem the item that has been removed
      */
-    protected void handleItemAccepted(TodoItem removedItem, int position){
+    void handleItemAccepted(TodoItem removedItem, int position){
         callNetwork(removedItem);
     }
 

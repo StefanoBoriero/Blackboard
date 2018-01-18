@@ -4,14 +4,15 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 /**
+ * Represents an achievement achieved by the user
  * Created by Stefano on 30/12/2017.
  */
 
 public class Achievement implements Parcelable {
-    private String title;
-    private String description;
+    private final String title;
+    private final String description;
 
-    protected  Achievement(Parcel in){
+    private Achievement(Parcel in){
         title = in.readString();
         description = in.readString();
     }

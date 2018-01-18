@@ -12,11 +12,12 @@ import dima.it.polimi.blackboard.R;
 import dima.it.polimi.blackboard.model.Achievement;
 
 /**
+ * Adapter to display achievement items
  * Created by Stefano on 30/12/2017.
  */
 
 public class AchievementListAdapter extends RecyclerView.Adapter<AchievementListAdapter.ViewHolder> {
-    List<Achievement> achievements;
+    private List<Achievement> achievements;
 
     public AchievementListAdapter(List<Achievement> list){
         achievements = list;
@@ -42,10 +43,10 @@ public class AchievementListAdapter extends RecyclerView.Adapter<AchievementList
     }
 
     protected class ViewHolder extends RecyclerView.ViewHolder{
-        protected TextView title;
-        protected TextView description;
+        private TextView title;
+        private TextView description;
 
-        public ViewHolder(View itemView) {
+        private ViewHolder(View itemView) {
             super(itemView);
             title = itemView.findViewById(R.id.title);
             description = itemView.findViewById(R.id.description);
