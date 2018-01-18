@@ -142,8 +142,8 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
 
 
     @Override
-    public void onTodoItemClicked(TodoItem todoItem, View view, int clickedPostion) {
-        mListener.onItemClick(todoItem, view, clickedPostion);
+    public void onTodoItemClicked(TodoItem todoItem, View view, int clickedPosition) {
+        mListener.onItemClick(todoItem, view, clickedPosition);
     }
 
     public void disableSwipe(){
@@ -184,12 +184,22 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
         mListener.onItemSwipe(position);
     }
 
+    /**
+     * Removes an item from the adapter
+     * @param position position of the item to remove
+     * @return the item removed
+     */
     public TodoItem removeItem(int position){
         final TodoItem removedItem = adapter.getItem(position);
         adapter.removeItem(position);
         return removedItem;
     }
 
+    /**
+     * Inserts an item at a given position
+     * @param todoItem the item to insert
+     * @param position the position where to insert
+     */
     public void insertItem(TodoItem todoItem, int position){
         //TODO change this rootView element
         RecyclerView recyclerView = rootView.findViewById(R.id.recycler_view);
@@ -205,6 +215,11 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
         return adapter.getItem(position);
     }
 
+    /**
+     * Returns the view of the row at the given position
+     * @param position the position in the list
+     * @return the view of the item at the given position
+     */
     public View getViewHolder(int position){
         return recyclerView.getLayoutManager().getChildAt(position);
     }

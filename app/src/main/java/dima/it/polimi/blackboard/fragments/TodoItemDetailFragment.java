@@ -64,6 +64,12 @@ public class TodoItemDetailFragment extends Fragment {
         return fragment;
     }
 
+    /**
+     * Factory method for larger devices, where transitions names are not needed
+     * @param todoItem the item to display
+     * @param position the position of the item in the list
+     * @return A new instance of fragment TodoItemDetailFragment.
+     */
     public static Fragment newInstance(TodoItem todoItem, int position){
         TodoItemDetailFragment fragment = new TodoItemDetailFragment();
         Bundle args = new Bundle();
@@ -119,6 +125,10 @@ public class TodoItemDetailFragment extends Fragment {
         );
     }
 
+    /**
+     * Populates the recyclerView with the current content
+     * @param recyclerView the recycler to be populated
+     */
     private void populateRecyclerView(RecyclerView recyclerView){
         RecyclerView.Adapter adapter = new DetailAdapter(todoTask.getDetails());
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -126,7 +136,11 @@ public class TodoItemDetailFragment extends Fragment {
         recyclerView.setAdapter(adapter);
     }
 
-    private void hideRecyclerView(RecyclerView recyclerView){
+    /**
+     * Fades out the RecyclerView and calls the update method when animation finishes
+     * @param recyclerView the recycler to be updated
+     */
+    private void updateRecyclerView(RecyclerView recyclerView){
         recyclerView.animate()
                 .alpha(0f)
                 .setDuration(FADE_DURATION)
@@ -134,7 +148,12 @@ public class TodoItemDetailFragment extends Fragment {
                 .start();
     }
 
+    /**
+     * Updates the content of the RecyclerView and shows it
+     * @param recyclerView the recycler to be updated
+     */
     private void showRecyclerView(RecyclerView recyclerView){
+        populateRecyclerView(recyclerView);
         recyclerView.animate()
                 .alpha(1f)
                 .setDuration(FADE_DURATION)
@@ -150,10 +169,12 @@ public class TodoItemDetailFragment extends Fragment {
                 return res.getDrawable(R.drawable.ic_home_black_24dp);
             case("Billing"):
                 return res.getDrawable(R.drawable.ic_payment_black_24dp);
+                /*
             case ("Shopping"):
                 return res.getDrawable(R.drawable.ic_shopping_cart_black_24dp);
+                */
             default:
-                return null;
+                return res.getDrawable(R.drawable.ic_shopping_cart_black_24dp);
         }
     }
 
@@ -175,6 +196,12 @@ public class TodoItemDetailFragment extends Fragment {
         mListener = null;
     }
 
+    /**
+     * This method is called when the device is a large one. It updates the content of the detail
+     * fragment by fading out the RecyclerView, changing its content and fading it in back
+     * @param todoItem the new item which details are to be shown
+     * @param position the position of the new item
+     */
     public void updateFragment(TodoItem todoItem, int position){
         View rootView = getView();
         todoTask = todoItem;
@@ -185,8 +212,7 @@ public class TodoItemDetailFragment extends Fragment {
             nameView.setText(todoItem.getName());
 
             RecyclerView rv = rootView.findViewById(R.id.recycler_view_detail);
-            hideRecyclerView(rv);
-            populateRecyclerView(rv);
+            updateRecyclerView(rv);
 
             //Binds the button click action to parent activity
             View acceptBtn = rootView.findViewById(R.id.accept_button);

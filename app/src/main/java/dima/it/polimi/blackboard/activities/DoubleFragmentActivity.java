@@ -114,15 +114,14 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
 
     @Override
     public void onItemClick(TodoItem item, View view, int clickedPosition) {
-
-
         if(isDouble){
             doubleFragmentClickHandler(view, item, clickedPosition);
         } else {
-            //singleFragmentClickHandler(item, view, clickedPosition);
+            // Disable swipe while the animation is going
             ((TodoItemListFragment)firstFragment).disableSwipe();
             itemRowClicked = view;
             isActivityResult = false;
+            // Animate the view clicked
             view.animate()
                     .scaleX(1.06f)
                     .scaleY(1.06f)
@@ -133,6 +132,10 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
         }
     }
 
+    /**
+     * Animates the view of a row when returning from the detail page
+     * @param itemRow the view to animate
+     */
     private void resize(View itemRow){
         itemRow.animate()
                 .scaleX(1f)
@@ -203,6 +206,10 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
 
     }
 
+    /**
+     * Sets a visual flag for the item currently selected in a large device
+     * @param view the view currently selected
+     */
     private void setFocusedItem(View view){
         Drawable selected = getDrawable(R.color.colorAccent);
         view.findViewById(R.id.selected_flag).setBackground(selected);
@@ -246,6 +253,10 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
      */
     protected abstract void showUndoMessage(TodoItem removedItem, int position);
 
+    /**
+     * Removes an item at a given position and sets the environment for showing next one
+     * @param position the position to remove
+     */
     protected void removeItem(int position){
         View nextItemView = ((TodoItemListFragment)firstFragment).getViewHolder(position + 1);
         TodoItem removedItem = ((TodoItemListFragment)firstFragment).removeItem(position);
@@ -258,10 +269,20 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
         }
     }
 
-    private boolean checkSelected(int position){
-        return position == ((TodoItemDetailFragment)secondFragment).getPosition();
+    /**
+     * Checks if the item removed is the one currently selected in large devices
+     * @param removedPosition the position of the item removed
+     * @return true if the removed position is the one currently shown
+     */
+    private boolean checkSelected(int removedPosition){
+        return removedPosition == ((TodoItemDetailFragment)secondFragment).getPosition();
     }
 
+    /**
+     * Inserts an item at a given position
+     * @param item the item to insert
+     * @param position the position where to insert it
+     */
     protected void insertItem(TodoItem item, int position){
         ((TodoItemListFragment)firstFragment).insertItem(item, position);
         if(isDouble && checkSelected(position)){
