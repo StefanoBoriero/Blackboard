@@ -227,6 +227,7 @@ public class NewToDoTaskActivity extends AppCompatActivity {
 
     }
 
+    //saves the state of the application when changing orientation
     protected void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
         savedInstanceState.putString("type", typeButton.getText().toString());

@@ -80,6 +80,8 @@
         <item>Not so important</item>
     </string-array>
 
+
+
     <string name="shopping">Shopping</string>
     <string name="houseKeeping">Housekeeping</string>
     <string name="bills">Bills</string>
@@ -208,5 +210,34 @@
     <string name="content_description_house">House icon</string>
     <string name="content_description_dots">Menu dots</string>
     <string name="content_description_selected">Visual feedback for selection</string>
+
+    <!-- Settings -->
+
+    <string name="key_notifications_v">notifications</string>
+    <string name="key_ringtone">ringtone</string>
+    <string name="key_sync_frequency">sync_frequency</string>
+    <string name="key_calendar">calendar</string>
+
+    <!-- Notifications settings -->
+    <string-array name="notifications">
+        <item>Always</item>
+        <item>Only important</item>
+        <item>Never</item>
+    </string-array>
+
+    <string-array name="notifications_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+    <string-array name="sync_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+    </string-array>
 
 </resources>

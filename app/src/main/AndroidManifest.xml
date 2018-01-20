@@ -74,12 +74,13 @@
         </activity>
         <activity
             android:name=".activities.PhotoDialogActivity"
-            android:theme="@android:style/Theme.Material.Light.Dialog.NoActionBar"></activity>
+            android:theme="@android:style/Theme.Material.Light.Dialog.NoActionBar" />
         <activity
             android:name=".activities.SignInActivity"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".activities.HouseDialogActivity"
-            android:theme="@android:style/Theme.Material.Light.DialogWhenLarge.NoActionBar"></activity>
+        <activity
+            android:name=".activities.HouseDialogActivity"
+            android:theme="@android:style/Theme.Material.Light.DialogWhenLarge.NoActionBar" />
     </application>
 
 </manifest>
