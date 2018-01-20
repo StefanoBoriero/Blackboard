@@ -41,12 +41,6 @@ public class BalanceActivity extends AppCompatActivity  implements PaymentListFr
         mFab = findViewById(R.id.add_fab);
         mFab.setTransitionName("revealCircular");
 
-
-
-
-
-
-
         displayListFragment();
         collapsingToolbar = findViewById(R.id.balance_toolbar);
         refreshBalanceColor();
