@@ -11,13 +11,16 @@ import android.os.Parcelable;
 public class Detail implements Parcelable{
     private Integer iconResId;
     private String content;
+    private String title;
 
-    public Detail(Integer icon, String content){
+    public Detail(String title, Integer icon, String content){
+        this.title = title;
         this.content = content;
         this.iconResId = icon;
     }
 
     private Detail(Parcel in){
+        title = in.readString();
         iconResId = in.readInt();
         content = in.readString();
     }
@@ -42,6 +45,10 @@ public class Detail implements Parcelable{
         return content;
     }
 
+    public String getTitle(){
+        return title;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -49,6 +56,7 @@ public class Detail implements Parcelable{
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(title);
         dest.writeInt(iconResId);
         dest.writeString(content);
     }

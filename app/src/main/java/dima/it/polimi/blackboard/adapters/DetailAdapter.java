@@ -35,7 +35,8 @@ public class DetailAdapter extends RecyclerView.Adapter<DetailAdapter.ViewHolder
 
 
         holder.tView.setText(detail.getContent());
-        holder.tView.setCompoundDrawablesWithIntrinsicBounds(detail.getIconResId(), 0, 0, 0);
+        holder.title.setText(detail.getTitle());
+        holder.title.setCompoundDrawablesWithIntrinsicBounds(detail.getIconResId(), 0, 0, 0);
     }
 
     @Override
@@ -43,11 +44,13 @@ public class DetailAdapter extends RecyclerView.Adapter<DetailAdapter.ViewHolder
         return details.size();
     }
 
-    protected class ViewHolder extends RecyclerView.ViewHolder{
+    class ViewHolder extends RecyclerView.ViewHolder{
         private TextView tView;
+        private TextView title;
 
         private ViewHolder(View itemView) {
             super(itemView);
+            title = itemView.findViewById(R.id.title);
             tView = itemView.findViewById(R.id.detail_content);
         }
     }

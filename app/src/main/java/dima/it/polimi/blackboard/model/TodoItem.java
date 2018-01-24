@@ -17,8 +17,6 @@ public class TodoItem implements Parcelable {
     private long id;
     private String name;
     private String type;
-    private String description;
-    private Double price;
     private String timestamp;
     private List<Detail> details;
 
@@ -39,8 +37,6 @@ public class TodoItem implements Parcelable {
         this.id = id;
         this.name = name;
         this.type = type;
-        this.description = description;
-        this.price = price;
         this.timestamp = "12:02";
 
         details = new ArrayList<>();
@@ -54,7 +50,6 @@ public class TodoItem implements Parcelable {
         this.id = id;
         this.name = name;
         this.type = type;
-        this.description = description;
         this.timestamp = "12:02";
 
         details = new ArrayList<>();
@@ -65,22 +60,22 @@ public class TodoItem implements Parcelable {
 
     private Detail createPriceDetail(String content){
         Integer priceIcon = R.drawable.ic_menu_balance_24dp;
-        return new Detail(priceIcon, content);
+        return new Detail("Price", priceIcon, content);
     }
 
     private Detail createDescription(String content){
         Integer descriptionIconId = R.drawable.ic_description_black_24dp;
-        return new Detail(descriptionIconId, content);
+        return new Detail("Description", descriptionIconId, content);
     }
 
     private Detail createExpirationDetail(String exp){
         Integer expirationResId = R.drawable.ic_date_range_black_24dp;
-        return new Detail(expirationResId, exp);
+        return new Detail("Expires", expirationResId, exp);
     }
 
     private Detail createSuggestionDetail(String suggestion){
         Integer suggestionResId = R.drawable.ic_person_black_24dp;
-        return new Detail(suggestionResId, suggestion);
+        return new Detail("Suggested User", suggestionResId, suggestion);
     }
 
     public List<Detail> getDetails(){
@@ -96,12 +91,6 @@ public class TodoItem implements Parcelable {
     public String getType(){
         return this.type;
     }
-
-    public String getDescription(){
-        return this.description;
-    }
-
-    public Double getPrice(){return this.price;}
 
     public String getTimestamp(){
         return this.timestamp;
