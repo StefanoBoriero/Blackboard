@@ -86,7 +86,9 @@ public class ProfileInfoFragment extends Fragment implements HouseListAdapter.Ho
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity(), PhotoDialogActivity.class);
-                startActivity(intent);
+                ActivityOptions options = ActivityOptions.
+                        makeScaleUpAnimation(v,0,0,0, 0);
+                startActivity(intent, options.toBundle());
 
             }
         });
