@@ -27,6 +27,7 @@
             android:animateLayoutChanges="true"
             android:descendantFocusability="beforeDescendants"
             android:focusable="true"
+            android:background="@color/colorAccent"
             android:focusableInTouchMode="true"
             android:maxWidth="500dp"
             android:visibility="invisible">
