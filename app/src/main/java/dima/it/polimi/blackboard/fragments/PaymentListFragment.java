@@ -41,15 +41,13 @@ public class PaymentListFragment extends Fragment implements PaymentListAdapter.
     private int mColumnCount = 1;
     private OnListFragmentInteractionListener mListener;
     private PaymentListAdapter adapter;
-    private List<PaymentItem> paymentItems;
     private CollapsingToolbarLayout balanceToolbar;
 
     // Attributes for onStop() onStart() consistency
     private CharSequence savedQuery;
     private int position;
 
-    private AppCompatActivity parentActivity;
-    private View rootView;
+
 
 
     /**
@@ -73,6 +71,8 @@ public class PaymentListFragment extends Fragment implements PaymentListAdapter.
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+       List<PaymentItem> paymentItems;
+
         super.onCreate(savedInstanceState);
 
         if (getArguments() != null) {
@@ -85,6 +85,9 @@ public class PaymentListFragment extends Fragment implements PaymentListAdapter.
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        AppCompatActivity parentActivity;
+        View rootView;
         View view = inflater.inflate(R.layout.fragment_payment_list, container, false);
 
 

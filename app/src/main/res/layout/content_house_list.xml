@@ -6,11 +6,10 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
     <FrameLayout
-        layout="@layout/fragment_list"
         android:id="@+id/fragment_list_container"
+        layout="@layout/fragment_list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        />
+        android:layout_height="match_parent" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/add_fab"

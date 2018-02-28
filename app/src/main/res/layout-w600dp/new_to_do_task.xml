@@ -68,7 +68,7 @@
                         android:layout_marginTop="16dp"
                         android:text="@string/name"
                         android:textColor="@color/white"
-                        android:textSize="20dp"
+                        android:textSize="20sp"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
@@ -85,10 +85,10 @@
                         android:hint="@string/name_selection"
                         android:paddingEnd="10dp"
                         android:paddingStart="10dp"
-                        android:textSize="20dp"
+                        android:textSize="20sp"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/nameTextView"></EditText>
+                        app:layout_constraintTop_toBottomOf="@+id/nameTextView"/>
 
                     <TextView
                         android:id="@+id/typeTextView"
@@ -98,7 +98,7 @@
                         android:layout_marginTop="8dp"
                         android:text="@string/type"
                         android:textColor="@color/white"
-                        android:textSize="20dp"
+                        android:textSize="20sp"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/nameEditText" />
 
@@ -111,15 +111,12 @@
                         android:layout_marginStart="32dp"
                         android:layout_marginTop="8dp"
                         android:background="@drawable/rounded_white"
-                        android:contextClickable="false"
                         android:drawableLeft="@drawable/touch_app_grey"
                         android:drawablePadding="5dp"
                         android:hint="@string/type_selection"
                         android:includeFontPadding="true"
                         android:paddingEnd="10dp"
-                        android:paddingHorizontal="0dp"
                         android:paddingStart="10dp"
-                        android:paddingVertical="0dp"
                         android:stateListAnimator="@null"
                         android:textAlignment="textStart"
 
@@ -138,7 +135,7 @@
                         android:layout_marginTop="8dp"
                         android:text="@string/cost"
                         android:textColor="@color/white"
-                        android:textSize="20dp"
+                        android:textSize="20sp"
                         android:visibility="gone"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/typeButton" />
@@ -159,14 +156,14 @@
 
                         android:paddingStart="10dp"
                         android:text="0,00"
-                        android:textSize="20dp"
+                        android:textSize="20sp"
                         android:visibility="gone"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:groupDivider="."
                         app:monetaryDivider=","
                         app:locale="en_US"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/costTextView"></faranjit.currency.edittext.CurrencyEditText>
+                        app:layout_constraintTop_toBottomOf="@+id/costTextView"/>
 
                     <TextView
                         android:id="@+id/priorityTextView"
@@ -176,14 +173,14 @@
                         android:layout_marginTop="8dp"
                         android:text="Priority"
                         android:textColor="@color/white"
-                        android:textSize="20dp"
+                        android:textSize="20sp"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/costEditText" />
 
                     <RelativeLayout
                         android:id="@+id/relativeLayout"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_height="0dp"
                         android:layout_marginEnd="32dp"
                         android:layout_marginStart="32dp"
                         android:layout_marginTop="8dp"
@@ -236,7 +233,7 @@
                         android:layout_marginTop="8dp"
                         android:text="@string/description"
                         android:textColor="@color/white"
-                        android:textSize="20dp"
+                        android:textSize="20sp"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/relativeLayout" />
 
@@ -255,17 +252,15 @@
                         android:paddingEnd="10dp"
                         android:paddingStart="12dp"
                         android:paddingTop="10dp"
-                        android:textSize="20dp"
+                        android:textSize="20sp"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/descriptionTextView"></EditText>
+                        app:layout_constraintTop_toBottomOf="@+id/descriptionTextView"/>
 
                     <Button
                         android:id="@+id/submit_button"
                         android:layout_width="120dp"
                         android:layout_height="50dp"
-                        android:layout_alignParentRight="true"
-                        android:layout_centerVertical="true"
                         android:layout_gravity="top|right"
                         android:layout_marginEnd="32dp"
                         android:layout_marginTop="12dp"

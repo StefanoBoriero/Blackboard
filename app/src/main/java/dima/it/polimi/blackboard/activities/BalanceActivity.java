@@ -27,8 +27,7 @@ import dima.it.polimi.blackboard.utils.DataGeneratorUtil;
 
 public class BalanceActivity extends AppCompatActivity  implements PaymentListFragment.OnListFragmentInteractionListener{
 
-    private PaymentListFragment listFragmentPositive;
-    private PaymentListFragment listFragmentNegative;
+
     private CollapsingToolbarLayout collapsingToolbar;
     private List<PaymentItem> items = DataGeneratorUtil.generatePaymentItems(30);
     private FloatingActionButton mFab;
@@ -50,6 +49,8 @@ public class BalanceActivity extends AppCompatActivity  implements PaymentListFr
 
     private void displayListFragment(){
         //Todo remove this call
+        PaymentListFragment listFragmentPositive;
+        PaymentListFragment listFragmentNegative;
 
         items = DataGeneratorUtil.generatePaymentItems(15);
         listFragmentPositive = PaymentListFragment.newInstance(1, getPosItems());

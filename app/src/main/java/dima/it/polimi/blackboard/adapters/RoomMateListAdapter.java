@@ -19,11 +19,11 @@ import dima.it.polimi.blackboard.model.RoomMate;
 
 public class RoomMateListAdapter extends RecyclerView.Adapter<RoomMateListAdapter.ViewHolder> {
     private List<RoomMate> myRoomMates;
-    private RoomMateListAdapterListener mListener;
+
 
     public RoomMateListAdapter(List<RoomMate> roomMates, RoomMateListAdapterListener listener){
         myRoomMates = roomMates;
-        this.mListener = listener;
+
     }
 
     @Override

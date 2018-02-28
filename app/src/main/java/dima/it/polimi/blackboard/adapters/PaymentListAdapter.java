@@ -29,10 +29,10 @@ import dima.it.polimi.blackboard.model.TodoItem;
 public class PaymentListAdapter extends RecyclerView.Adapter<PaymentListAdapter.PaymentViewHolder> {
     private Context mContext;
     private List<PaymentItem> paymentItems;
-    private PaymentListAdapterListener mListener;
-    private ViewGroup parent;
 
     public PaymentListAdapter(Context context, List<PaymentItem> paymentItems, PaymentListAdapterListener listener){
+        PaymentListAdapterListener mListener;
+
         this.mContext = context;
         List<PaymentItem> filteredItems = new ArrayList<>();
         for (PaymentItem item : paymentItems) {
@@ -42,12 +42,11 @@ public class PaymentListAdapter extends RecyclerView.Adapter<PaymentListAdapter.
             }
         }
         this.paymentItems = filteredItems;
-        this.mListener = listener;
+        mListener = listener;
     }
 
     @Override
     public PaymentViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        this.parent = parent;
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.payment_item_row, parent, false);
         return new PaymentViewHolder(itemView);

@@ -40,8 +40,6 @@ public class NewToDoTaskActivity extends AppCompatActivity {
     public TextView costView;
     public EditText costEditText;
     private FloatingActionButton mFab;
-    private LinearLayout linearLayout;
-    private RelativeLayout myRelativeLayout;
     private RelativeLayout container_layout;
 
 
@@ -50,6 +48,10 @@ public class NewToDoTaskActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        LinearLayout linearLayout;
+        RelativeLayout myRelativeLayout;
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.new_to_do_task);
 
@@ -248,7 +250,7 @@ public class NewToDoTaskActivity extends AppCompatActivity {
         container_layout.setBackground(getResources().getDrawable(R.drawable.background_addition));
 
         typeButton.setText(savedInstanceState.getString("type"));
-        if(savedInstanceState.getBoolean("activated_cost") == true)
+        if(savedInstanceState.getBoolean("activated_cost"))
         {
             //show cost field
             costEditText.setVisibility(LinearLayout.VISIBLE);
