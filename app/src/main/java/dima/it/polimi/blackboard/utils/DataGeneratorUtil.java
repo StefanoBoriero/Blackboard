@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import dima.it.polimi.blackboard.model.Achievement;
+import dima.it.polimi.blackboard.model.DayResume;
 import dima.it.polimi.blackboard.model.House;
 import dima.it.polimi.blackboard.model.PaymentItem;
 import dima.it.polimi.blackboard.model.RoomMate;
@@ -115,5 +116,21 @@ public class DataGeneratorUtil {
         }
 
         return roomMates;
+    }
+
+
+    public static List<DayResume> generateDayResumes(int amount){
+        int i;
+        List<DayResume> days = new ArrayList<>(amount);
+
+        for(i=0; i<amount; i++){
+            int completed = (int)(Math.random() * 7);
+            int added = (int)(Math.random() * 4);
+            double diff = (Math.random() * 3);
+
+            DayResume day = new DayResume(completed, diff, added);
+            days.add(day);
+        }
+        return days;
     }
 }

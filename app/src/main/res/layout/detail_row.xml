@@ -5,6 +5,17 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
+    <ImageView
+        android:id="@+id/icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@drawable/ic_description_black_24dp"
+        android:contentDescription="@string/content_description_dots"
+        tools:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"/>
+
     <TextView
         android:id="@+id/title"
         android:layout_width="wrap_content"
@@ -12,16 +23,16 @@
         android:gravity="center"
         android:textSize="16sp"
         android:layout_marginTop="@dimen/row_margin_top"
+        android:layout_marginStart="4dp"
         android:textStyle="bold"
         android:textColor="@color/black"
         app:layout_constraintBottom_toTopOf="@+id/detail_content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/icon"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_chainStyle="spread_inside"
         tools:text="Description"
-        tools:drawableStart="@drawable/ic_description_black_24dp"
-        android:drawablePadding="@dimen/drawable_padding"/>
+        />
+
 
     <TextView
         android:id="@+id/detail_content"
@@ -31,8 +42,8 @@
         android:gravity="center"
         android:singleLine="false"
         android:textSize="@dimen/description_text_size"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/icon"
+        android:layout_marginStart="4dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/title"
         tools:text="Lorem ipsum dolet sic K Maronn " />

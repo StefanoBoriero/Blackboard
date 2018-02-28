@@ -8,12 +8,20 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import java.util.List;
+
 import dima.it.polimi.blackboard.R;
+import dima.it.polimi.blackboard.adapters.DayResumeAdapter;
+import dima.it.polimi.blackboard.model.DayResume;
+import dima.it.polimi.blackboard.utils.DataGeneratorUtil;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -34,6 +42,15 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+
+        List<DayResume> dayss = DataGeneratorUtil.generateDayResumes(30);
+
+        RecyclerView days = findViewById(R.id.dashboard);
+        days.setLayoutManager(new LinearLayoutManager(this));
+        RecyclerView.Adapter adapter = new DayResumeAdapter(dayss);
+        days.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
+        days.setAdapter(adapter);
     }
 
     @Override

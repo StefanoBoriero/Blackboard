@@ -4,6 +4,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.List;
@@ -36,7 +37,7 @@ public class DetailAdapter extends RecyclerView.Adapter<DetailAdapter.ViewHolder
 
         holder.tView.setText(detail.getContent());
         holder.title.setText(detail.getTitle());
-        holder.title.setCompoundDrawablesWithIntrinsicBounds(detail.getIconResId(), 0, 0, 0);
+        holder.icon.setImageResource(detail.getIconResId());
     }
 
     @Override
@@ -47,11 +48,13 @@ public class DetailAdapter extends RecyclerView.Adapter<DetailAdapter.ViewHolder
     class ViewHolder extends RecyclerView.ViewHolder{
         private TextView tView;
         private TextView title;
+        private ImageView icon;
 
         private ViewHolder(View itemView) {
             super(itemView);
             title = itemView.findViewById(R.id.title);
             tView = itemView.findViewById(R.id.detail_content);
+            icon = itemView.findViewById(R.id.icon);
         }
     }
 }

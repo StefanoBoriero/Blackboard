@@ -113,11 +113,11 @@ public class TodoItemDetailFragment extends Fragment {
         // Binds dynamically the shared element through transition name
         View userIconView = view.findViewById(R.id.user_icon);
         userIconView.setTransitionName(transitionNameIcon);
-
+/*
         TextView typeView = view.findViewById(R.id.type_detail);
         typeView.setText(todoTask.getType());
         typeView.setCompoundDrawablesWithIntrinsicBounds(resolveIcon(todoTask.getType()), null, null, null);
-
+*/
         //Binds the button click action to parent activity
         View acceptBtn = view.findViewById(R.id.accept_button);
         acceptBtn.setOnClickListener((v)->
