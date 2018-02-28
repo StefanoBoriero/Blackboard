@@ -1,7 +1,7 @@
 package dima.it.polimi.blackboard.adapters;
 
-/**
- * Created by simone on 26/12/2017.
+/*
+  Created by simone on 26/12/2017.
  */
 
 import android.support.v4.app.Fragment;

@@ -1,8 +1,8 @@
 package dima.it.polimi.blackboard.adapters;
 
-/**
- *  Adapter used for the creation of the List of payments
- * Created by simone on 21/12/2017.
+/*
+   Adapter used for the creation of the List of payments.
+  Created by simone on 21/12/2017.
  */
 
 

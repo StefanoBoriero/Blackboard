@@ -39,11 +39,11 @@ public class RoomMateListAdapter extends RecyclerView.Adapter<RoomMateListAdapte
         holder.roomMateName.setText(roomMate.getName());
 
         //TODO see if we want to click
-        /**
+        /*
         holder.itemView.setOnClickListener((v) ->
                 mListener.onHouseClicked(roomMate, v, holder.getAdapterPosition())
         );
-         **/
+         */
 
     }
 

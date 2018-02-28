@@ -24,7 +24,7 @@
                 android:layout_height="match_parent">
 
                 <ImageView
-                    android:id="@+id/credit_image"
+                    android:id="@+id/debt_image"
                     android:layout_width="60dp"
                     android:layout_height="60dp"
                     android:layout_marginBottom="8dp"
@@ -48,7 +48,7 @@
                     android:textStyle="bold"
                     app:layout_constraintBottom_toTopOf="@+id/credit_text"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@id/credit_image"
+                    app:layout_constraintStart_toEndOf="@id/debt_image"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintVertical_chainStyle="packed" />
 
@@ -64,7 +64,7 @@
                     android:textAlignment="center"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@id/credit_image"
+                    app:layout_constraintStart_toEndOf="@id/debt_image"
                     app:layout_constraintTop_toBottomOf="@+id/credit_number" />
 
 
@@ -75,7 +75,7 @@
                 android:layout_height="match_parent">
 
                 <ImageView
-                    android:id="@+id/debt_image"
+                    android:id="@+id/credit_image"
                     android:layout_width="60dp"
                     android:layout_height="60dp"
                     android:layout_marginBottom="8dp"
@@ -99,7 +99,7 @@
                     android:textStyle="bold"
                     app:layout_constraintBottom_toTopOf="@+id/debt_text"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@id/debt_image"
+                    app:layout_constraintStart_toEndOf="@id/credit_image"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintVertical_chainStyle="packed" />
 
@@ -115,7 +115,7 @@
                     android:textAlignment="center"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@id/debt_image"
+                    app:layout_constraintStart_toEndOf="@id/credit_image"
                     app:layout_constraintTop_toBottomOf="@+id/debt_number" />
 
 
