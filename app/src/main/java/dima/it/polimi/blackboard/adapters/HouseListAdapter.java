@@ -11,7 +11,7 @@ import java.util.List;
 
 import dima.it.polimi.blackboard.R;
 import dima.it.polimi.blackboard.model.House;
-import dima.it.polimi.blackboard.model.TodoItem;
+
 
 /**
  * Adapter for display houses in a Recycler View

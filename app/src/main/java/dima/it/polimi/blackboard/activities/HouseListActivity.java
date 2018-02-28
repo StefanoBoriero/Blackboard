@@ -13,7 +13,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
+
 
 import dima.it.polimi.blackboard.R;
 import dima.it.polimi.blackboard.model.TodoItem;

@@ -1,11 +1,11 @@
 package dima.it.polimi.blackboard.activities;
 
 import android.app.Activity;
-import android.support.v7.app.AppCompatActivity;
+
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.ViewGroup;
+
 
 import java.util.List;
 

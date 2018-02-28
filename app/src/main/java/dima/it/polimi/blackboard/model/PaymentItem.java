@@ -4,6 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 /**
+ * This class represents a payment item issued by an user
  * Created by simone on 21/12/2017.
  */
 

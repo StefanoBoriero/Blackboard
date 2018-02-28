@@ -1,16 +1,13 @@
 package dima.it.polimi.blackboard.activities;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
+
 import android.content.Context;
-import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
 import android.transition.Transition;
 import android.transition.TransitionInflater;
 import android.view.ContextMenu;
@@ -27,7 +24,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
+
 
 import dima.it.polimi.blackboard.R;
 import dima.it.polimi.blackboard.utils.GUIUtils;
@@ -56,24 +53,19 @@ public class NewToDoTaskActivity extends AppCompatActivity {
         setContentView(R.layout.new_to_do_task);
 
         //initialize views
-        typeButton = (Button) findViewById(R.id.typeButton);
-        editText = (EditText) findViewById(R.id.nameEditText);
-        myConstraintLayout = (ConstraintLayout) findViewById(R.id.constraintLayout);
-        costEditText = (EditText) findViewById(R.id.costEditText);
-        costView = (TextView) findViewById(R.id.costTextView);
-        mFab = (FloatingActionButton) findViewById((R.id.activity_contact_fab));
+        typeButton = findViewById(R.id.typeButton);
+        editText = findViewById(R.id.nameEditText);
+        myConstraintLayout = findViewById(R.id.constraintLayout);
+        costEditText = findViewById(R.id.costEditText);
+        costView = findViewById(R.id.costTextView);
+        mFab = findViewById((R.id.activity_contact_fab));
         mFab.setTransitionName("revealCircular");
-        linearLayout = findViewById(R.id.newLinLayout);
-        myRelativeLayout = findViewById((R.id.newRelativeLayout));
         container_layout = findViewById(R.id.container_layout);
 
         //initialize context menu
-        typeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                registerForContextMenu(typeButton);
-                openContextMenu(typeButton);
-            }
+        typeButton.setOnClickListener(v -> {
+            registerForContextMenu(typeButton);
+            openContextMenu(typeButton);
         });
         editText.clearFocus();
 
@@ -99,6 +91,7 @@ public class NewToDoTaskActivity extends AppCompatActivity {
             float x = ev.getRawX() + view.getLeft() - scrcoords[0];
             float y = ev.getRawY() + view.getTop() - scrcoords[1];
             if (x < view.getLeft() || x > view.getRight() || y < view.getTop() || y > view.getBottom()) {
+                if(this.getSystemService(Context.INPUT_METHOD_SERVICE) != null)
                 ((InputMethodManager) this.getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow((this.getWindow().getDecorView().getApplicationWindowToken()), 0);
                 view.clearFocus();
                 //give focus to constraint layout
@@ -265,6 +258,7 @@ public class NewToDoTaskActivity extends AppCompatActivity {
         // Inflate the menu; this adds items to the action bar if it is present.
         //getMenuInflater().inflate(R.menu.menu_account, menu);
 
+        if(getSupportActionBar() != null)
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         //TODO create string
         getSupportActionBar().setTitle("Add activity");

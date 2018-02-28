@@ -39,9 +39,9 @@ public class NewPaymentActivity extends AppCompatActivity {
         setContentView(R.layout.activity_new_payment);
 
         container_layout = findViewById(R.id.container_layout);
-        mFab = (FloatingActionButton) findViewById((R.id.activity_contact_fab));
-        editText = (EditText) findViewById(R.id.nameEditText);
-        myConstraintLayout = (ConstraintLayout) findViewById(R.id.constraintLayout);
+        mFab =  findViewById((R.id.activity_contact_fab));
+        editText =  findViewById(R.id.nameEditText);
+        myConstraintLayout =  findViewById(R.id.constraintLayout);
 
         mFab.setTransitionName("revealCircular");
         editText.clearFocus();
@@ -178,6 +178,7 @@ public class NewPaymentActivity extends AppCompatActivity {
         // Inflate the menu; this adds items to the action bar if it is present.
         //getMenuInflater().inflate(R.menu.menu_account, menu);
 
+        if(getSupportActionBar() != null)
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         //TODO create string
         getSupportActionBar().setTitle("Add payment");

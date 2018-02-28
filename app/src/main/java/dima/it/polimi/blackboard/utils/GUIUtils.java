@@ -4,8 +4,6 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.support.annotation.ColorRes;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.view.animation.FastOutLinearInInterpolator;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.animation.AccelerateDecelerateInterpolator;
@@ -13,6 +11,7 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import dima.it.polimi.blackboard.R;
 
 /**
+ * utils for creating some transition effects (mainly fab reveal)
  * Created by simone on 20/12/2017.
  */
 

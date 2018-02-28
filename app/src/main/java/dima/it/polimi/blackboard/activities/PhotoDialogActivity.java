@@ -1,7 +1,6 @@
 package dima.it.polimi.blackboard.activities;
 
 import android.app.Activity;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
 import dima.it.polimi.blackboard.R;

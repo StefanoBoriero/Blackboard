@@ -1,6 +1,7 @@
 package dima.it.polimi.blackboard.model;
 
 /**
+ * This class represents a roomMate of one of the houses the user is part of
  * Created by simone on 17/01/2018.
  */
 

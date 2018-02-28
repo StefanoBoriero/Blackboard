@@ -5,14 +5,13 @@ import android.content.Intent;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.support.v7.widget.Toolbar;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,9 +19,7 @@ import java.util.List;
 import dima.it.polimi.blackboard.R;
 import dima.it.polimi.blackboard.adapters.PaymentViewPagerAdapter;
 import dima.it.polimi.blackboard.fragments.PaymentListFragment;
-import dima.it.polimi.blackboard.fragments.TodoItemListFragment;
 import dima.it.polimi.blackboard.model.PaymentItem;
-import dima.it.polimi.blackboard.model.TodoItem;
 import dima.it.polimi.blackboard.utils.DataGeneratorUtil;
 
 public class BalanceActivity extends AppCompatActivity  implements PaymentListFragment.OnListFragmentInteractionListener{
@@ -55,7 +52,7 @@ public class BalanceActivity extends AppCompatActivity  implements PaymentListFr
         items = DataGeneratorUtil.generatePaymentItems(15);
         listFragmentPositive = PaymentListFragment.newInstance(1, getPosItems());
         listFragmentNegative = PaymentListFragment.newInstance(1,getNegItems());
-        ViewPager mViewPager = (ViewPager) findViewById(R.id.viewpager);
+        ViewPager mViewPager = findViewById(R.id.viewpager);
         PaymentViewPagerAdapter mViewPagerAdapter = new PaymentViewPagerAdapter(getSupportFragmentManager());
         mViewPagerAdapter.addFragment(listFragmentNegative, "Negative");
         mViewPagerAdapter.addFragment(listFragmentPositive, "Positive");
@@ -65,7 +62,7 @@ public class BalanceActivity extends AppCompatActivity  implements PaymentListFr
                 .commit();
         getSupportFragmentManager().executePendingTransactions();*/
 
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+        TabLayout tabLayout =  findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
     }
 
@@ -75,7 +72,8 @@ public class BalanceActivity extends AppCompatActivity  implements PaymentListFr
         // Inflate the menu; this adds items to the action bar if it is present.
         //getMenuInflater().inflate(R.menu.menu_account, menu);
 
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        if(getSupportActionBar() != null)
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
         //TODO create string
         getSupportActionBar().setTitle("Balance");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -100,7 +98,7 @@ public class BalanceActivity extends AppCompatActivity  implements PaymentListFr
     {
         //TODO change Stefy and simo
         //TODO fetch items from firebase
-        List<PaymentItem> posItems = new ArrayList<PaymentItem>();
+        List<PaymentItem> posItems = new ArrayList<>();
         for(PaymentItem p : items)
         {
             if(p.getReceiver().equals("Stefy & Simo") && !p.getEmitter().equals("Stefy & Simo") )
@@ -116,7 +114,7 @@ public class BalanceActivity extends AppCompatActivity  implements PaymentListFr
     {
         //TODO change Stefy and simo
         //TODO fetch items from firebase
-        List<PaymentItem> negItems = new ArrayList<PaymentItem>();
+        List<PaymentItem> negItems = new ArrayList<>();
         for(PaymentItem p : items)
         {
             if(p.getEmitter().equals("Stefy & Simo") && !p.getReceiver().equals("Stefy & Simo"))
@@ -161,7 +159,7 @@ public class BalanceActivity extends AppCompatActivity  implements PaymentListFr
 
         collapsingToolbar.setTitle(String.format("%.2f",sum) + "€");
 
-        if(!collapsingToolbar.getTitle().toString().contains("-")) {
+        if(collapsingToolbar.getTitle() != null && !collapsingToolbar.getTitle().toString().contains("-")) {
 
             collapsingToolbar.setCollapsedTitleTextAppearance(R.style.CollapsedAppBarPositive);
             collapsingToolbar.setExpandedTitleTextAppearance(R.style.ExpandedAppBarPositive);

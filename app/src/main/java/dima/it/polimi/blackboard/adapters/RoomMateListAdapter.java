@@ -10,10 +10,9 @@ import android.widget.TextView;
 import java.util.List;
 
 import dima.it.polimi.blackboard.R;
-import dima.it.polimi.blackboard.model.House;
 import dima.it.polimi.blackboard.model.RoomMate;
 
-/**
+/**Adapter used to create the roomMate list
  * Created by simone on 17/01/2018.
  */
 

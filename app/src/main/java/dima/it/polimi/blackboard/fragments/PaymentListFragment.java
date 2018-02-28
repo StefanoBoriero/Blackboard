@@ -3,7 +3,6 @@ package dima.it.polimi.blackboard.fragments;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -11,8 +10,6 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SearchView;
-import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -92,7 +89,6 @@ public class PaymentListFragment extends Fragment implements PaymentListAdapter.
 
 
         parentActivity = ((AppCompatActivity)getActivity());
-        rootView = parentActivity.findViewById(R.id.root_view);
 
         // Setting up the RecyclerView adapter and helpers
         RecyclerView recyclerView = view.findViewById(R.id.recycler_view);

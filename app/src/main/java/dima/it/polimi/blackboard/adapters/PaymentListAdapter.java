@@ -1,19 +1,16 @@
 package dima.it.polimi.blackboard.adapters;
 
 /**
+ *  Adapter used for the creation of the List of payments
  * Created by simone on 21/12/2017.
  */
 
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
-import android.transition.TransitionManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Filter;
-import android.widget.Filterable;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -23,7 +20,6 @@ import java.util.List;
 
 import dima.it.polimi.blackboard.R;
 import dima.it.polimi.blackboard.model.PaymentItem;
-import dima.it.polimi.blackboard.model.TodoItem;
 
 
 public class PaymentListAdapter extends RecyclerView.Adapter<PaymentListAdapter.PaymentViewHolder> {
@@ -42,7 +38,6 @@ public class PaymentListAdapter extends RecyclerView.Adapter<PaymentListAdapter.
             }
         }
         this.paymentItems = filteredItems;
-        mListener = listener;
     }
 
     @Override
@@ -73,11 +68,8 @@ public class PaymentListAdapter extends RecyclerView.Adapter<PaymentListAdapter.
         holder.todoItemPrice.setText("Amount: " + String.format("%.2f", paymentItem.getPrice()) +" €");
 
 
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        holder.itemView.setOnClickListener(v -> {
 
-            }
         });
     }
 
