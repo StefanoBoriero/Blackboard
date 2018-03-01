@@ -14,7 +14,7 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:gravity="center_horizontal"
-        android:text="House Name"
+        android:text="@string/house_name"
         android:textSize="30sp"
         android:textStyle="bold" />
 

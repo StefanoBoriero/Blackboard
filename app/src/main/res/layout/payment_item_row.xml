@@ -42,7 +42,7 @@
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:lines="1"
-                android:text="example"
+                android:text="@string/example"
                 android:textSize="@dimen/msg_text_primary"
                 android:textStyle="bold" />
 
@@ -52,7 +52,7 @@
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:lines="1"
-                android:text="example"
+                android:text="@string/example"
                 android:textSize="@dimen/msg_text_secondary"
                 android:textStyle="bold" />
 
@@ -65,7 +65,8 @@
             android:orientation="vertical">
 
             <ImageView
-                android:id="@+id/positive_negatve_image"
+                android:id="@+id/positive_negative_image"
+                android:contentDescription="@string/content_description_positive_negative_icon"
                 android:layout_width="@dimen/icon_width_height"
                 android:layout_height="@dimen/icon_width_height"
 

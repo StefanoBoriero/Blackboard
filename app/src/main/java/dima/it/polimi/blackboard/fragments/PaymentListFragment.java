@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -83,12 +82,8 @@ public class PaymentListFragment extends Fragment implements PaymentListAdapter.
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        AppCompatActivity parentActivity;
         View rootView;
         View view = inflater.inflate(R.layout.fragment_payment_list, container, false);
-
-
-        parentActivity = ((AppCompatActivity)getActivity());
 
         // Setting up the RecyclerView adapter and helpers
         RecyclerView recyclerView = view.findViewById(R.id.recycler_view);

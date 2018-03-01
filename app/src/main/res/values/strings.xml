@@ -90,6 +90,7 @@
     <string name="type">Type</string>
     <string name="description">Description</string>
     <string name="cost">Cost</string>
+    <string name="priority">Priority</string>
     <string name="new_activity">Add activity</string>
     <string name="type_menu">Select a type</string>
 
@@ -100,7 +101,7 @@
 
     <!-- Profile Info Strings -->
     <string name="my_houses">My Houses</string>
-
+    <string name="house_name">House_name</string>
 
     <string name="title_activity_balance">BalanceActivity</string>
     <string name="title_activity_settings">Settings</string>
@@ -133,6 +134,19 @@
     <string name="content_description_house">House icon</string>
     <string name="content_description_dots">Menu dots</string>
     <string name="content_description_selected">Visual feedback for selection</string>
+    <string name="content_description_leave_image">Leave image button</string>
+    <string name="content_description_priority_icon">Priority icon</string>
+    <string name="content_description_black_down_arrow">Black selection arrow for spinner</string>
+    <string name="content_description_recycling_bin_icon">Recycling bin icon</string>
+    <string name="content_description_photo_icon">Photo icon</string>
+    <string name="content_description_credit_icon">Credit icon</string>
+    <string name="content_description_debt_icon">Debt icon</string>
+    <string name="content_description_heart_icon">Heart icon</string>
+    <string name="content_description_timer_icon">Timer icon</string>
+    <string name="content_description_check_icon">Check icon</string>
+    <string name="content_description_fire_icon">Fire icon</string>
+    <string name="content_description_image_icon">Image icon</string>
+    <string name="content_description_positive_negative_icon">Positive or negative icon</string>
 
     <!-- Settings -->
 
@@ -162,5 +176,17 @@
         <item>4</item>
         <item>5</item>
     </string-array>
+
+    <!-- Numbers -->
+    <string name="zero_decimal">0.00</string>
+    <string name="fifty">50</string>
+    <string name="seven">7</string>
+    <string name="five_hundred">500</string>
+    <string name="one_day">1 day</string>
+
+    <!-- Group members interface-->
+    <string name="leave_house">Leave house</string>
+
+    <string name="example">Example</string>
 
 </resources>

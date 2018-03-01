@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "879474289315",
+    "firebase_url": "https://blackboard-f94ed.firebaseio.com",
+    "project_id": "blackboard-f94ed",
+    "storage_bucket": "blackboard-f94ed.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:879474289315:android:ca3c37f913681d6c",
+        "android_client_info": {
+          "package_name": "dima.it.polimi.blackboard"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "879474289315-msfp1ms504sq7uua6erlcbc4r8qv55hs.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "dima.it.polimi.blackboard",
+            "certificate_hash": "1bf9f04b288c4def9bc36c58a0500dd961c5ce92"
+          }
+        },
+        {
+          "client_id": "879474289315-5qh6uel39e0vr93cmgidlj072r6hgdn4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDL3BE9ga6LmW-_J7_gMGrlaxu3xDc16-E"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "879474289315-5qh6uel39e0vr93cmgidlj072r6hgdn4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

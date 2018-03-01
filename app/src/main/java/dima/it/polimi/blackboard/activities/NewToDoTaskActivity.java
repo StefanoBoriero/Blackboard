@@ -126,7 +126,7 @@ public class NewToDoTaskActivity extends AppCompatActivity {
         {
             //hide cost field
             costEditText.setVisibility(LinearLayout.GONE);
-            costEditText.setText("0.00");
+            costEditText.setText(R.string.zero_decimal);
             costView.setVisibility(LinearLayout.GONE);
 
         }

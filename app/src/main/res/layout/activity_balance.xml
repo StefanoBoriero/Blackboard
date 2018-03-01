@@ -15,7 +15,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/balance_toolbar"
-            android:layout_marginRight="10dp"
+            android:layout_marginEnd="10dp"
             app:title="6.66€"
             app:contentScrim="?attr/colorPrimary"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
