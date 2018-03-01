@@ -11,7 +11,6 @@ import android.support.constraint.ConstraintSet;
 import android.support.v7.app.AppCompatActivity;
 import android.transition.ChangeBounds;
 import android.transition.Transition;
-import android.transition.TransitionInflater;
 import android.transition.TransitionManager;
 import android.view.MotionEvent;
 import android.view.View;
@@ -20,9 +19,7 @@ import android.view.animation.AnimationUtils;
 import android.view.animation.OvershootInterpolator;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.view.inputmethod.EditorInfo;
-import android.widget.EditText;
 
 import dima.it.polimi.blackboard.R;
 
@@ -32,10 +29,10 @@ import dima.it.polimi.blackboard.R;
  */
 
 public class LoginActivity extends AppCompatActivity {
-    final public static int ANIMATION_DELAY = 800;
-    ConstraintSet mConstraintSet2 = new ConstraintSet(); // create a Constraint Set
-    ConstraintLayout mConstraintLayout;
-    View contentLogin;
+    private final static int ANIMATION_DELAY = 800;
+    private ConstraintSet mConstraintSet2 = new ConstraintSet(); // create a Constraint Set
+    private ConstraintLayout mConstraintLayout;
+    private View contentLogin;
 
 
     @Override
@@ -129,7 +126,10 @@ public class LoginActivity extends AppCompatActivity {
             float x = ev.getRawX() + view.getLeft() - scrcoords[0];
             float y = ev.getRawY() + view.getTop() - scrcoords[1];
             if (x < view.getLeft() || x > view.getRight() || y < view.getTop() || y > view.getBottom()) {
-                ((InputMethodManager) this.getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow((this.getWindow().getDecorView().getApplicationWindowToken()), 0);
+                InputMethodManager softKeyboard = (InputMethodManager) this.getSystemService(Context.INPUT_METHOD_SERVICE);
+                if(softKeyboard != null) {
+                    softKeyboard.hideSoftInputFromWindow((this.getWindow().getDecorView().getApplicationWindowToken()), 0);
+                }
                 view.clearFocus();
                 //give focus to constraint layout
                 mConstraintLayout.requestFocus();

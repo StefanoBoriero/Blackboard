@@ -5,6 +5,7 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="colorButtonNormal">@color/greenAccept</item>
+        <item name="background">@color/white</item>
         <item name="android:spinnerItemStyle">
             @style/spinnerItemStyle
         </item>
