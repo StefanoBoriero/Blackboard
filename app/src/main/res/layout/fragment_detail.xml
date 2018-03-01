@@ -9,23 +9,7 @@
     <include
         android:id="@+id/detail_header"
         layout="@layout/detail_header" />
-    <!--
-    <TextView
-        android:id="@+id/type_detail"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_margin="@dimen/margin_type"
-        android:textSize="@dimen/text_size_type"
-        android:textColor="@color/black"
-        android:textStyle="bold"
-        android:drawablePadding="@dimen/drawable_padding"
-        android:gravity="center"
-        tools:drawableStart="@drawable/ic_shopping_cart_black_24dp"
-        tools:text="Shopping"
-        app:layout_constraintTop_toBottomOf="@id/detail_header"
-        app:layout_constraintBottom_toTopOf="@id/recycler_view_detail"/>
--->
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler_view_detail"
         android:layout_width="0dp"
