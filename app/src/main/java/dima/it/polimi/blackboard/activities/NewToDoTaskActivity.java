@@ -32,10 +32,10 @@ import dima.it.polimi.blackboard.utils.OnRevealAnimationListener;
 
 public class NewToDoTaskActivity extends AppCompatActivity {
 
-    public Button typeButton;
-    public EditText editText;
-    public TextView costView;
-    public EditText costEditText;
+    private Button typeButton;
+    private EditText editText;
+    private TextView costView;
+    private EditText costEditText;
     private FloatingActionButton mFab;
     private RelativeLayout container_layout;
 
@@ -45,9 +45,6 @@ public class NewToDoTaskActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
-        LinearLayout linearLayout;
-        RelativeLayout myRelativeLayout;
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.new_to_do_task);

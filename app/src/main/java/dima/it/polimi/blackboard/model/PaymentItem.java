@@ -9,11 +9,11 @@ import android.os.Parcelable;
  */
 
 public class PaymentItem implements Parcelable{
-    private long id;
-    private String name;
-    private String from;
-    private String to;
-    private double price;
+    private final long id;
+    private final String name;
+    private final String from;
+    private final String to;
+    private final double price;
 
     protected PaymentItem(Parcel in) {
         //Order must be the same of writeToParcel

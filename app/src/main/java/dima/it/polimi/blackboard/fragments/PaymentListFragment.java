@@ -37,13 +37,6 @@ public class PaymentListFragment extends Fragment implements PaymentListAdapter.
     private int mColumnCount = 1;
     private OnListFragmentInteractionListener mListener;
     private PaymentListAdapter adapter;
-    private CollapsingToolbarLayout balanceToolbar;
-
-    // Attributes for onStop() onStart() consistency
-    private CharSequence savedQuery;
-    private int position;
-
-
 
 
     /**
@@ -82,7 +75,6 @@ public class PaymentListFragment extends Fragment implements PaymentListAdapter.
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View rootView;
         View view = inflater.inflate(R.layout.fragment_payment_list, container, false);
 
         // Setting up the RecyclerView adapter and helpers

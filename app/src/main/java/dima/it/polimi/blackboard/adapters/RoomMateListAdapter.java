@@ -17,7 +17,7 @@ import dima.it.polimi.blackboard.model.RoomMate;
  */
 
 public class RoomMateListAdapter extends RecyclerView.Adapter<RoomMateListAdapter.ViewHolder> {
-    private List<RoomMate> myRoomMates;
+    private final List<RoomMate> myRoomMates;
 
 
     public RoomMateListAdapter(List<RoomMate> roomMates, RoomMateListAdapterListener listener){
@@ -61,8 +61,8 @@ public class RoomMateListAdapter extends RecyclerView.Adapter<RoomMateListAdapte
 
 
     protected class ViewHolder extends RecyclerView.ViewHolder{
-        ImageView roomMateImage;
-        TextView roomMateName;
+        final ImageView roomMateImage;
+        final TextView roomMateName;
 
         private ViewHolder(View itemView) {
             super(itemView);

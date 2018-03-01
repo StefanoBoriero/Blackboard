@@ -9,7 +9,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 public class RoomMate implements Parcelable {
-    private String name;
+    private final String name;
 
     public RoomMate(String name) {
         this.name = name;

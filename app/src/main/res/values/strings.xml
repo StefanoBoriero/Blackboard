@@ -85,26 +85,25 @@
 
     <string name="type_selection">Select activity type</string>
     <string name="name_selection">Insert activity name</string>
-    <string name="cost_selection">Insert activity cost</string>
     <string name="name">Name</string>
     <string name="type">Type</string>
     <string name="description">Description</string>
     <string name="cost">Cost</string>
     <string name="priority">Priority</string>
     <string name="new_activity">Add activity</string>
-    <string name="type_menu">Select a type</string>
+
 
 
     <string name="swipe_text">Accept Task</string>
-    <string name="swipe_pay_text">$BOR$a</string>
+
 
 
     <!-- Profile Info Strings -->
     <string name="my_houses">My Houses</string>
     <string name="house_name">House_name</string>
 
-    <string name="title_activity_balance">BalanceActivity</string>
-    <string name="title_activity_settings">Settings</string>
+
+
 
     <!-- Strings related to Settings -->
 

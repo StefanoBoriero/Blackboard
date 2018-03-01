@@ -29,7 +29,7 @@ public class NewPaymentActivity extends AppCompatActivity {
     private FloatingActionButton mFab;
     private RelativeLayout container_layout;
     private ConstraintLayout myConstraintLayout;
-    public EditText editText;
+    private EditText editText;
 
 
 

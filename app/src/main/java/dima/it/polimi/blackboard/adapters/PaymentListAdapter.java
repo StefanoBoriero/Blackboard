@@ -23,11 +23,11 @@ import dima.it.polimi.blackboard.model.PaymentItem;
 
 
 public class PaymentListAdapter extends RecyclerView.Adapter<PaymentListAdapter.PaymentViewHolder> {
-    private Context mContext;
-    private List<PaymentItem> paymentItems;
+    private final Context mContext;
+    private final List<PaymentItem> paymentItems;
 
     public PaymentListAdapter(Context context, List<PaymentItem> paymentItems, PaymentListAdapterListener listener){
-        PaymentListAdapterListener mListener;
+
 
         this.mContext = context;
         List<PaymentItem> filteredItems = new ArrayList<>();
@@ -100,13 +100,13 @@ public class PaymentListAdapter extends RecyclerView.Adapter<PaymentListAdapter.
     public class PaymentViewHolder extends RecyclerView.ViewHolder{
 
 
-        private TextView todoItemName;
-        private TextView todoItemPrice;
-        private LinearLayout todoItemContainer;
-        private RelativeLayout positiveNegativeIconContainer;
+        private final TextView todoItemName;
+        private final TextView todoItemPrice;
+        private final LinearLayout todoItemContainer;
+        private final RelativeLayout positiveNegativeIconContainer;
 
-        public RelativeLayout viewForeground;
-        public RelativeLayout viewBackground;
+        public final RelativeLayout viewForeground;
+        public final RelativeLayout viewBackground;
 
         public PaymentViewHolder(View itemView) {
             super(itemView);

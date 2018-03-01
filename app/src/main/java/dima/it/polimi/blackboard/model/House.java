@@ -10,7 +10,7 @@ import android.os.Parcelable;
  */
 
 public class House implements Parcelable {
-    private String name;
+    private final String name;
 
     public House(String name){
         this.name = name;
