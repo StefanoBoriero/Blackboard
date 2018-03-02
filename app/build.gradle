@@ -41,4 +41,9 @@ dependencies {
     implementation 'com.github.bumptech.glide:glide:4.3.1'
     implementation 'com.github.faranjit:currency-edittext:1.0.1'
     implementation 'com.android.support:cardview-v7:26.1.0'
+
+    //Firebase dependecies
+    implementation 'com.google.firebase:firebase-core:11.8.0'
 }
+
+apply plugin: 'com.google.gms.google-services'
