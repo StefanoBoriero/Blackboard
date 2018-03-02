@@ -51,7 +51,7 @@
         android:id="@+id/login_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/background_my_list_resume"
+        android:background="@drawable/background_login_button"
         android:layout_margin="8dp"
         android:onClick="onLogin"
         android:text="@string/button_string"
