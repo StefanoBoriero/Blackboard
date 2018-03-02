@@ -3,7 +3,6 @@ package dima.it.polimi.blackboard.utils;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
-import android.support.annotation.ColorRes;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.animation.AccelerateDecelerateInterpolator;
@@ -18,7 +17,7 @@ import dima.it.polimi.blackboard.R;
 public class GUIUtils {
 
     public static void animateRevealShow(final Context ctx, final View view, final int startRadius,
-                                         @ColorRes final int color, int x, int y, final OnRevealAnimationListener listener) {
+                                         int x, int y, final OnRevealAnimationListener listener) {
         float finalRadius = (float) Math.hypot(view.getWidth(), view.getHeight());
 
         Animator anim =
@@ -29,7 +28,7 @@ public class GUIUtils {
         anim.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationStart(Animator animation) {
-                view.setBackgroundColor(ctx.getResources().getColor(color));
+                view.setBackgroundColor(ctx.getResources().getColor(R.color.colorAccent));
             }
 
             @Override
@@ -41,7 +40,7 @@ public class GUIUtils {
         anim.start();
     }
 
-    public static void animateRevealHide(final Context ctx, final View view, @ColorRes int color,
+    public static void animateRevealHide(final Context ctx, final View view,
                                          final int finalRadius, OnRevealAnimationListener listener) {
         int cx = (view.getWidth()) / 2;
         int cy = (view.getHeight()) / 2;
@@ -53,7 +52,7 @@ public class GUIUtils {
             @Override
             public void onAnimationStart(Animator animation) {
                 super.onAnimationStart(animation);
-                view.setBackgroundColor(ctx.getResources().getColor(color));
+                view.setBackgroundColor(ctx.getResources().getColor(R.color.colorAccent));
             }
 
             @Override

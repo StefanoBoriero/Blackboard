@@ -113,7 +113,7 @@ public class NewPaymentActivity extends AppCompatActivity {
         View view = container_layout;
         int cx = (myConstraintLayout.getWidth()) / 2;
         int cy = (myConstraintLayout.getHeight()) / 2;
-        GUIUtils.animateRevealShow(this, view, mFab.getWidth() / 2, R.color.colorAccent,
+        GUIUtils.animateRevealShow(this, view, mFab.getWidth() / 2,
                 cx, cy, new OnRevealAnimationListener() {
                     @Override
                     public void onRevealHide() {
@@ -142,7 +142,7 @@ public class NewPaymentActivity extends AppCompatActivity {
     //when the back button is pressed, we need to start the back animation
     @Override
     public void onBackPressed() {
-        GUIUtils.animateRevealHide(this, myConstraintLayout, R.color.colorAccent, mFab.getWidth() / 2,
+        GUIUtils.animateRevealHide(this, myConstraintLayout, mFab.getWidth() / 2,
                 new OnRevealAnimationListener() {
                     @Override
                     public void onRevealHide() {
