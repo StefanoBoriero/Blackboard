@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<transitionSet xmlns:android="http://schemas.android.com/apk/res/android">
+    <slide
+        android:duration="@integer/detail_out_duration"
+        android:slideEdge="top"
+        android:interpolator="@android:interpolator/fast_out_slow_in">
+        <targets>
+            <target android:targetId="@id/detail_header"/>
+        </targets>
+    </slide>
+
+    <slide
+        android:duration="@integer/detail_out_duration"
+        android:slideEdge="bottom"
+        android:interpolator="@android:interpolator/fast_out_slow_in">
+        <targets>
+            <target android:excludeId="@android:id/statusBarBackground"/>
+            <target android:excludeId="@id/detail_header"/>
+        </targets>
+    </slide>
+
+    <fade
+        android:duration="@integer/detail_out_duration">
+    </fade>
+
+</transitionSet>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="none">
+        <item android:id="@+id/shopping"
+            android:title="@string/shopping" />
+        <item android:id="@+id/houseKeeping"
+            android:title="@string/houseKeeping" />
+        <item android:id="@+id/bills"
+            android:title="@string/bills" />
+    </group>
+</menu>

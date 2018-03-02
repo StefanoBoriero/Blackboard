@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <dimen name="margin_surface" tools:keep="@dimen/margin_surface">16dp</dimen>
+    <dimen name="elevation_surface">16dp</dimen>
+    <dimen name="size_items_my_list">80sp</dimen>
+    <dimen name="size_comment_good_boi">16sp</dimen>
+    <dimen name="size_item_text">24sp</dimen>
+</resources>

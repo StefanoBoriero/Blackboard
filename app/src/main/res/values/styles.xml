@@ -1,11 +1,82 @@
 <resources>
 
-    <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorButtonNormal">@color/greenAccept</item>
+        <item name="background">@color/white</item>
+        <item name="android:spinnerItemStyle">
+            @style/spinnerItemStyle
+        </item>
+    </style>
+
+    <style name="AppTheme.NoTitle" parent="@style/Theme.AppCompat.Light.NoActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
+
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="windowActionModeOverlay">true</item>
+        <item name="android:statusBarColor">@color/colorPrimaryDark</item>
+    </style>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="AppTheme.GroupList" parent="AppTheme.NoActionBar">
+        <item name="android:windowEnterTransition">@transition/slide_in</item>
+    </style>
+
+    <style name="AppTheme.MainActivity" parent="AppTheme.NoActionBar">
+        <item name="android:windowExitTransition">@android:transition/fade</item>
+    </style>
+
+    <style name="Theme.noTitleBar" parent="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="AppTheme.Detail" parent="AppTheme.NoActionBar">
+        <item name="android:windowEnterTransition">@transition/detail_in</item>
+        <item name="android:windowExitTransition">@transition/detail_out</item>
+        <item name="android:windowSharedElementEnterTransition">@transition/shared_element_detail</item>
+    </style>
+
+    <style name="spinnerItemStyle">
+        <item name="android:padding">10dp</item>
+        <item name="android:paddingStart">38dp</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:textColor">#333131</item>
+    </style>
+
+    <style name="ExpandedAppBarPositive" parent="@android:style/TextAppearance.Medium">
+        <item name="android:textSize">70sp</item>
+        <item name="android:textColor">#4CAF50</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="CollapsedAppBarPositive" parent="@android:style/TextAppearance.Medium">
+        <item name="android:textSize">25sp</item>
+        <item name="android:textColor">#4CAF50</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+
+    <style name="ExpandedAppBarNegative" parent="@android:style/TextAppearance.Medium">
+        <item name="android:textSize">70sp</item>
+        <item name="android:textColor">#D32F2F</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="CollapsedAppBarnegative" parent="@android:style/TextAppearance.Medium">
+        <item name="android:textSize">25sp</item>
+        <item name="android:textColor">#D32F2F</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+
 
 </resources>

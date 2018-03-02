@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="Notifications">
+        <ListPreference
+            android:defaultValue="1"
+            android:entries="@array/notifications"
+            android:entryValues="@array/notifications_values"
+            android:key="@string/key_notifications_v"
+            android:title="Receive notifications" />
+        <RingtonePreference
+            android:defaultValue=" "
+            android:key="@string/key_ringtone"
+            android:title="Ringtone"
+            android:summary="Mr. Sexy Guy"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Data and Synchronization">
+
+        <ListPreference
+            android:defaultValue="1"
+            android:entries="@array/pref_sync_frequency_titles"
+            android:entryValues="@array/sync_values"
+            android:key="@string/key_sync_frequency"
+            android:title="Sync frequency" />
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="@string/key_calendar"
+            android:title="Sync with Google Calendar" />
+    </PreferenceCategory>
+</PreferenceScreen>
