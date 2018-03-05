@@ -16,6 +16,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.google.firebase.auth.FirebaseAuth;
+
 import java.util.List;
 
 import dima.it.polimi.blackboard.R;
@@ -26,13 +28,15 @@ import dima.it.polimi.blackboard.utils.DataGeneratorUtil;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
+    private FirebaseAuth firebaseAuth;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
+        firebaseAuth = FirebaseAuth.getInstance();
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -59,7 +63,7 @@ public class MainActivity extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            moveTaskToBack(true);
         }
     }
 
@@ -110,6 +114,12 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_settings){
             Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
             startActivity(intent);
+        }
+        else if (id == R.id.nav_logout){
+            finish();
+            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+            startActivity(intent);
+            firebaseAuth.signOut();
         }
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
