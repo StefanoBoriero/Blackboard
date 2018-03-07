@@ -12,7 +12,9 @@ import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.text.DateFormatSymbols;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import dima.it.polimi.blackboard.R;
@@ -31,8 +33,14 @@ public class TodoListAdapter extends RecyclerView.Adapter<TodoListAdapter.ViewHo
     private ViewGroup parent;
 
     public TodoListAdapter(List<TodoItem> todoItems, TodoListAdapterListener listener){
+        this.mListener = listener;
         this.todoItems = todoItems;
         this.todoItemsFiltered = todoItems;
+    }
+
+    public TodoListAdapter(TodoListAdapterListener listener){
+        this.todoItems = new ArrayList<>();
+        this.todoItemsFiltered = new ArrayList<>();
         this.mListener = listener;
     }
 
@@ -52,7 +60,7 @@ public class TodoListAdapter extends RecyclerView.Adapter<TodoListAdapter.ViewHo
         holder.todoItemType.setText(todoItem.getType());
         holder.todoItemName.setTransitionName(todoItem.getName() + "Name" + todoItem.getId());
         holder.userIcon.setTransitionName(todoItem.getName() + "Icon" + todoItem.getId());
-        holder.timestampView.setText(todoItem.getTimestamp());
+        holder.timestampView.setText(decodeDate(todoItem.getMyCreatedOn()));
         holder.todoItemType.setCompoundDrawablesWithIntrinsicBounds(resolveIcon(todoItem.getType()), null, null, null);
         //TODO get user icon
 
@@ -62,19 +70,40 @@ public class TodoListAdapter extends RecyclerView.Adapter<TodoListAdapter.ViewHo
         );
     }
 
+    private String decodeDate(Calendar calendar){
+        int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
+        String day = String.valueOf(dayOfMonth);
+
+        int monthInt = calendar.get(Calendar.MONTH);
+        String month = "wrong";
+        DateFormatSymbols dfs = new DateFormatSymbols();
+        String[] months = dfs.getMonths();
+        if (monthInt >= 0 && monthInt <= 11 ) {
+            month = months[monthInt];
+        }
+
+        return day + " " + month;
+    }
+
     //TODO extract this method in Utility class OR put iconResId in todoItem
     private Drawable resolveIcon(String type){
         Resources res = parent.getResources();
         switch (type) {
             case ("Housing"):
                     return res.getDrawable(R.drawable.ic_home_black_24dp);
-            case("Billing"):
+            case("Bill"):
                     return res.getDrawable(R.drawable.ic_payment_black_24dp);
             case ("Shopping"):
                     return res.getDrawable(R.drawable.ic_shopping_cart_black_24dp);
             default:
                 return null;
         }
+    }
+
+    public void setTodoItems(List<TodoItem> items){
+        this.todoItems = items;
+        this.todoItemsFiltered = items;
+        notifyDataSetChanged();
     }
 
     @Override

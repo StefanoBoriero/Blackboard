@@ -38,7 +38,7 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
     private static final int ACCEPT_TASK_REQUEST = 1;
     private static final int ANIM_DURATION = 250;
 
-    private Fragment firstFragment;
+    protected Fragment firstFragment;
     private Fragment secondFragment;
 
     private View itemRowClicked;

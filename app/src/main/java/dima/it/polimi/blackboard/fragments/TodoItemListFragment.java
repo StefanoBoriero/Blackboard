@@ -3,6 +3,7 @@ package dima.it.polimi.blackboard.fragments;
 import android.content.Context;
 import android.os.Bundle;
 
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -12,12 +13,22 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QuerySnapshot;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import dima.it.polimi.blackboard.R;
 import dima.it.polimi.blackboard.activities.HouseListActivity;
@@ -37,6 +48,8 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
 
     private static final String ARG_COLUMN_COUNT = "column-count";
     private static final String ARG_TODO_ITEMS = "todo-items";
+    private static final String ARG_HOUSE_LIST = "house-list";
+    private static final String TAG = "ITEM_LIST";
 
     private int mColumnCount = 1;
     private OnListFragmentInteractionListener mListener;
@@ -44,8 +57,10 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
     private ItemTouchHelper swipeHelper;
     private TodoListAdapter adapter;
 
-
     private View rootView;
+
+    private FirebaseFirestore db;
+    private String house;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -74,8 +89,12 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
             List<TodoItem> todoItems = getArguments().getParcelableArrayList(ARG_TODO_ITEMS);
-            adapter = new TodoListAdapter(todoItems, this);
+            adapter = new TodoListAdapter(this);
+            //adapter = new TodoListAdapter(todoItems, this);
         }
+
+        db = FirebaseFirestore.getInstance();
+        getItems();
     }
 
     @Override
@@ -139,6 +158,10 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
     @Override
     public void onTodoItemClicked(TodoItem todoItem, View view, int clickedPosition) {
         mListener.onItemClick(todoItem, view, clickedPosition);
+    }
+
+    public void setHouse(String house){
+        this.house = house;
     }
 
     public void disableSwipe(){
@@ -222,6 +245,29 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
     public void onRefresh() {
         //TODO implement refreshing through Firebase. Add setter for network source
     }
+
+    private void getItems(){
+
+        CollectionReference houseItems = db.collection("houses")
+                .document(house)
+                .collection("items");
+        Query query = houseItems.whereEqualTo("taken", false);
+        query.get()
+                .addOnCompleteListener( (task) -> {
+                        if (task.isSuccessful()) {
+                            List<TodoItem> items = new ArrayList<>();
+                            for (DocumentSnapshot document : task.getResult()) {
+                                TodoItem item = document.toObject(TodoItem.class);
+                                items.add(item);
+                                Log.d(TAG, document.getId() + " => " + document.getData());
+                            }
+                            adapter.setTodoItems(items);
+                        } else {
+                            Log.d(TAG, "Error getting documents: ", task.getException());
+                        }
+                });
+    }
+
 
     /**
      * This interface must be implemented by activities that contain this

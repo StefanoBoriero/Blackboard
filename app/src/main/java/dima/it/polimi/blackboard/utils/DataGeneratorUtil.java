@@ -1,5 +1,7 @@
 package dima.it.polimi.blackboard.utils;
 
+import android.content.Intent;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,13 +38,14 @@ public class DataGeneratorUtil {
             int name = (int)(Math.random() * 3);
             int type = (int)(Math.random() * 3);
             double price = (Math.random() * 3);
+            String id = i + "a";
 
             TodoItem item;
             if(Math.random() > 0.5) {
-                item = new TodoItem(i, names[name], types[type], "Lorem ipsum dolor sit amet", price);
+                item = new TodoItem(id, names[name], types[type], "Lorem ipsum dolor sit amet", price);
             }
             else{
-                item = new TodoItem(i, names[name], types[type], "We guajò, bella sta App");
+                item = new TodoItem(id, names[name], types[type], "We guajò, bella sta App");
             }
             out.add(item);
         }

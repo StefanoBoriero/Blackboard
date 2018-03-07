@@ -16,6 +16,7 @@ import android.view.View;
 
 
 import dima.it.polimi.blackboard.R;
+import dima.it.polimi.blackboard.fragments.TodoItemListFragment;
 import dima.it.polimi.blackboard.model.TodoItem;
 import dima.it.polimi.blackboard.utils.DataGeneratorUtil;
 
@@ -36,7 +37,9 @@ public class HouseListActivity extends DoubleFragmentActivity implements DialogI
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setContentView(R.layout.activity_house_list);
+
         super.setItemList(DataGeneratorUtil.generateTodoItems(30));
+        super.onCreate(savedInstanceState);
 
         mFab = findViewById(R.id.add_fab);
         mFab.setTransitionName("revealCircular");
@@ -45,8 +48,8 @@ public class HouseListActivity extends DoubleFragmentActivity implements DialogI
         toolbar.setTitle(R.string.title_activity_house_list);
         setSupportActionBar(toolbar);
 
+        ((TodoItemListFragment)firstFragment).setHouse("Sexy");
 
-        super.onCreate(savedInstanceState);
     }
 
     @Override

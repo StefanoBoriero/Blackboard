@@ -46,6 +46,7 @@ dependencies {
     //Firebase dependecies
     implementation 'com.google.firebase:firebase-core:11.8.0'
     implementation 'com.google.firebase:firebase-auth:11.8.0'
+    implementation 'com.google.firebase:firebase-firestore:11.8.0'
 
     //Google play authentication dependencies
     implementation 'com.google.android.gms:play-services-auth:11.8.0'
