@@ -13,8 +13,6 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
 
-import dima.it.polimi.blackboard.R;
-
 /**
  * Object representing a task to be done
  * Created by Stefano on 27/11/2017.
