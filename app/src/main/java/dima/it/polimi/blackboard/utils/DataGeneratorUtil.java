@@ -41,13 +41,15 @@ public class DataGeneratorUtil {
             String id = i + "a";
 
             TodoItem item;
+            /*
             if(Math.random() > 0.5) {
-                item = new TodoItem(id, names[name], types[type], "Lorem ipsum dolor sit amet", price);
+                item = new TodoItem(names[name], types[type], "Lorem ipsum dolor sit amet", price);
             }
             else{
-                item = new TodoItem(id, names[name], types[type], "We guajò, bella sta App");
+                item = new TodoItem(names[name], types[type], "We guajò, bella sta App");
             }
             out.add(item);
+            */
         }
         return out;
     }

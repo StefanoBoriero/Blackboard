@@ -49,22 +49,7 @@ public class TodoItem implements Parcelable {
         details = new ArrayList<>(tmp);
     }
 
-    public TodoItem(String id, String name, String type, String description, Double price){
-        //this.id = id;
-        this.name = name;
-        this.type = type;
-        /*
-        details = new ArrayList<>();
-
-        details.add(createDescription(description));
-        details.add(createExpirationDetail("Tomorrow"));
-        details.add(createPriceDetail(price.toString()));
-        details.add(createSuggestionDetail("You"));
-        */
-    }
-
-    public TodoItem(String id, String name, String type, String priority, Map<String, Object> additionalInfo){
-        this.id = id;
+    public TodoItem(String name, String type, String priority, Map<String, Object> additionalInfo){
         this.name = name;
         this.type = type;
         this.priority = priority;
@@ -76,17 +61,6 @@ public class TodoItem implements Parcelable {
         if(user != null) {
             this.createdBy = user.getUid();
         }
-    }
-
-    public TodoItem(String id, String name, String type, String description){
-        this.id = id;
-        this.name = name;
-        this.type = type;
-/*
-        details = new ArrayList<>();
-        details.add(createDescription(description));
-        details.add(createSuggestionDetail("You"));
-        */
     }
 
     public List<Detail> getDetails(){
