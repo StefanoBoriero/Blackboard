@@ -23,10 +23,17 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import dima.it.polimi.blackboard.R;
+import dima.it.polimi.blackboard.model.TodoItem;
 import dima.it.polimi.blackboard.utils.GUIUtils;
 import dima.it.polimi.blackboard.utils.OnRevealAnimationListener;
 
@@ -42,6 +49,7 @@ public class NewToDoTaskActivity extends AppCompatActivity {
 
 
     private ConstraintLayout myConstraintLayout;
+    private FirebaseFirestore db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +81,8 @@ public class NewToDoTaskActivity extends AppCompatActivity {
 
 
         setupEnterAnimation();
+
+        db = FirebaseFirestore.getInstance();
 
     }
 
@@ -271,5 +281,21 @@ public class NewToDoTaskActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    public void createActivity(View v)
+    {
+        EditText nameEditText = findViewById(R.id.nameEditText);
+        Button typeButton = findViewById(R.id.typeButton);
+        EditText currencyEditText = findViewById(R.id.costEditText);
+        Spinner spinner = findViewById(R.id.spinner2);
+        EditText description = findViewById(R.id.descriptionEditText);
+        Map<String, Object> additionalInfo = new HashMap<String, Object>() ;
+        additionalInfo.put("description", description.getText().toString());
+
+
+
+        TodoItem todoItem = new TodoItem(nameEditText.getText().toString().trim(),  typeButton.getText().toString(),spinner.getSelectedItem().toString(),additionalInfo);
+        db.collection("houses").document("Sexy").collection("items").document().set(todoItem);
     }
 }

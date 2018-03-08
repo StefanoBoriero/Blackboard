@@ -249,6 +249,7 @@
                         android:layout_gravity="top|end"
                         android:layout_marginEnd="32dp"
                         android:layout_marginTop="12dp"
+                        android:onClick="createActivity"
                         android:text="@string/new_activity"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/descriptionEditText" />
