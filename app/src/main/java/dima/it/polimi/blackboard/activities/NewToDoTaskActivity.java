@@ -290,8 +290,14 @@ public class NewToDoTaskActivity extends AppCompatActivity {
         EditText currencyEditText = findViewById(R.id.costEditText);
         Spinner spinner = findViewById(R.id.spinner2);
         EditText description = findViewById(R.id.descriptionEditText);
+        //String amountString = currencyEditText.getText().toString().replace(",",".");
+        //Float amount = Float.parseFloat(amountString);
         Map<String, Object> additionalInfo = new HashMap<String, Object>() ;
         additionalInfo.put("description", description.getText().toString());
+        //if(amount != 0.00)
+        //{
+            //additionalInfo.put("amount", amount);
+        //}
 
 
 
