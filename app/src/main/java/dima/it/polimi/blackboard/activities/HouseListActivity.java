@@ -6,14 +6,26 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import dima.it.polimi.blackboard.R;
 import dima.it.polimi.blackboard.fragments.TodoItemListFragment;
@@ -30,7 +42,9 @@ public class HouseListActivity extends DoubleFragmentActivity implements DialogI
 
     // TODO select preferred
     private int whichHouse = 0;
-
+    private final static String TAG = "HOUSE_LIST";
+    private CharSequence[] houses;
+    private FirebaseFirestore db;
 
     private FloatingActionButton mFab;
 
@@ -49,7 +63,10 @@ public class HouseListActivity extends DoubleFragmentActivity implements DialogI
         setSupportActionBar(toolbar);
 
         ((TodoItemListFragment)firstFragment).setHouse("Sexy");
+        ((TodoItemListFragment)firstFragment).setMyList(false);
 
+        db = FirebaseFirestore.getInstance();
+        getHouses();
     }
 
     @Override
@@ -84,6 +101,29 @@ public class HouseListActivity extends DoubleFragmentActivity implements DialogI
         //TODO update firebase
     }
 
+    @SuppressWarnings("unchecked")
+    private void getHouses(){
+        DocumentReference user = db.collection("users").document("Serento");
+        user.get().addOnCompleteListener((task) -> {
+            List<CharSequence> myHouses = new ArrayList<>();
+            if (task.isSuccessful()) {
+               {
+                   DocumentSnapshot document = task.getResult();
+                   Map<String, Object> userParam = document.getData();
+                   ArrayList<String> houses = (ArrayList<String>)userParam.get("houses");
+                   Log.d(TAG, document.getId() + " => " + document.getData());
+                   this.houses = new CharSequence[houses.size()];
+                   for(int i=0; i<houses.size(); i++){
+                       this.houses[i] = houses.get(i);
+                   }
+                }
+
+            } else {
+                Log.d(TAG, "Error getting documents: ", task.getException());
+            }
+        });
+    }
+
 
     @Override
     public void onItemSwipe( int swipedPosition) {
@@ -93,7 +133,7 @@ public class HouseListActivity extends DoubleFragmentActivity implements DialogI
 
     public void onChooseHouse(MenuItem menuItem){
         ChooseHouseDialog.mListener = this;
-        DialogFragment houseListDialog = ChooseHouseDialog.newInstance(whichHouse);
+        DialogFragment houseListDialog = ChooseHouseDialog.newInstance(whichHouse, houses);
         houseListDialog.show(getFragmentManager(), "dialog");
     }
 
@@ -117,6 +157,8 @@ public class HouseListActivity extends DoubleFragmentActivity implements DialogI
     @Override
     public void onClick(DialogInterface dialog, int which) {
         this.whichHouse = which;
+        String currentHouse = (String)this.houses[whichHouse];
+        ((TodoItemListFragment)firstFragment).changeHouse(currentHouse);
         dialog.dismiss();
 
     }
@@ -124,10 +166,10 @@ public class HouseListActivity extends DoubleFragmentActivity implements DialogI
     public static class ChooseHouseDialog extends DialogFragment{
         public static Dialog.OnClickListener mListener;
 
-        public static ChooseHouseDialog newInstance(int whichHouse) {
-
+        public static ChooseHouseDialog newInstance(int whichHouse, CharSequence[] houses) {
             Bundle args = new Bundle();
             args.putInt("chosen_house", whichHouse);
+            args.putCharSequenceArray("houses", houses);
             ChooseHouseDialog fragment = new ChooseHouseDialog();
             fragment.setArguments(args);
             return fragment;
@@ -136,10 +178,11 @@ public class HouseListActivity extends DoubleFragmentActivity implements DialogI
         @Override
         public Dialog onCreateDialog(final Bundle savedInstanceState) {
             int which = getArguments().getInt("chosen_house");
+            CharSequence[] houses = getArguments().getCharSequenceArray("houses");
             final AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
             dialog.setTitle(R.string.action_choose_house);
-            CharSequence[] entries = new CharSequence[]{"One", "Two", "Three"};
-            dialog.setSingleChoiceItems(entries, which, mListener);
+            //CharSequence[] entries = new CharSequence[]{"One", "Two", "Three"};
+            dialog.setSingleChoiceItems(houses, which, mListener);
             return dialog.create();
         }
     }

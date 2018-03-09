@@ -81,6 +81,12 @@
         <activity
             android:name=".activities.HouseDialogActivity"
             android:theme="@android:style/Theme.Material.Light.DialogWhenLarge.NoActionBar" />
+        <receiver android:name=".receivers.BatteryStatusReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BATTERY_LOW"/>
+                <action android:name="android.intent.action.BATTERY_OKAY"/>
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

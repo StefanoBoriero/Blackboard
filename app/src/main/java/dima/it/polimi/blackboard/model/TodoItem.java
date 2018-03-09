@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -47,6 +48,9 @@ public class TodoItem implements Parcelable {
         List<Detail> tmp = new ArrayList<>();
         in.readList(tmp, Detail.class.getClassLoader());
         details = new ArrayList<>(tmp);
+
+        additionalInfo = new HashMap<>();
+        in.readMap(additionalInfo, HashMap.class.getClassLoader());
     }
 
     public TodoItem(String name, String type, String priority, Map<String, Object> additionalInfo){
@@ -64,6 +68,11 @@ public class TodoItem implements Parcelable {
     }
 
     public List<Detail> getDetails(){
+        List<Detail> details = new ArrayList<>(additionalInfo.size());
+        for (Map.Entry<String, Object> entry : additionalInfo.entrySet()) {
+            Detail det = new Detail(entry.getKey(), entry.getValue());
+            details.add(det);
+        }
         return details;
     }
 
@@ -139,7 +148,9 @@ public class TodoItem implements Parcelable {
     }
 
     public Calendar getMyCreatedOn(){
-        return myCreatedOn;
+        Calendar myCal = new GregorianCalendar();
+        myCal.setTime(createdOn);
+        return myCal;
     }
 
     public void setAdditionalInfo(Map<String, Object> info){
@@ -161,6 +172,7 @@ public class TodoItem implements Parcelable {
         dest.writeString(this.name);
         dest.writeString(this.type);
         dest.writeList(this.details);
+        dest.writeMap(this.additionalInfo);
     }
 
     @Override

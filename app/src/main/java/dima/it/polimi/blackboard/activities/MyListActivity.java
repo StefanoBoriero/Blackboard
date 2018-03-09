@@ -7,6 +7,7 @@ import android.view.Menu;
 import android.view.View;
 
 import dima.it.polimi.blackboard.R;
+import dima.it.polimi.blackboard.fragments.TodoItemListFragment;
 import dima.it.polimi.blackboard.model.TodoItem;
 import dima.it.polimi.blackboard.utils.DataGeneratorUtil;
 
@@ -22,13 +23,18 @@ public class MyListActivity extends DoubleFragmentActivity{
         setContentView(R.layout.activity_my_list);
 
         super.setItemList(DataGeneratorUtil.generateTodoItems(30));
+        super.onCreate(savedInstanceState);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle(R.string.title_activity_my_list);
         setSupportActionBar(toolbar);
 
 
-        super.onCreate(savedInstanceState);
+
+
+        ((TodoItemListFragment)firstFragment).setHouse("Sexy");
+        ((TodoItemListFragment)firstFragment).setMyList(true);
+
     }
 
     @Override
