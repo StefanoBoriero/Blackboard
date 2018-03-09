@@ -27,6 +27,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
@@ -98,8 +99,10 @@ public class NewToDoTaskActivity extends AppCompatActivity {
             float x = ev.getRawX() + view.getLeft() - scrcoords[0];
             float y = ev.getRawY() + view.getTop() - scrcoords[1];
             if (x < view.getLeft() || x > view.getRight() || y < view.getTop() || y > view.getBottom()) {
-                if(this.getSystemService(Context.INPUT_METHOD_SERVICE) != null)
-                ((InputMethodManager) this.getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow((this.getWindow().getDecorView().getApplicationWindowToken()), 0);
+                InputMethodManager imm = (InputMethodManager) this.getSystemService(Context.INPUT_METHOD_SERVICE);
+                if(imm != null) {
+                    imm.hideSoftInputFromWindow((this.getWindow().getDecorView().getApplicationWindowToken()), 0);
+                }
                 view.clearFocus();
                 //give focus to constraint layout
                 myConstraintLayout.requestFocus();
@@ -292,7 +295,7 @@ public class NewToDoTaskActivity extends AppCompatActivity {
         EditText description = findViewById(R.id.descriptionEditText);
         //String amountString = currencyEditText.getText().toString().replace(",",".");
         //Float amount = Float.parseFloat(amountString);
-        Map<String, Object> additionalInfo = new HashMap<String, Object>() ;
+        Map<String, Object> additionalInfo = new HashMap<>() ;
         additionalInfo.put("description", description.getText().toString());
         //if(amount != 0.00)
         //{
@@ -302,6 +305,9 @@ public class NewToDoTaskActivity extends AppCompatActivity {
 
 
         TodoItem todoItem = new TodoItem(nameEditText.getText().toString().trim(),  typeButton.getText().toString(),spinner.getSelectedItem().toString(),additionalInfo);
-        db.collection("houses").document("Sexy").collection("items").document().set(todoItem);
+        DocumentReference newDoc = db.collection("houses").document("Sexy").collection("items").document();
+        String itemId = newDoc.getId();
+        todoItem.setId(itemId);
+        newDoc.set(todoItem);
     }
 }
