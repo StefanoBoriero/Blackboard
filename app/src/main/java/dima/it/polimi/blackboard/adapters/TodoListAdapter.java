@@ -60,7 +60,7 @@ public class TodoListAdapter extends RecyclerView.Adapter<TodoListAdapter.ViewHo
         holder.todoItemType.setText(todoItem.getType());
         holder.todoItemName.setTransitionName(todoItem.getName() + "Name" + todoItem.getId());
         holder.userIcon.setTransitionName(todoItem.getName() + "Icon" + todoItem.getId());
-        holder.timestampView.setText(decodeDate(todoItem.getMyCreatedOn()));
+        holder.timestampView.setText(todoItem.getMyCreatedOn());
         holder.todoItemType.setCompoundDrawablesWithIntrinsicBounds(resolveIcon(todoItem.getType()), null, null, null);
         //TODO get user icon
 
@@ -70,20 +70,6 @@ public class TodoListAdapter extends RecyclerView.Adapter<TodoListAdapter.ViewHo
         );
     }
 
-    private String decodeDate(Calendar calendar){
-        int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
-        String day = String.valueOf(dayOfMonth);
-
-        int monthInt = calendar.get(Calendar.MONTH);
-        String month = "wrong";
-        DateFormatSymbols dfs = new DateFormatSymbols();
-        String[] months = dfs.getMonths();
-        if (monthInt >= 0 && monthInt <= 11 ) {
-            month = months[monthInt];
-        }
-
-        return day + " " + month;
-    }
 
     //TODO extract this method in Utility class OR put iconResId in todoItem
     private Drawable resolveIcon(String type){

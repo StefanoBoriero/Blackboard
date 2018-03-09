@@ -105,7 +105,6 @@ public class HouseListActivity extends DoubleFragmentActivity implements DialogI
     private void getHouses(){
         DocumentReference user = db.collection("users").document("Serento");
         user.get().addOnCompleteListener((task) -> {
-            List<CharSequence> myHouses = new ArrayList<>();
             if (task.isSuccessful()) {
                {
                    DocumentSnapshot document = task.getResult();

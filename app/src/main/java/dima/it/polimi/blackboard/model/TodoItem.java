@@ -6,6 +6,7 @@ import android.os.Parcelable;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.text.DateFormatSymbols;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -24,15 +25,13 @@ public class TodoItem implements Parcelable {
     private String name;
     private String type;
     private Date createdOn;
+    private String createdOnString;
     private String createdBy;
     private String priority;
     private Map<String, Object> additionalInfo;
     private String suggestedTo;
     private boolean taken;
     private String takenBy;
-    private List<Detail> details;
-
-    private Calendar myCreatedOn;
 
     public TodoItem(){
         //Needed for Firebase
@@ -43,12 +42,9 @@ public class TodoItem implements Parcelable {
         id = in.readString();
         name = in.readString();
         type = in.readString();
-
-        details = new ArrayList<>();
-        List<Detail> tmp = new ArrayList<>();
-        in.readList(tmp, Detail.class.getClassLoader());
-        details = new ArrayList<>(tmp);
-
+        suggestedTo = in.readString();
+        createdBy = in.readString();
+        createdOnString = in.readString();
         additionalInfo = new HashMap<>();
         in.readMap(additionalInfo, HashMap.class.getClassLoader());
     }
@@ -139,31 +135,36 @@ public class TodoItem implements Parcelable {
 
     public void setCreatedOn(Date date){
         this.createdOn = date;
-        this.myCreatedOn = new GregorianCalendar();
-        myCreatedOn.setTime(date);
-    }
-
-    public Date getCreatedOn(){
-        return this.createdOn;
-    }
-
-    public Calendar getMyCreatedOn(){
         Calendar myCal = new GregorianCalendar();
-        myCal.setTime(createdOn);
-        return myCal;
+        myCal.setTime(date);
+        this.createdOnString = decodeDate(myCal);
+    }
+
+    public String getMyCreatedOn(){
+        return createdOnString;
     }
 
     public void setAdditionalInfo(Map<String, Object> info){
         this.additionalInfo = info;
-        details = new ArrayList<>(info.size());
-        for (Map.Entry<String, Object> entry : info.entrySet()) {
-            Detail det = new Detail(entry.getKey(), entry.getValue());
-            details.add(det);
-        }
     }
 
     public Map<String, Object> getAdditionalInfo(){
         return this.additionalInfo;
+    }
+
+    private String decodeDate(Calendar calendar){
+        int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
+        String day = String.valueOf(dayOfMonth);
+
+        int monthInt = calendar.get(Calendar.MONTH);
+        String month = "wrong";
+        DateFormatSymbols dfs = new DateFormatSymbols();
+        String[] months = dfs.getMonths();
+        if (monthInt >= 0 && monthInt <= 11 ) {
+            month = months[monthInt];
+        }
+
+        return day + " " + month;
     }
 
     @Override
@@ -171,7 +172,9 @@ public class TodoItem implements Parcelable {
         dest.writeString(this.id);
         dest.writeString(this.name);
         dest.writeString(this.type);
-        dest.writeList(this.details);
+        dest.writeString(this.suggestedTo);
+        dest.writeString(this.createdBy);
+        dest.writeString(this.createdOnString);
         dest.writeMap(this.additionalInfo);
     }
 
