@@ -64,7 +64,7 @@ public class DataGeneratorUtil {
             int to = (int)(Math.random() * 4);
             double price = (Math.random() * 4);
 
-            PaymentItem item = new PaymentItem(i,names[name],froms[from],tos[to] ,price);
+            PaymentItem item = new PaymentItem(names[name] ,0.00f);
             out.add(item);
         }
         return out;

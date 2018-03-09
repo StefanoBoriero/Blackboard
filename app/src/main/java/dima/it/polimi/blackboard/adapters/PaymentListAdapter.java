@@ -23,21 +23,17 @@ import dima.it.polimi.blackboard.model.PaymentItem;
 
 
 public class PaymentListAdapter extends RecyclerView.Adapter<PaymentListAdapter.PaymentViewHolder> {
-    private final Context mContext;
+
     private final List<PaymentItem> paymentItems;
+    private Context mContext;
 
-    public PaymentListAdapter(Context context, List<PaymentItem> paymentItems, PaymentListAdapterListener listener){
+    public PaymentListAdapter(Context context, PaymentListAdapterListener listener){
 
 
-        this.mContext = context;
+
         List<PaymentItem> filteredItems = new ArrayList<>();
-        for (PaymentItem item : paymentItems) {
-            if(item.getPrice() != 0)
-            {
-                filteredItems.add(item);
-            }
-        }
         this.paymentItems = filteredItems;
+        mContext =context;
     }
 
     @Override
@@ -54,8 +50,11 @@ public class PaymentListAdapter extends RecyclerView.Adapter<PaymentListAdapter.
         final PaymentItem paymentItem = paymentItems.get(position);
 
 
-       // holder.todoItemName.setText(paymentItem.getName());
+        holder.todoItemName.setText(paymentItem.getName());
+        holder.positiveNegativeIconContainer.setBackground(mContext.getResources().getDrawable(R.drawable.grey_euro));
+
         //TODO change all this
+        /*
         if(paymentItem.getEmitter().equals("Stefy & Simo") ) {
             holder.todoItemName.setText("To: " + paymentItem.getReceiver());
             holder.positiveNegativeIconContainer.setBackground(mContext.getResources().getDrawable(R.drawable.grey_euro));
@@ -64,6 +63,7 @@ public class PaymentListAdapter extends RecyclerView.Adapter<PaymentListAdapter.
             holder.todoItemName.setText("From: " + paymentItem.getEmitter());
             holder.positiveNegativeIconContainer.setBackground(mContext.getResources().getDrawable(R.drawable.grey_euro));
         }
+        */
 
         holder.todoItemPrice.setText("Amount: " + String.format("%.2f", paymentItem.getPrice()) +" €");
 
@@ -72,6 +72,8 @@ public class PaymentListAdapter extends RecyclerView.Adapter<PaymentListAdapter.
 
         });
     }
+
+
 
     @Override
     public int getItemCount() {

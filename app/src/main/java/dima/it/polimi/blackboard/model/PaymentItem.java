@@ -3,58 +3,62 @@ package dima.it.polimi.blackboard.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
 /**
  * This class represents a payment item issued by an user
  * Created by simone on 21/12/2017.
  */
 
 public class PaymentItem implements Parcelable{
-    private final long id;
-    private final String name;
-    private final String from;
-    private final String to;
-    private final double price;
+    private  String name;
+    private  float price;
+    private  String performedBy;
+
+    public PaymentItem()
+    {
+        //used for firebase
+    }
 
     protected PaymentItem(Parcel in) {
         //Order must be the same of writeToParcel
-        this.id = in.readLong();
         this.name = in.readString();
-        this.from = in.readString();
-        this.to = in.readString();
-        this.price = in.readDouble();
+        this.price = in.readFloat();
+        this.performedBy = in.readString();
     }
 
-    public PaymentItem(long id, String name, String from, String to, Double price){
-        this.id = id;
+    public PaymentItem( String name, float price){
         this.name = name;
-        this.from = from;
-        this.to = to;
         this.price = price;
+
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if(user != null) {
+            this.performedBy = user.getUid();
+        }
     }
 
-    public long getId(){return this.id;}
+    public String getPerformedBy(){ return  this.performedBy;}
+
+    public void setPerformedBy(String performedBy){ this.performedBy = performedBy;}
+
+    public void setName(String name){ this.name = name;}
+
+    public void setPrice(Float price){ this.price = price;}
+
 
     public String getName(){
         return this.name;
     }
 
-    public String getEmitter(){
-        return this.from;
-    }
 
-    public String getReceiver(){
-        return this.to;
-    }
-
-    public Double getPrice(){return this.price;}
+    public Float getPrice(){return this.price;}
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeLong(this.id);
         dest.writeString(this.name);
-        dest.writeString(this.from);
-        dest.writeString(this.to);
         dest.writeDouble(this.price);
+        dest.writeString(this.performedBy);
     }
 
     @Override
@@ -62,15 +66,13 @@ public class PaymentItem implements Parcelable{
         return 0;
     }
 
-    public static final Creator<TodoItem> CREATOR = new Creator<TodoItem>() {
+    public static final Creator<PaymentItem> CREATOR = new Creator<PaymentItem>() {
         @Override
-        public TodoItem createFromParcel(Parcel in) {
-            return new TodoItem(in);
+        public PaymentItem createFromParcel(Parcel in) {
+            return new PaymentItem(in);
         }
 
         @Override
-        public TodoItem[] newArray(int size) {
-            return new TodoItem[size];
-        }
+        public PaymentItem[] newArray(int size) {return new PaymentItem[size];}
     };
 }

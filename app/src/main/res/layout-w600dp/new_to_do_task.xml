@@ -264,6 +264,7 @@
                         android:layout_width="120dp"
                         android:layout_height="50dp"
                         android:layout_gravity="top|end"
+                        android:onClick="createActivity"
                         android:layout_marginEnd="32dp"
                         android:layout_marginTop="12dp"
                         android:text="@string/new_activity"

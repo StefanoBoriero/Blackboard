@@ -1,6 +1,7 @@
 package dima.it.polimi.blackboard.activities;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.constraint.ConstraintLayout;
@@ -19,7 +20,10 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 
+import com.google.firebase.firestore.FirebaseFirestore;
+
 import dima.it.polimi.blackboard.R;
+import dima.it.polimi.blackboard.model.PaymentItem;
 import dima.it.polimi.blackboard.utils.GUIUtils;
 import dima.it.polimi.blackboard.utils.OnRevealAnimationListener;
 
@@ -30,6 +34,8 @@ public class NewPaymentActivity extends AppCompatActivity {
     private RelativeLayout container_layout;
     private ConstraintLayout myConstraintLayout;
     private EditText editText;
+    private FirebaseFirestore db;
+    private String selectedHouse;
 
 
 
@@ -47,9 +53,11 @@ public class NewPaymentActivity extends AppCompatActivity {
         editText.clearFocus();
 
 
+        Intent myIntent = getIntent();
+        selectedHouse = myIntent.getStringExtra("HouseName");
         setupEnterAnimation();
 
-
+        db = FirebaseFirestore.getInstance();
     }
 
     //We override dispatchTouchEvent in order to take away the focus from
@@ -194,5 +202,16 @@ public class NewPaymentActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    public void createPayment(View v)
+    {
+        EditText nameEditText = findViewById(R.id.nameEditText);
+        EditText currencyEditText = findViewById(R.id.costEditText);
+        String amountString = currencyEditText.getText().toString().replace(",",".");
+        Float amount = Float.parseFloat(amountString);
+
+        PaymentItem paymentItem = new PaymentItem(nameEditText.getText().toString(),amount);
+        db.collection("houses").document(selectedHouse).collection("payments").document().set(paymentItem);
     }
 }

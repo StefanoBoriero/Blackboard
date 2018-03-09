@@ -13,11 +13,20 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentChange;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.Query;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import dima.it.polimi.blackboard.R;
 import dima.it.polimi.blackboard.adapters.PaymentListAdapter;
+import dima.it.polimi.blackboard.adapters.TodoListAdapter;
 import dima.it.polimi.blackboard.model.PaymentItem;
 
 
@@ -32,11 +41,18 @@ public class PaymentListFragment extends Fragment implements PaymentListAdapter.
 
 
     private static final String ARG_COLUMN_COUNT = "column-count";
-    private static final String ARG_TODO_ITEMS = "todo-items";
+    private static final String ARG_TYPE = "type";
 
     private int mColumnCount = 1;
     private OnListFragmentInteractionListener mListener;
     private PaymentListAdapter adapter;
+    private FirebaseFirestore db;
+    private Query myPaymentsQuery;
+    private FirebaseUser user;
+    private ListenerRegistration myListener;
+    private String house;
+    private RecyclerView recyclerView;
+    private String type;
 
 
     /**
@@ -46,15 +62,13 @@ public class PaymentListFragment extends Fragment implements PaymentListAdapter.
     public PaymentListFragment() {
     }
 
-    public static PaymentListFragment newInstance(int columnCount, List<PaymentItem> paymentItems) {
+    public static PaymentListFragment newInstance(int columnCount, String type) {
         PaymentListFragment fragment = new PaymentListFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
-
-
-        //TODO change this with network fetching
-        args.putParcelableArrayList(ARG_TODO_ITEMS, (ArrayList)paymentItems);
+        args.putString(ARG_TYPE, type);
         fragment.setArguments(args);
+
         return fragment;
     }
 
@@ -66,8 +80,12 @@ public class PaymentListFragment extends Fragment implements PaymentListAdapter.
 
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
-            paymentItems = getArguments().getParcelableArrayList(ARG_TODO_ITEMS);
-            adapter = new PaymentListAdapter(getContext(),paymentItems, this);
+            type = getArguments().getString(ARG_TYPE);
+            adapter = new PaymentListAdapter(this.getContext(),this);
+            db = FirebaseFirestore.getInstance();
+            user = FirebaseAuth.getInstance().getCurrentUser();
+            prepareQuery();
+            enableRealTimeUpdate();
         }
     }
 
@@ -78,7 +96,7 @@ public class PaymentListFragment extends Fragment implements PaymentListAdapter.
         View view = inflater.inflate(R.layout.fragment_payment_list, container, false);
 
         // Setting up the RecyclerView adapter and helpers
-        RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
+        recyclerView = view.findViewById(R.id.recycler_view);
         Context context = view.getContext();
         if (mColumnCount <= 1) {
             recyclerView.setLayoutManager(new LinearLayoutManager(context));
@@ -133,5 +151,59 @@ public class PaymentListFragment extends Fragment implements PaymentListAdapter.
      */
     public interface OnListFragmentInteractionListener {
         void onRefresh();
+    }
+
+    public void changeHouse(String selectedHouse)
+    {
+        this.house = selectedHouse;
+        this.adapter = new PaymentListAdapter(this.getContext(),this);
+        this.recyclerView.setAdapter(adapter);
+        prepareQuery();
+        disableRealTimeUpdate();
+        enableRealTimeUpdate();
+    }
+
+    private void insertPayment(PaymentItem item)
+    {
+        adapter.insertItem(item, 0);
+    }
+
+    private void prepareQuery(){
+
+        CollectionReference housePayments = db.collection("houses")
+                .document(house)
+                .collection("payments");
+
+
+            myPaymentsQuery = housePayments;
+
+
+
+    }
+
+    public void enableRealTimeUpdate(){
+        myListener = myPaymentsQuery.addSnapshotListener( (querySnapshot, error) ->
+        {
+            if (error != null) {
+                return;
+            }
+
+            for(DocumentChange dc: querySnapshot.getDocumentChanges()){
+                if(dc.getType() == DocumentChange.Type.ADDED){
+                    PaymentItem newItem = dc.getDocument().toObject(PaymentItem.class);
+                    if((type.equals("positive") && newItem.getPerformedBy().equals(user.getUid()) || (type.equals("negative") && !newItem.getPerformedBy().equals(user.getUid()))))
+                        insertPayment(newItem);
+                }
+            }
+
+        });
+    }
+
+    public void disableRealTimeUpdate(){
+        myListener.remove();
+    }
+
+    public void setHouse(String house){
+        this.house = house;
     }
 }
