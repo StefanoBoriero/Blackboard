@@ -32,6 +32,7 @@ public class TodoItem implements Parcelable {
     private String suggestedTo;
     private boolean taken;
     private String takenBy;
+    private boolean completed;
 
     public TodoItem(){
         //Needed for Firebase
@@ -55,6 +56,7 @@ public class TodoItem implements Parcelable {
         this.priority = priority;
         this.additionalInfo = additionalInfo;
         this.taken = false;
+        this.completed = false;
 
         this.createdOn = Calendar.getInstance().getTime();
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -144,6 +146,13 @@ public class TodoItem implements Parcelable {
         return createdOnString;
     }
 
+    public boolean isCompleted(){
+        return this.completed;
+    }
+
+    public void setCompleted(boolean b){
+        this.completed = b;
+    }
     public void setAdditionalInfo(Map<String, Object> info){
         this.additionalInfo = info;
     }

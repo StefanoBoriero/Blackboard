@@ -6,6 +6,9 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.View;
 
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+
 import dima.it.polimi.blackboard.R;
 import dima.it.polimi.blackboard.fragments.TodoItemListFragment;
 import dima.it.polimi.blackboard.model.TodoItem;
@@ -17,6 +20,7 @@ import dima.it.polimi.blackboard.utils.DataGeneratorUtil;
  */
 
 public class MyListActivity extends DoubleFragmentActivity{
+    private FirebaseFirestore db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +38,8 @@ public class MyListActivity extends DoubleFragmentActivity{
 
         ((TodoItemListFragment)firstFragment).setHouse("Sexy");
         ((TodoItemListFragment)firstFragment).setMyList(true);
+
+        db = FirebaseFirestore.getInstance();
 
     }
 
@@ -68,7 +74,14 @@ public class MyListActivity extends DoubleFragmentActivity{
 
     @Override
     protected void callNetwork(TodoItem removedItem) {
-        //TODO update firebase
+        String itemId = removedItem.getId();
+
+        DocumentReference completedDoc = db.collection("houses").document("Sexy").collection("items")
+                .document(itemId);
+
+        completedDoc.update(
+                "completed", true
+        );
     }
 
     @Override

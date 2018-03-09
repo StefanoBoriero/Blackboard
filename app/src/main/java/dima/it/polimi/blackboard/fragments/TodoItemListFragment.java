@@ -288,7 +288,8 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
             myQuery = houseItems.whereEqualTo("taken", false);
         }
         else{
-            myQuery = houseItems.whereEqualTo("taken", true).whereEqualTo("takenBy", authId);
+            myQuery = houseItems.whereEqualTo("taken", true).whereEqualTo("takenBy", authId)
+                .whereEqualTo("completed", false);
         }
 
     }

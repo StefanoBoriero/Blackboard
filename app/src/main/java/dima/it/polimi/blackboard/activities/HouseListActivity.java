@@ -19,6 +19,8 @@ import android.view.View;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -98,7 +100,19 @@ public class HouseListActivity extends DoubleFragmentActivity implements DialogI
 
     @Override
     protected void callNetwork(TodoItem removedItem) {
-        //TODO update firebase
+        String id = removedItem.getId();
+        String house = (String)houses[whichHouse];
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if(user != null){
+            String userId = user.getUid();
+            DocumentReference item = db.collection("houses").document(house).collection("items")
+                    .document(id);
+            item.update(
+                    "taken", true,
+                    "takenBy", userId
+            );
+        }
+
     }
 
     @SuppressWarnings("unchecked")
