@@ -85,7 +85,7 @@ public abstract class FirestoreAdapter<VH extends RecyclerView.ViewHolder>
     }
 
     private void onDocumentRemoved(DocumentChange change){
-        mSnapshots.remove(change.getOldIndex());
+        //mSnapshots.remove(change.getOldIndex());
         //notifyItemRemoved(change.getOldIndex());
     }
 

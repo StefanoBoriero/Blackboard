@@ -47,6 +47,7 @@ public class HouseListActivity extends DoubleFragmentActivity implements DialogI
     private final static String TAG = "HOUSE_LIST";
     private CharSequence[] houses;
     private FirebaseFirestore db;
+    private final static String ARG_HOUSE = "house";
 
     private FloatingActionButton mFab;
 
@@ -155,7 +156,7 @@ public class HouseListActivity extends DoubleFragmentActivity implements DialogI
      */
     public void fabListener(View v){
         Intent intent = new Intent(this, NewToDoTaskActivity.class);
-
+        intent.putExtra(ARG_HOUSE, houses[whichHouse]);
 
         ActivityOptions options = ActivityOptions.
                 makeSceneTransitionAnimation(this, mFab, mFab.getTransitionName());

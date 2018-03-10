@@ -39,6 +39,8 @@ import dima.it.polimi.blackboard.utils.GUIUtils;
 import dima.it.polimi.blackboard.utils.OnRevealAnimationListener;
 
 public class NewToDoTaskActivity extends AppCompatActivity {
+    private final static String ARG_HOUSE = "house";
+    private String house;
 
     private Button typeButton;
     private EditText editText;
@@ -84,6 +86,7 @@ public class NewToDoTaskActivity extends AppCompatActivity {
         setupEnterAnimation();
 
         db = FirebaseFirestore.getInstance();
+        house = getIntent().getStringExtra(ARG_HOUSE);
 
     }
 
@@ -305,9 +308,11 @@ public class NewToDoTaskActivity extends AppCompatActivity {
 
 
         TodoItem todoItem = new TodoItem(nameEditText.getText().toString().trim(),  typeButton.getText().toString(),spinner.getSelectedItem().toString(),additionalInfo);
-        DocumentReference newDoc = db.collection("houses").document("Sexy").collection("items").document();
+        DocumentReference newDoc = db.collection("houses").document(house).collection("items").document();
         String itemId = newDoc.getId();
         todoItem.setId(itemId);
         newDoc.set(todoItem);
+
+        onBackPressed();
     }
 }
