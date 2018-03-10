@@ -1,13 +1,23 @@
 package dima.it.polimi.blackboard.activities;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.ArrayList;
+import java.util.Map;
 
 import dima.it.polimi.blackboard.R;
 import dima.it.polimi.blackboard.fragments.TodoItemListFragment;
@@ -19,8 +29,11 @@ import dima.it.polimi.blackboard.utils.DataGeneratorUtil;
  * Created by Stefano on 27/12/2017.
  */
 
-public class MyListActivity extends DoubleFragmentActivity{
+public class MyListActivity extends DoubleFragmentActivity implements DialogInterface.OnClickListener{
+    private static String TAG = "my_list_activity";
     private FirebaseFirestore db;
+    private int whichHouse = 0;
+    private CharSequence[] houses;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,16 +53,16 @@ public class MyListActivity extends DoubleFragmentActivity{
         ((TodoItemListFragment)firstFragment).setMyList(true);
 
         db = FirebaseFirestore.getInstance();
+        getHouses();
 
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu){
+    public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_my_list, menu);
+        getMenuInflater().inflate(R.menu.menu_house_list, menu);
 
         super.onCreateOptionsMenu(menu);
-
         return true;
     }
 
@@ -87,5 +100,71 @@ public class MyListActivity extends DoubleFragmentActivity{
     @Override
     public void onItemSwipe(int swipedPosition) {
         super.removeItem(swipedPosition);
+    }
+
+    /**
+     * This method return the chosen house from the list
+     * @param dialog the dialog sending data
+     * @param which the house chosen
+     */
+    @Override
+    public void onClick(DialogInterface dialog, int which) {
+        this.whichHouse = which;
+        String currentHouse = (String)this.houses[whichHouse];
+        ((TodoItemListFragment)firstFragment).changeHouse(currentHouse);
+        dialog.dismiss();
+
+    }
+
+    @SuppressWarnings("unchecked")
+    private void getHouses(){
+        DocumentReference user = db.collection("users").document("Serento");
+        user.get().addOnCompleteListener((task) -> {
+            if (task.isSuccessful()) {
+                {
+                    DocumentSnapshot document = task.getResult();
+                    Map<String, Object> userParam = document.getData();
+                    ArrayList<String> houses = (ArrayList<String>)userParam.get("houses");
+                    Log.d(TAG, document.getId() + " => " + document.getData());
+                    this.houses = new CharSequence[houses.size()];
+                    for(int i=0; i<houses.size(); i++){
+                        this.houses[i] = houses.get(i);
+                    }
+                    //houseDownloadComplete = true;
+                }
+
+            } else {
+                Log.d(TAG, "Error getting documents: ", task.getException());
+            }
+        });
+    }
+
+    public void onChooseHouse(MenuItem menuItem){
+        HouseListActivity.ChooseHouseDialog.mListener = this;
+        DialogFragment houseListDialog = HouseListActivity.ChooseHouseDialog.newInstance(whichHouse, houses);
+        houseListDialog.show(getFragmentManager(), "dialog");
+    }
+
+    public static class ChooseHouseDialog extends DialogFragment {
+        public static Dialog.OnClickListener mListener;
+
+        public static HouseListActivity.ChooseHouseDialog newInstance(int whichHouse, CharSequence[] houses) {
+            Bundle args = new Bundle();
+            args.putInt("chosen_house", whichHouse);
+            args.putCharSequenceArray("houses", houses);
+            HouseListActivity.ChooseHouseDialog fragment = new HouseListActivity.ChooseHouseDialog();
+            fragment.setArguments(args);
+            return fragment;
+        }
+
+        @Override
+        public Dialog onCreateDialog(final Bundle savedInstanceState) {
+            int which = getArguments().getInt("chosen_house");
+            CharSequence[] houses = getArguments().getCharSequenceArray("houses");
+            final AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
+            dialog.setTitle(R.string.action_choose_house);
+            dialog.setSingleChoiceItems(houses, which, mListener);
+            return dialog.create();
+        }
     }
 }

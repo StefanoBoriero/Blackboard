@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -48,6 +49,7 @@ public class HouseListActivity extends DoubleFragmentActivity implements DialogI
     private CharSequence[] houses;
     private FirebaseFirestore db;
     private final static String ARG_HOUSE = "house";
+    private boolean houseDownloadComplete;
 
     private FloatingActionButton mFab;
 
@@ -130,6 +132,7 @@ public class HouseListActivity extends DoubleFragmentActivity implements DialogI
                    for(int i=0; i<houses.size(); i++){
                        this.houses[i] = houses.get(i);
                    }
+                   houseDownloadComplete = true;
                 }
 
             } else {
@@ -155,12 +158,18 @@ public class HouseListActivity extends DoubleFragmentActivity implements DialogI
     FAB listener set in XML layout
      */
     public void fabListener(View v){
-        Intent intent = new Intent(this, NewToDoTaskActivity.class);
-        intent.putExtra(ARG_HOUSE, houses[whichHouse]);
+        if(houseDownloadComplete) {
+            Intent intent = new Intent(this, NewToDoTaskActivity.class);
+            intent.putExtra(ARG_HOUSE, houses[whichHouse]);
 
-        ActivityOptions options = ActivityOptions.
-                makeSceneTransitionAnimation(this, mFab, mFab.getTransitionName());
-        startActivity(intent, options.toBundle());
+            ActivityOptions options = ActivityOptions.
+                    makeSceneTransitionAnimation(this, mFab, mFab.getTransitionName());
+            startActivity(intent, options.toBundle());
+        }
+        else{
+            Toast.makeText(this, "Error connecting to network, try again", Toast.LENGTH_SHORT)
+                    .show();
+        }
     }
 
     /**
@@ -195,7 +204,6 @@ public class HouseListActivity extends DoubleFragmentActivity implements DialogI
             CharSequence[] houses = getArguments().getCharSequenceArray("houses");
             final AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
             dialog.setTitle(R.string.action_choose_house);
-            //CharSequence[] entries = new CharSequence[]{"One", "Two", "Three"};
             dialog.setSingleChoiceItems(houses, which, mListener);
             return dialog.create();
         }
