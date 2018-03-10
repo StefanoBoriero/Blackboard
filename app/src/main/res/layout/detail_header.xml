@@ -45,7 +45,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@id/user_icon"
         app:layout_constraintTop_toBottomOf="@+id/item_name"
-        android:text="Added by Maharez"
+        tools:text="Added by Maharez"
         android:textSize="@dimen/msg_text_secondary"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"/>
 

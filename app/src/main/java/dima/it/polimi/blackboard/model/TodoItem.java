@@ -38,7 +38,7 @@ public class TodoItem implements Parcelable {
         //Needed for Firebase
     }
 
-    TodoItem(Parcel in) {
+    private TodoItem(Parcel in) {
         //Order must be the same of writeToParcel
         id = in.readString();
         name = in.readString();
@@ -71,6 +71,7 @@ public class TodoItem implements Parcelable {
             Detail det = new Detail(entry.getKey(), entry.getValue());
             details.add(det);
         }
+        details.add(new Detail("suggestedTo", this.suggestedTo));
         return details;
     }
 

@@ -3,8 +3,6 @@ package dima.it.polimi.blackboard.fragments;
 import android.content.Context;
 import android.os.Bundle;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -19,23 +17,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import dima.it.polimi.blackboard.R;
 import dima.it.polimi.blackboard.activities.HouseListActivity;
@@ -101,7 +93,7 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
             List<TodoItem> todoItems = getArguments().getParcelableArrayList(ARG_TODO_ITEMS);
-            adapter = new TodoListAdapter(this);
+            //adapter = new TodoListAdapter(this);
             //adapter = new TodoListAdapter(todoItems, this);
         }
 
@@ -111,9 +103,7 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
             authId = user.getUid();
         }
         prepareQuery();
-        //executeQuery();
-        enableRealTimeUpdate();
-        new BatteryStatusReceiver(this);
+        adapter = new TodoListAdapter(myQuery, this);
     }
 
     @Override
@@ -154,6 +144,18 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
         return view;
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        adapter.startListening();
+        new BatteryStatusReceiver(adapter);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        adapter.stopListening();
+    }
 
     @Override
     public void onAttach(Context context) {
@@ -228,6 +230,7 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
     public TodoItem removeItem(int position){
         final TodoItem removedItem = adapter.getItem(position);
         adapter.removeItem(position);
+
         return removedItem;
     }
 
@@ -271,12 +274,13 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
 
     public void changeHouse(String newHouse){
         this.house = newHouse;
-        this.adapter = new TodoListAdapter(this);
-        this.recyclerView.setAdapter(this.adapter);
+        //this.adapter = new TodoListAdapter(this);
+        //this.recyclerView.setAdapter(this.adapter);
         prepareQuery();
+        this.adapter.setQuery(myQuery);
         //executeQuery();
-        disableRealTimeUpdate();
-        enableRealTimeUpdate();
+        //disableRealTimeUpdate();
+        //enableRealTimeUpdate();
     }
 
     private void prepareQuery(){
@@ -292,61 +296,6 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
                 .whereEqualTo("completed", false);
         }
 
-    }
-
-    private void executeQuery(){
-        /*
-        CollectionReference houseItems = db.collection("houses")
-                .document(house)
-                .collection("items");
-        //Query myQuery;
-        if(!myList) {
-            myQuery = houseItems.whereEqualTo("taken", false);
-        }
-        else{
-            myQuery = houseItems.whereEqualTo("taken", true).whereEqualTo("takenBy", authId);
-        }
-        */
-        myQuery.get().addOnCompleteListener(task -> {
-            if(task.isSuccessful()){
-                List<TodoItem> items = new ArrayList<>();
-                for (DocumentSnapshot document : task.getResult()) {
-                    TodoItem item = document.toObject(TodoItem.class);
-                    items.add(item);
-                    Log.d(TAG, document.getId() + " => " + document.getData());
-                }
-                adapter.setTodoItems(items);
-            }
-            else{
-                Log.d(TAG, "Error getting documents: ", task.getException());
-            }
-        });
-    }
-
-    private void getItemsTaken(){
-
-    }
-
-    public void enableRealTimeUpdate(){
-        myListener = myQuery.addSnapshotListener( (querySnapshot, error) ->
-        {
-            if (error != null) {
-                Log.w(TAG, "listen:error", error);
-                return;
-            }
-
-            for(DocumentChange dc: querySnapshot.getDocumentChanges()){
-                if(dc.getType() == DocumentChange.Type.ADDED){
-                    TodoItem newItem = dc.getDocument().toObject(TodoItem.class);
-                    insertItem(newItem, 0);
-                }
-            }
-
-        });
-    }
-
-    public void disableRealTimeUpdate(){
-        myListener.remove();
     }
 
     /**

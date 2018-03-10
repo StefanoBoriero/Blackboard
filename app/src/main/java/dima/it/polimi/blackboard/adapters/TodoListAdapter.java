@@ -7,14 +7,11 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Filter;
-import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.text.DateFormatSymbols;
-import java.util.ArrayList;
-import java.util.Calendar;
+import com.google.firebase.firestore.Query;
+
 import java.util.List;
 
 import dima.it.polimi.blackboard.R;
@@ -25,22 +22,14 @@ import dima.it.polimi.blackboard.model.TodoItem;
  * Created by Stefano on 30/11/2017.
  */
 
-public class TodoListAdapter extends RecyclerView.Adapter<TodoListAdapter.ViewHolder>
-    implements Filterable{
-    private List<TodoItem> todoItems;
+public class TodoListAdapter extends FirestoreAdapter<TodoListAdapter.ViewHolder>/*RecyclerView.Adapter<TodoListAdapter.ViewHolder>*/
+    {
     private List<TodoItem> todoItemsFiltered;
     private TodoListAdapterListener mListener;
     private ViewGroup parent;
 
-    public TodoListAdapter(List<TodoItem> todoItems, TodoListAdapterListener listener){
-        this.mListener = listener;
-        this.todoItems = todoItems;
-        this.todoItemsFiltered = todoItems;
-    }
-
-    public TodoListAdapter(TodoListAdapterListener listener){
-        this.todoItems = new ArrayList<>();
-        this.todoItemsFiltered = new ArrayList<>();
+    public TodoListAdapter(Query query, TodoListAdapterListener listener){
+        super(query);
         this.mListener = listener;
     }
 
@@ -54,8 +43,9 @@ public class TodoListAdapter extends RecyclerView.Adapter<TodoListAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        final TodoItem todoItem = todoItemsFiltered.get(position);
+        //final TodoItem todoItem = todoItemsFiltered.get(position);
 
+        final TodoItem todoItem = getFilteredSnapshot(position).toObject(TodoItem.class);
         holder.todoItemName.setText(todoItem.getName());
         holder.todoItemType.setText(todoItem.getType());
         holder.todoItemName.setTransitionName(todoItem.getName() + "Name" + todoItem.getId());
@@ -86,61 +76,12 @@ public class TodoListAdapter extends RecyclerView.Adapter<TodoListAdapter.ViewHo
         }
     }
 
-    public void setTodoItems(List<TodoItem> items){
-        this.todoItems = items;
-        this.todoItemsFiltered = items;
-        notifyDataSetChanged();
-    }
-
-    @Override
-    public int getItemCount() {
-        return todoItemsFiltered.size();
-    }
-
     public TodoItem getItem(int position){
-        return todoItemsFiltered.get(position);
-    }
-    public void removeItem(int position){
-        todoItemsFiltered.remove(position);
-        notifyItemRemoved(position);
+        return getFilteredSnapshot(position).toObject(TodoItem.class);
     }
 
     public void insertItem(TodoItem item, int position){
-        todoItemsFiltered.add(position, item);
-        notifyItemInserted(position);
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public Filter getFilter() {
-        return new Filter() {
-            @Override
-            protected FilterResults performFiltering(CharSequence constraint) {
-                String expression = constraint.toString();
-                if(expression.isEmpty()){
-                    todoItemsFiltered = todoItems;
-                }
-                else {
-                    List<TodoItem> filteredItems = new ArrayList<>();
-                    for (TodoItem item : todoItems) {
-                        if(item.getName().toLowerCase().contains(expression.toLowerCase())
-                                || item.getType().toLowerCase().contains(expression.toLowerCase())){
-                            filteredItems.add(item);
-                        }
-                    }
-                    todoItemsFiltered = filteredItems;
-                }
-                FilterResults results = new FilterResults();
-                results.values = todoItemsFiltered;
-                return results;
-            }
-
-            @Override
-            protected void publishResults(CharSequence constraint, FilterResults results) {
-                todoItemsFiltered = (List<TodoItem>)results.values;
-                notifyDataSetChanged();
-            }
-        };
+       super.insertItem(position);
     }
 
     public interface TodoListAdapterListener {

@@ -14,6 +14,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 
+import com.google.firebase.firestore.FirebaseFirestore;
+
 import dima.it.polimi.blackboard.R;
 import dima.it.polimi.blackboard.adapters.DetailAdapter;
 import dima.it.polimi.blackboard.model.TodoItem;
@@ -110,6 +112,10 @@ public class TodoItemDetailFragment extends Fragment {
         nameView.setText(todoTask.getName());
         nameView.setTransitionName(transitionName);
 
+        TextView addedByView = view.findViewById(R.id.added_by);
+        //setCreator(addedByView);
+
+
         // Binds dynamically the shared element through transition name
         View userIconView = view.findViewById(R.id.user_icon);
         userIconView.setTransitionName(transitionNameIcon);
@@ -123,6 +129,17 @@ public class TodoItemDetailFragment extends Fragment {
         acceptBtn.setOnClickListener((v)->
                 mListener.onAcceptClick(todoTask, position)
         );
+    }
+
+    private void setCreator(TextView addedByView){
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("users").document(todoTask.getCreatedBy()).
+                get().addOnCompleteListener( task -> {
+            if(task.isSuccessful()){
+                String userName = (String)task.getResult().getData().get("name");
+                addedByView.setText(userName);
+            }
+        });
     }
 
     /**
