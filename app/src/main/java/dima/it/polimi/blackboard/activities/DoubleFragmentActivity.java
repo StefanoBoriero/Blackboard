@@ -2,8 +2,12 @@ package dima.it.polimi.blackboard.activities;
 
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.drawable.Drawable;
 import android.support.v4.app.Fragment;
 import android.content.Intent;
@@ -15,9 +19,18 @@ import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.util.Pair;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
+import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import dima.it.polimi.blackboard.R;
 import dima.it.polimi.blackboard.fragments.TodoItemDetailFragment;
@@ -33,8 +46,10 @@ import dima.it.polimi.blackboard.model.TodoItem;
 
 public abstract class DoubleFragmentActivity extends AppCompatActivity
         implements TodoItemListFragment.OnListFragmentInteractionListener,
-            TodoItemDetailFragment.OnTodoItemDetailInteraction{
+            TodoItemDetailFragment.OnTodoItemDetailInteraction,
+            DialogInterface.OnClickListener{
 
+    private static final String TAG = "double_frag_activity";
     private static final int ACCEPT_TASK_REQUEST = 1;
     private static final int ANIM_DURATION = 250;
 
@@ -47,6 +62,13 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
     private boolean isDouble;
     private boolean isActivityResult;
 
+    protected int whichHouse = 0;
+    protected CharSequence[] houses;
+    protected boolean houseDownloadComplete;
+
+    protected FirebaseFirestore db;
+
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,6 +78,10 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
         if(isDouble()){
             showSecondFragment();
         }
+
+        db = FirebaseFirestore.getInstance();
+        getHouses();
+        ((TodoItemListFragment)firstFragment).setHouse("Sexy");
     }
 
     @Override
@@ -64,6 +90,7 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
         if(getSupportActionBar() != null){
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
+        getMenuInflater().inflate(R.menu.menu_house_list, menu);
 
         // Implementing the search functionality
         SearchManager searchManager = (SearchManager)getSystemService(Context.SEARCH_SERVICE);
@@ -300,4 +327,70 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
 
     protected abstract void callNetwork(TodoItem removedItem);
 
+
+    /**
+     * This method return the chosen house from the list
+     * @param dialog the dialog sending data
+     * @param which the house chosen
+     */
+    @Override
+    public void onClick(DialogInterface dialog, int which) {
+        this.whichHouse = which;
+        String currentHouse = (String)this.houses[whichHouse];
+        ((TodoItemListFragment)firstFragment).changeHouse(currentHouse);
+        dialog.dismiss();
+
+    }
+
+    @SuppressWarnings("unchecked")
+    private void getHouses(){
+        DocumentReference user = db.collection("users").document("Serento");
+        user.get().addOnCompleteListener((task) -> {
+            if (task.isSuccessful()) {
+                {
+                    DocumentSnapshot document = task.getResult();
+                    Map<String, Object> userParam = document.getData();
+                    ArrayList<String> houses = (ArrayList<String>)userParam.get("houses");
+                    Log.d(TAG, document.getId() + " => " + document.getData());
+                    this.houses = new CharSequence[houses.size()];
+                    for(int i=0; i<houses.size(); i++){
+                        this.houses[i] = houses.get(i);
+                    }
+                    houseDownloadComplete = true;
+                }
+
+            } else {
+                Log.d(TAG, "Error getting documents: ", task.getException());
+            }
+        });
+    }
+
+    public void onChooseHouse(MenuItem menuItem){
+        HouseListActivity.ChooseHouseDialog.mListener = this;
+        DialogFragment houseListDialog = DoubleFragmentActivity.ChooseHouseDialog.newInstance(whichHouse, houses);
+        houseListDialog.show(getFragmentManager(), "dialog");
+    }
+
+    public static class ChooseHouseDialog extends DialogFragment {
+        public static Dialog.OnClickListener mListener;
+
+        public static HouseListActivity.ChooseHouseDialog newInstance(int whichHouse, CharSequence[] houses) {
+            Bundle args = new Bundle();
+            args.putInt("chosen_house", whichHouse);
+            args.putCharSequenceArray("houses", houses);
+            HouseListActivity.ChooseHouseDialog fragment = new HouseListActivity.ChooseHouseDialog();
+            fragment.setArguments(args);
+            return fragment;
+        }
+
+        @Override
+        public Dialog onCreateDialog(final Bundle savedInstanceState) {
+            int which = getArguments().getInt("chosen_house");
+            CharSequence[] houses = getArguments().getCharSequenceArray("houses");
+            final AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
+            dialog.setTitle(R.string.action_choose_house);
+            dialog.setSingleChoiceItems(houses, which, mListener);
+            return dialog.create();
+        }
+    }
 }
