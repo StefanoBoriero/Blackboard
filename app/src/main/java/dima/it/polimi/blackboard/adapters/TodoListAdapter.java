@@ -24,7 +24,6 @@ import dima.it.polimi.blackboard.model.TodoItem;
 
 public class TodoListAdapter extends FirestoreAdapter<TodoListAdapter.ViewHolder>/*RecyclerView.Adapter<TodoListAdapter.ViewHolder>*/
     {
-    private List<TodoItem> todoItemsFiltered;
     private TodoListAdapterListener mListener;
     private ViewGroup parent;
 
@@ -43,8 +42,6 @@ public class TodoListAdapter extends FirestoreAdapter<TodoListAdapter.ViewHolder
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        //final TodoItem todoItem = todoItemsFiltered.get(position);
-
         final TodoItem todoItem = getFilteredSnapshot(position).toObject(TodoItem.class);
         holder.todoItemName.setText(todoItem.getName());
         holder.todoItemType.setText(todoItem.getType());

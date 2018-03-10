@@ -139,8 +139,12 @@ public class TodoItem implements Parcelable {
     public void setCreatedOn(Date date){
         this.createdOn = date;
         Calendar myCal = new GregorianCalendar();
-        myCal.setTime(date);
+        myCal.setTime(createdOn);
         this.createdOnString = decodeDate(myCal);
+    }
+
+    public Date getCreatedOn(){
+        return this.createdOn;
     }
 
     public String getMyCreatedOn(){
