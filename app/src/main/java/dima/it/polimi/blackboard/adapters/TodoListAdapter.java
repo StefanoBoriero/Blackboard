@@ -62,7 +62,7 @@ public class TodoListAdapter extends FirestoreAdapter<TodoListAdapter.ViewHolder
     private Drawable resolveIcon(String type){
         Resources res = parent.getResources();
         switch (type) {
-            case ("Housing"):
+            case ("Housekeeping"):
                     return res.getDrawable(R.drawable.ic_home_black_24dp);
             case("Bill"):
                     return res.getDrawable(R.drawable.ic_payment_black_24dp);
