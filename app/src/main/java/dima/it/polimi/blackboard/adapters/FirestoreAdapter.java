@@ -33,12 +33,14 @@ public abstract class FirestoreAdapter<VH extends RecyclerView.ViewHolder>
     private List<DocumentSnapshot> mFilteredSnapshots;
     private DocumentSnapshot lastRemoved;
 
+    private OnCompleteListener mListener;
     private String filter="";
 
-    FirestoreAdapter(Query query){
+    FirestoreAdapter(Query query, OnCompleteListener listener){
         mQuery = query;
         mSnapshots = new ArrayList<>();
         mFilteredSnapshots = new ArrayList<>();
+        mListener = listener;
     }
 
     public void onEvent(QuerySnapshot documentSnapshots, FirebaseFirestoreException e){
@@ -62,7 +64,7 @@ public abstract class FirestoreAdapter<VH extends RecyclerView.ViewHolder>
 
             }
         }
-
+        mListener.onComplete(mSnapshots.isEmpty());
         getFilter().filter(filter);
     }
 
@@ -85,8 +87,9 @@ public abstract class FirestoreAdapter<VH extends RecyclerView.ViewHolder>
     }
 
     private void onDocumentRemoved(DocumentChange change){
-        //mSnapshots.remove(change.getOldIndex());
-        //notifyItemRemoved(change.getOldIndex());
+        int oldIndex = change.getOldIndex();
+        mSnapshots.remove(lastRemoved);
+        //notifyItemRemoved(oldIndex);
     }
 
     public void startListening(){
@@ -168,5 +171,9 @@ public abstract class FirestoreAdapter<VH extends RecyclerView.ViewHolder>
     void insertItem(int position){
         mFilteredSnapshots.add(position, lastRemoved);
         notifyItemInserted(position);
+    }
+
+    public interface OnCompleteListener{
+        void onComplete(boolean emptyResult);
     }
 }

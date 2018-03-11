@@ -12,25 +12,23 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentChange;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import dima.it.polimi.blackboard.R;
 import dima.it.polimi.blackboard.activities.HouseListActivity;
+import dima.it.polimi.blackboard.adapters.FirestoreAdapter;
 import dima.it.polimi.blackboard.adapters.TodoListAdapter;
 import dima.it.polimi.blackboard.helper.TodoItemTouchHelper;
 import dima.it.polimi.blackboard.model.TodoItem;
@@ -43,7 +41,7 @@ import dima.it.polimi.blackboard.receivers.BatteryStatusReceiver;
  * interface.
  */
 public class TodoItemListFragment extends Fragment implements TodoListAdapter.TodoListAdapterListener,
-        TodoItemTouchHelper.TodoItemTouchHelperListener, SwipeRefreshLayout.OnRefreshListener{
+        TodoItemTouchHelper.TodoItemTouchHelperListener, SwipeRefreshLayout.OnRefreshListener, FirestoreAdapter.OnCompleteListener{
 
 
     private static final String ARG_COLUMN_COUNT = "column-count";
@@ -64,7 +62,6 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
     private String house;
     private boolean myList;
     private Query myQuery;
-    private ListenerRegistration myListener;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -81,8 +78,8 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
 
 
         //TODO change this with network fetching
-        args.putParcelableArrayList(ARG_TODO_ITEMS, new ArrayList<>(todoItems));
-        fragment.setArguments(args);
+        //args.putParcelableArrayList(ARG_TODO_ITEMS, new ArrayList<>(todoItems));
+        //fragment.setArguments(args);
         return fragment;
     }
 
@@ -92,9 +89,6 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
 
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
-            List<TodoItem> todoItems = getArguments().getParcelableArrayList(ARG_TODO_ITEMS);
-            //adapter = new TodoListAdapter(this);
-            //adapter = new TodoListAdapter(todoItems, this);
         }
 
         db = FirebaseFirestore.getInstance();
@@ -103,7 +97,8 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
             authId = user.getUid();
         }
         prepareQuery();
-        adapter = new TodoListAdapter(myQuery, this);
+        adapter = new TodoListAdapter(myQuery, this, this);
+        adapter.startListening();
     }
 
     @Override
@@ -141,20 +136,30 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
         SwipeRefreshLayout swipeRefreshLayout = view.findViewById(R.id.swipe_refresh_layout);
         swipeRefreshLayout.setOnRefreshListener(this);
 
+        String message;
+        int iconId;
+        if(myList){
+            message = "Good job, you've done everything!\nLook for new things in your house list";
+            iconId = R.drawable.ic_done_all_black_24dp;
+        }
+        else{
+            message = "Great, everything has been taken care of!\nAdd something to do";
+            iconId = R.drawable.ic_add_box_black_24dp;
+        }
+        View emptyMessage = view.findViewById(R.id.empty_message);
+        TextView m = emptyMessage.findViewById(R.id.message);
+        ImageView i = emptyMessage.findViewById(R.id.imageView6);
+
+        m.setText(message);
+        i.setImageResource(iconId);
+
         return view;
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        adapter.startListening();
         new BatteryStatusReceiver(adapter);
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        adapter.stopListening();
     }
 
     @Override
@@ -172,7 +177,6 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
     public void onDetach() {
         super.onDetach();
         mListener = null;
-
     }
 
 
@@ -274,17 +278,11 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
 
     public void changeHouse(String newHouse){
         this.house = newHouse;
-        //this.adapter = new TodoListAdapter(this);
-        //this.recyclerView.setAdapter(this.adapter);
         prepareQuery();
         this.adapter.setQuery(myQuery);
-        //executeQuery();
-        //disableRealTimeUpdate();
-        //enableRealTimeUpdate();
     }
 
     private void prepareQuery(){
-
         CollectionReference houseItems = db.collection("houses")
                 .document(house)
                 .collection("items");
@@ -296,6 +294,24 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
                 .whereEqualTo("completed", false);
         }
 
+    }
+
+    @Override
+    public void onComplete(boolean empty){
+        View rootView = getView();
+        if(rootView != null) {
+            View emptyMessage = rootView.findViewById(R.id.empty_message);
+            if(empty){
+                emptyMessage.setVisibility(View.VISIBLE);
+            }
+            else{
+                emptyMessage.setVisibility(View.INVISIBLE);
+            }
+       }
+    }
+
+    public void stopListening(){
+        adapter.stopListening();
     }
 
     /**

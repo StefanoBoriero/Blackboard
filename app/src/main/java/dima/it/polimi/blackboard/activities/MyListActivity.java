@@ -68,8 +68,9 @@ public class MyListActivity extends DoubleFragmentActivity implements DialogInte
     @Override
     protected void callNetwork(TodoItem removedItem) {
         String itemId = removedItem.getId();
+        String house = houses[whichHouse].toString();
 
-        DocumentReference completedDoc = db.collection("houses").document("Sexy").collection("items")
+        DocumentReference completedDoc = db.collection("houses").document(house).collection("items")
                 .document(itemId);
 
         completedDoc.update(

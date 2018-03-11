@@ -149,4 +149,9 @@ public class HouseListActivity extends DoubleFragmentActivity{
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        ((TodoItemListFragment)firstFragment).stopListening();
+        super.onBackPressed();
+    }
 }

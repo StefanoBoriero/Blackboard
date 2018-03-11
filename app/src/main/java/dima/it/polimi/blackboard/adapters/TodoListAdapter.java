@@ -12,8 +12,6 @@ import android.widget.TextView;
 
 import com.google.firebase.firestore.Query;
 
-import java.util.List;
-
 import dima.it.polimi.blackboard.R;
 import dima.it.polimi.blackboard.model.TodoItem;
 
@@ -27,8 +25,8 @@ public class TodoListAdapter extends FirestoreAdapter<TodoListAdapter.ViewHolder
     private TodoListAdapterListener mListener;
     private ViewGroup parent;
 
-    public TodoListAdapter(Query query, TodoListAdapterListener listener){
-        super(query);
+    public TodoListAdapter(Query query, TodoListAdapterListener listener, OnCompleteListener completeListener){
+        super(query, completeListener);
         this.mListener = listener;
     }
 

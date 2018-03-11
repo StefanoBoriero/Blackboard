@@ -184,4 +184,8 @@
 
     <string name="example">Example</string>
 
+    <string name="empty_list">Great, everything has been taken care of!\n
+                                Add something to do! </string>
+    <string name="empty_list_content">Empty list message</string>
+
 </resources>
