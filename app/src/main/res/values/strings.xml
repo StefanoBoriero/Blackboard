@@ -77,6 +77,12 @@
         <item>Not so important</item>
     </string-array>
 
+    <!-- Sex strings -->
+    <string-array name="sex">
+        <item>Male</item>
+        <item>Female</item>
+
+    </string-array>
 
     <string name="shopping">Shopping</string>
     <string name="houseKeeping">Housekeeping</string>

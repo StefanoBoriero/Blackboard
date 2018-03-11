@@ -44,6 +44,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import dima.it.polimi.blackboard.R;
 
@@ -83,12 +85,7 @@ public class LoginActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
 
         //If the user is already logged in, send him to main activity
-        if(mAuth.getCurrentUser() != null)
-        {
-            finish();
-            Intent i = new Intent(LoginActivity.this, MainActivity.class);
-            startActivity(i);
-        }
+
 
         passwordEditText.setOnEditorActionListener( (v, actionId, event) -> {
             boolean handled = false;
@@ -98,6 +95,7 @@ public class LoginActivity extends AppCompatActivity {
             }
             return handled;
         });
+
 
         handleTransition();
         setUpGoogleLogin();
@@ -109,8 +107,30 @@ public class LoginActivity extends AppCompatActivity {
 
                 if(firebaseAuth.getCurrentUser() != null)
                 {
-                    finish();
-                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                    FirebaseFirestore db = FirebaseFirestore.getInstance();
+                    db.collection("users").whereEqualTo("auth_id", firebaseAuth.getCurrentUser().getUid()).get()
+                            .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                    if (task.isSuccessful()) {
+                                        if(task.getResult().getDocuments().isEmpty())
+                                        {
+                                            finish();
+                                            Intent i = new Intent(LoginActivity.this,InsertDetailsActivity.class);
+                                            startActivity(i);
+                                        }
+                                        else
+                                        {
+                                            finish();
+                                            Intent i = new Intent(LoginActivity.this, MainActivity.class);
+                                            startActivity(i);
+                                        }
+                                    }
+                                    else {
+                                        //TODO add error message
+                                    }
+                                }
+                            });
                 }
 
             }
@@ -124,6 +144,41 @@ public class LoginActivity extends AppCompatActivity {
         super.onStart();
 
         mAuth.addAuthStateListener(mAuthListener);
+    }
+
+    private void checkLogin()
+    {
+        if(mAuth.getCurrentUser() != null)
+        {
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            db.collection("users").whereEqualTo("auth_id", mAuth.getCurrentUser().getUid()).get()
+                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                            if (task.isSuccessful()) {
+                                if(task.getResult().getDocuments().isEmpty())
+                                {
+                                    mAuth.signOut();
+                                    initViews();
+                                }
+                                else
+                                {
+                                    finish();
+                                    Intent i = new Intent(LoginActivity.this, MainActivity.class);
+                                    startActivity(i);
+                                }
+                            }
+                            else {
+                                //TODO add error message
+                            }
+                        }
+                    });
+        }
+        else
+        {
+            initViews();
+        }
+
     }
 
     //this method sets up login with email and password
@@ -285,7 +340,7 @@ public class LoginActivity extends AppCompatActivity {
                 @Override
                 public void onTransitionEnd(Transition transition) {
                     transition.removeListener(this);
-                    initViews();
+                    checkLogin();
                 }
 
                 @Override

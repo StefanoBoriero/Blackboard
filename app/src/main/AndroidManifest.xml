@@ -11,6 +11,7 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".activities.LoginActivity"
+
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -89,7 +90,10 @@
             </intent-filter>
         </receiver>
 
-        <activity android:name=".activities.InsertDetailsActivity"></activity>
+        <activity android:name=".activities.InsertDetailsActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+           </activity>
+
     </application>
 
 </manifest>
