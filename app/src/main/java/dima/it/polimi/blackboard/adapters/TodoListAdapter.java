@@ -2,6 +2,7 @@ package dima.it.polimi.blackboard.adapters;
 
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -10,10 +11,16 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import dima.it.polimi.blackboard.R;
+import dima.it.polimi.blackboard.fragments.TodoItemListFragment;
 import dima.it.polimi.blackboard.model.TodoItem;
+import dima.it.polimi.blackboard.utils.GlideApp;
 
 /**
  * Adapter class for a list of todoItems
@@ -31,7 +38,8 @@ public class TodoListAdapter extends FirestoreAdapter<TodoListAdapter.ViewHolder
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    @NonNull
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         this.parent = parent;
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.todo_item_row, parent, false);
@@ -39,7 +47,7 @@ public class TodoListAdapter extends FirestoreAdapter<TodoListAdapter.ViewHolder
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
         final TodoItem todoItem = getFilteredSnapshot(position).toObject(TodoItem.class);
         holder.todoItemName.setText(todoItem.getName());
         holder.todoItemType.setText(todoItem.getType());
@@ -47,8 +55,14 @@ public class TodoListAdapter extends FirestoreAdapter<TodoListAdapter.ViewHolder
         holder.userIcon.setTransitionName(todoItem.getName() + "Icon" + todoItem.getId());
         holder.timestampView.setText(todoItem.getMyCreatedOn());
         holder.todoItemType.setCompoundDrawablesWithIntrinsicBounds(resolveIcon(todoItem.getType()), null, null, null);
-        //TODO get user icon
 
+        // TODO: 11/03/2018 Refactor this code to get the correct image 
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        StorageReference reference = storage.getReference().child("bonnie.jpg");
+        GlideApp.with( (TodoItemListFragment)mListener)
+                .load(reference)
+                .apply(RequestOptions.circleCropTransform())
+                .into(holder.userIcon);
 
         holder.itemView.setOnClickListener((v) ->
                 mListener.onTodoItemClicked(todoItem, v, holder.getAdapterPosition())
