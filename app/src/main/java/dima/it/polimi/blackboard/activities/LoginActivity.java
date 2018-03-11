@@ -25,6 +25,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.view.inputmethod.EditorInfo;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.android.gms.auth.api.Auth;
@@ -66,6 +67,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private EditText userNameEditText;
     private EditText passwordEditText;
+    private ProgressBar progressBar;
 
 
 
@@ -97,7 +99,7 @@ public class LoginActivity extends AppCompatActivity {
         });
 
 
-        handleTransition();
+        checkLogin();
         setUpGoogleLogin();
 
 
@@ -159,7 +161,7 @@ public class LoginActivity extends AppCompatActivity {
                                 if(task.getResult().getDocuments().isEmpty())
                                 {
                                     mAuth.signOut();
-                                    initViews();
+                                    handleTransition();
                                 }
                                 else
                                 {
@@ -176,7 +178,7 @@ public class LoginActivity extends AppCompatActivity {
         }
         else
         {
-            initViews();
+            handleTransition();
         }
 
     }
@@ -340,7 +342,7 @@ public class LoginActivity extends AppCompatActivity {
                 @Override
                 public void onTransitionEnd(Transition transition) {
                     transition.removeListener(this);
-                    checkLogin();
+                    initViews();
                 }
 
                 @Override
