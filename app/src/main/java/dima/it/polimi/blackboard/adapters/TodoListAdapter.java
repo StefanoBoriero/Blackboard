@@ -17,6 +17,10 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
+
 import dima.it.polimi.blackboard.R;
 import dima.it.polimi.blackboard.fragments.TodoItemListFragment;
 import dima.it.polimi.blackboard.model.TodoItem;
@@ -53,7 +57,8 @@ public class TodoListAdapter extends FirestoreAdapter<TodoListAdapter.ViewHolder
         holder.todoItemType.setText(todoItem.getType());
         holder.todoItemName.setTransitionName(todoItem.getName() + "Name" + todoItem.getId());
         holder.userIcon.setTransitionName(todoItem.getName() + "Icon" + todoItem.getId());
-        holder.timestampView.setText(todoItem.getMyCreatedOn());
+        DateFormat df = new SimpleDateFormat("MMM dd", Locale.US);
+        holder.timestampView.setText(df.format(todoItem.getCreatedOn()));
         holder.todoItemType.setCompoundDrawablesWithIntrinsicBounds(resolveIcon(todoItem.getType()), null, null, null);
 
         // TODO: 11/03/2018 Refactor this code to get the correct image 

@@ -36,6 +36,7 @@ import dima.it.polimi.blackboard.R;
 import dima.it.polimi.blackboard.fragments.TodoItemDetailFragment;
 import dima.it.polimi.blackboard.fragments.TodoItemListFragment;
 import dima.it.polimi.blackboard.model.TodoItem;
+import dima.it.polimi.blackboard.model.User;
 
 /**
  * This class represents an activity which shows one fragment on smaller devices,
@@ -344,6 +345,14 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
 
     @SuppressWarnings("unchecked")
     private void getHouses(){
+        User user = User.getInstance();
+        List<Object> houses = user.getHouses();
+        this.houses = new CharSequence[houses.size()];
+        for(int i=0; i<houses.size(); i++){
+            this.houses[i] = (String)houses.get(i);
+        }
+        houseDownloadComplete = true;
+        /*
         DocumentReference user = db.collection("users").document("Serento");
         user.get().addOnCompleteListener((task) -> {
             if (task.isSuccessful()) {
@@ -363,6 +372,7 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
                 Log.d(TAG, "Error getting documents: ", task.getException());
             }
         });
+        */
     }
 
     public void onChooseHouse(MenuItem menuItem){

@@ -17,18 +17,27 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import dima.it.polimi.blackboard.R;
 import dima.it.polimi.blackboard.adapters.DayResumeAdapter;
 import dima.it.polimi.blackboard.model.DayResume;
+import dima.it.polimi.blackboard.model.User;
 import dima.it.polimi.blackboard.utils.DataGeneratorUtil;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private FirebaseAuth firebaseAuth;
+    private RecyclerView recyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,14 +56,11 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        recyclerView = findViewById(R.id.dashboard);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
 
-        List<DayResume> dayss = DataGeneratorUtil.generateDayResumes(30);
-
-        RecyclerView days = findViewById(R.id.dashboard);
-        days.setLayoutManager(new LinearLayoutManager(this));
-        RecyclerView.Adapter adapter = new DayResumeAdapter(dayss);
-        days.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
-        days.setAdapter(adapter);
+        initializeUser();
     }
 
     @Override
@@ -127,11 +133,36 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    public void onSuggestionSurfaceClick(View v){
-
-        Intent intent = new Intent(MainActivity.this, HouseListActivity.class);
-        startActivity(intent);
+    private void initializeUser(){
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        FirebaseUser user = firebaseAuth.getCurrentUser();
+        if(user != null) {
+            DocumentReference userRef = db.collection("users").document(user.getUid());
+            userRef.get().addOnCompleteListener(task -> {
+                User u = task.getResult().toObject(User.class);
+                User.setInstance(u);
+                initializeDays();
+            });
+        }
     }
 
+    private void initializeDays(){
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if(user != null){
+            String id = user.getUid();
+            CollectionReference days = db.collection("users").document(id).collection("days");
+            Query query = days.orderBy("day", Query.Direction.DESCENDING);
+            query.get().addOnCompleteListener( task -> {
+                List<DayResume> result = new ArrayList<>();
+                for(DocumentSnapshot day: task.getResult()){
+                    DayResume d = day.toObject(DayResume.class);
+                    result.add(d);
+                }
+                RecyclerView.Adapter adapter = new DayResumeAdapter(result);
+                recyclerView.setAdapter(adapter);
+            });
+        }
+    }
 
 }

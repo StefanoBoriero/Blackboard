@@ -1,12 +1,16 @@
 package dima.it.polimi.blackboard.adapters;
 
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Locale;
 
 import dima.it.polimi.blackboard.R;
 import dima.it.polimi.blackboard.model.DayResume;
@@ -25,26 +29,28 @@ public class DayResumeAdapter extends RecyclerView.Adapter<DayResumeAdapter.View
 
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    @NonNull
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.day_resume, parent, false);
         return new DayResumeAdapter.ViewHolder(itemView);
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         DayResume day = days.get(position);
 
-        String completed = DayResume.COMPLETED_MESSAGE + day.getTaskCompleted();
+        String completed = DayResume.COMPLETED_MESSAGE + day.getCompletedItems();
         holder.completed.setText(completed);
 
-        String added = DayResume.ADDED_MESSAGE + day.getAddedTasks();
+        String added = DayResume.ADDED_MESSAGE + day.getCreatedItems();
         holder.added.setText(added);
 
         String balance = DayResume.BALANCE_MESSAGE + day.getBalanceDiff() + "$";
         holder.balance.setText(balance);
 
-        holder.day.setText(day.getDay());
+        DateFormat df = new SimpleDateFormat("EEE, MMM dd", Locale.US);
+        holder.day.setText(df.format(day.getDay()));
     }
 
     @Override

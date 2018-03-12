@@ -6,22 +6,14 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 
 import android.view.View;
 import android.widget.Toast;
 
-
-
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
-
-import java.util.ArrayList;
-import java.util.Map;
 
 import dima.it.polimi.blackboard.R;
 import dima.it.polimi.blackboard.fragments.TodoItemListFragment;
@@ -100,29 +92,6 @@ public class HouseListActivity extends DoubleFragmentActivity{
             );
         }
 
-    }
-
-    @SuppressWarnings("unchecked")
-    private void getHouses(){
-        DocumentReference user = db.collection("users").document("Serento");
-        user.get().addOnCompleteListener((task) -> {
-            if (task.isSuccessful()) {
-               {
-                   DocumentSnapshot document = task.getResult();
-                   Map<String, Object> userParam = document.getData();
-                   ArrayList<String> houses = (ArrayList<String>)userParam.get("houses");
-                   Log.d(TAG, document.getId() + " => " + document.getData());
-                   this.houses = new CharSequence[houses.size()];
-                   for(int i=0; i<houses.size(); i++){
-                       this.houses[i] = houses.get(i);
-                   }
-                   houseDownloadComplete = true;
-                }
-
-            } else {
-                Log.d(TAG, "Error getting documents: ", task.getException());
-            }
-        });
     }
 
 
