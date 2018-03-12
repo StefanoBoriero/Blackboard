@@ -46,7 +46,10 @@
 
     <!-- Stats strings -->
     <string name="completed_tasks">Completed tasks</string>
-    <string name="average_completion_time">Average completion time</string>
+    <string name="completed_housekeeping_tasks">Completed housekeeping tasks</string>
+    <string name="completed_shopping_tasks">Completed shopping tasks</string>
+    <string name="completed_billing_tasks">Completed billing tasks</string>
+    <string name="average_completion_time">Average number of tasks in a day</string>
     <string name="most_task_completed">Most tasks completed in one day</string>
     <string name="preferred_type">Preferred type</string>
     <string name="days_in_credit">Days in debt</string>
@@ -86,6 +89,7 @@
 
     <string name="shopping">Shopping</string>
     <string name="houseKeeping">Housekeeping</string>
+    <string name="billing">Billing</string>
     <string name="bills">Bills</string>
 
 
@@ -145,6 +149,9 @@
     <string name="content_description_heart_icon">Heart icon</string>
     <string name="content_description_timer_icon">Timer icon</string>
     <string name="content_description_check_icon">Check icon</string>
+    <string name="content_description_cart_icon">Cart icon</string>
+    <string name="content_description_house_icon">House icon</string>
+    <string name="content_description_card_icon">Card icon</string>
     <string name="content_description_fire_icon">Fire icon</string>
     <string name="content_description_image_icon">Image icon</string>
     <string name="content_description_positive_negative_icon">Positive or negative icon</string>

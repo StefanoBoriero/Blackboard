@@ -52,11 +52,18 @@ public class InsertDetailsActivity extends AppCompatActivity {
 
         Map<String,Object> user = new HashMap<>();
         Map<String,Object> personalInfo = new HashMap<>();
+        Map<String,Object> stats = new HashMap<>();
         personalInfo.put("name",nameEditText.getText().toString().trim());
         personalInfo.put("surname",surnameEditText.getText().toString().trim());
         personalInfo.put("Sex",selectedRadioButton.getText());
+        stats.put("billing_task",0);
+        stats.put("housekeeping_task",0);
+        stats.put("shopping_task",0);
+        stats.put("total_task",0);
         user.put("auth_id",FirebaseAuth.getInstance().getCurrentUser().getUid() );
         user.put("personal_info",personalInfo);
+        user.put("stats", stats);
+
 
 
         db.collection("users").document(FirebaseAuth.getInstance().getCurrentUser().getUid()).set(user);
