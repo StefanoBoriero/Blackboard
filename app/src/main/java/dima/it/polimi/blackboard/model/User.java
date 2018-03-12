@@ -14,6 +14,7 @@ public class User {
     @Exclude private static User instance;
     private Map<String, Object> personal_info;
     private List<Object> houses;
+    private List<Object> achievements;
     private String auth_id;
 
     private User(){
@@ -42,6 +43,14 @@ public class User {
 
     public String getAuth_id(){
         return this.auth_id;
+    }
+
+    public void setAchievements(List<Object> achievements){
+        this.achievements = achievements;
+    }
+
+    public List<Object> getAchievements(){
+        return this.achievements;
     }
 
     public static User getInstance(){
