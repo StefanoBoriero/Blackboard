@@ -43,6 +43,12 @@ public abstract class FirestoreAdapter<VH extends RecyclerView.ViewHolder>
         mListener = listener;
     }
 
+    FirestoreAdapter(Query query){
+        mQuery = query;
+        mSnapshots = new ArrayList<>();
+        mFilteredSnapshots = new ArrayList<>();
+    }
+
     public void onEvent(QuerySnapshot documentSnapshots, FirebaseFirestoreException e){
         if(e != null){
             Log.w(TAG, "onEvent:error", e);
@@ -64,8 +70,11 @@ public abstract class FirestoreAdapter<VH extends RecyclerView.ViewHolder>
 
             }
         }
-        mListener.onComplete(mSnapshots.isEmpty());
+        if(mListener != null) {
+            mListener.onComplete(mSnapshots.isEmpty());
+        }
         getFilter().filter(filter);
+
     }
 
     private void onDocumentAdded(DocumentChange change){

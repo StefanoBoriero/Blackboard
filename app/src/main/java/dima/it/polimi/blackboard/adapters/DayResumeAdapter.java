@@ -7,8 +7,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.google.firebase.firestore.Query;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.DayOfWeek;
 import java.util.List;
 import java.util.Locale;
 
@@ -20,13 +23,16 @@ import dima.it.polimi.blackboard.model.DayResume;
  * Created by Stefano on 30/01/2018.
  */
 
-public class DayResumeAdapter extends RecyclerView.Adapter<DayResumeAdapter.ViewHolder>{
+public class DayResumeAdapter extends FirestoreAdapter<DayResumeAdapter.ViewHolder>{
     private List<DayResume> days;
 
-    public DayResumeAdapter(List<DayResume> days){
+    /*public DayResumeAdapter(List<DayResume> days){
         this.days = days;
     }
-
+*/
+    public DayResumeAdapter(Query query){
+        super(query);
+    }
 
     @Override
     @NonNull
@@ -38,7 +44,7 @@ public class DayResumeAdapter extends RecyclerView.Adapter<DayResumeAdapter.View
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        DayResume day = days.get(position);
+        DayResume day = getSnapshot(position).toObject(DayResume.class);
 
         String completed = DayResume.COMPLETED_MESSAGE + day.getCompletedItems();
         holder.completed.setText(completed);
@@ -46,22 +52,18 @@ public class DayResumeAdapter extends RecyclerView.Adapter<DayResumeAdapter.View
         String added = DayResume.ADDED_MESSAGE + day.getCreatedItems();
         holder.added.setText(added);
 
-        String balance = DayResume.BALANCE_MESSAGE + day.getBalanceDiff() + "$";
-        holder.balance.setText(balance);
-
         DateFormat df = new SimpleDateFormat("EEE, MMM dd", Locale.US);
         holder.day.setText(df.format(day.getDay()));
     }
 
     @Override
     public int getItemCount() {
-        return days.size();
+        return super.getItemCount();
     }
 
     class ViewHolder extends RecyclerView.ViewHolder{
         private TextView completed;
         private TextView added;
-        private TextView balance;
         private TextView day;
 
         private ViewHolder(View itemView) {
@@ -69,7 +71,6 @@ public class DayResumeAdapter extends RecyclerView.Adapter<DayResumeAdapter.View
 
             this.completed = itemView.findViewById(R.id.completed_tasks);
             this.added = itemView.findViewById(R.id.added_tasks);
-            this.balance = itemView.findViewById(R.id.balance_diff);
             this.day= itemView.findViewById(R.id.day);
         }
     }

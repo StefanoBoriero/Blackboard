@@ -1,7 +1,5 @@
 package dima.it.polimi.blackboard.utils;
 
-import android.content.Intent;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -131,9 +129,8 @@ public class DataGeneratorUtil {
         for(i=0; i<amount; i++){
             int completed = (int)(Math.random() * 7);
             int added = (int)(Math.random() * 4);
-            double diff = (Math.random() * 3);
 
-            DayResume day = new DayResume(completed, diff, added);
+            DayResume day = new DayResume(completed, added);
             days.add(day);
         }
         return days;

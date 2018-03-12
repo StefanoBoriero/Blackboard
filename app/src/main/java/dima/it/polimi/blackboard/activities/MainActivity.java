@@ -29,6 +29,7 @@ import java.util.List;
 
 import dima.it.polimi.blackboard.R;
 import dima.it.polimi.blackboard.adapters.DayResumeAdapter;
+import dima.it.polimi.blackboard.adapters.FirestoreAdapter;
 import dima.it.polimi.blackboard.model.DayResume;
 import dima.it.polimi.blackboard.model.User;
 import dima.it.polimi.blackboard.utils.DataGeneratorUtil;
@@ -153,16 +154,10 @@ public class MainActivity extends AppCompatActivity
             String id = user.getUid();
             CollectionReference days = db.collection("users").document(id).collection("days");
             Query query = days.orderBy("day", Query.Direction.DESCENDING);
-            query.get().addOnCompleteListener( task -> {
-                List<DayResume> result = new ArrayList<>();
-                for(DocumentSnapshot day: task.getResult()){
-                    DayResume d = day.toObject(DayResume.class);
-                    result.add(d);
-                }
-                RecyclerView.Adapter adapter = new DayResumeAdapter(result);
-                recyclerView.setAdapter(adapter);
-            });
+
+            FirestoreAdapter adapter = new DayResumeAdapter(query);
+            recyclerView.setAdapter(adapter);
+            adapter.startListening();
         }
     }
-
 }
