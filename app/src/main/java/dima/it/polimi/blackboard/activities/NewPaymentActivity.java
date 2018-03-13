@@ -8,6 +8,7 @@ import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.transition.Transition;
 import android.transition.TransitionInflater;
 import android.view.Menu;
@@ -17,10 +18,13 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 
 import com.google.firebase.firestore.FirebaseFirestore;
+
+import org.w3c.dom.Text;
 
 import dima.it.polimi.blackboard.R;
 import dima.it.polimi.blackboard.model.PaymentItem;
@@ -208,10 +212,31 @@ public class NewPaymentActivity extends AppCompatActivity {
     {
         EditText nameEditText = findViewById(R.id.nameEditText);
         EditText currencyEditText = findViewById(R.id.costEditText);
+
+        String name = nameEditText.getText().toString().trim();
         String amountString = currencyEditText.getText().toString().replace(",",".");
         Float amount = Float.parseFloat(amountString);
+        Button submitButton = findViewById(R.id.submit_button);
 
-        PaymentItem paymentItem = new PaymentItem(nameEditText.getText().toString(),amount);
+        if(TextUtils.isEmpty(name))
+        {
+            nameEditText.setError("Please enter name");
+
+            //We don't complete the request
+            return;
+        }
+
+        if(amount == 0.0f)
+        {
+            currencyEditText.setError("Amount must be different from 0");
+
+            //We don't complete the request
+            return;
+        }
+
+        PaymentItem paymentItem = new PaymentItem(name,amount);
         db.collection("houses").document(selectedHouse).collection("payments").document().set(paymentItem);
+        submitButton.setClickable(false);
+        onBackPressed();
     }
 }

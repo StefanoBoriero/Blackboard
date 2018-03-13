@@ -1,21 +1,33 @@
 package dima.it.polimi.blackboard.activities;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,9 +35,11 @@ import java.util.Map;
 import dima.it.polimi.blackboard.R;
 import dima.it.polimi.blackboard.model.PersonalInfo;
 
-public class InsertDetailsActivity extends AppCompatActivity {
+public class InsertDetailsActivity extends AppCompatActivity implements DialogInterface.OnClickListener {
     FirebaseFirestore db;
     ConstraintLayout myConstraintLayout;
+    private static final int GALLERY_INTENT = 2;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +47,8 @@ public class InsertDetailsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_insert_details);
         db = FirebaseFirestore.getInstance();
         myConstraintLayout = findViewById(R.id.root_layout);
+
+        setUpPhotoButton();
     }
 
     @Override
@@ -47,6 +63,7 @@ public class InsertDetailsActivity extends AppCompatActivity {
         EditText surnameEditText = findViewById(R.id.surnameEditText);
         RadioGroup radioGroup = findViewById(R.id.radioGroup);
         RadioButton selectedRadioButton = radioGroup.findViewById(radioGroup.getCheckedRadioButtonId());
+
 
 
 
@@ -66,7 +83,9 @@ public class InsertDetailsActivity extends AppCompatActivity {
 
 
 
+
         db.collection("users").document(FirebaseAuth.getInstance().getCurrentUser().getUid()).set(user);
+
 
         finish();
         Intent i = new Intent(InsertDetailsActivity.this,MainActivity.class);
@@ -100,4 +119,76 @@ public class InsertDetailsActivity extends AppCompatActivity {
     }
 
 
+
+    private void setUpPhotoButton()
+    {
+        findViewById(R.id.user_icon).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                InsertDetailsActivity.ProfilePictureDialog.mListener = this;
+                DialogFragment houseListDialog = ProfilePictureDialog.newInstance();
+                houseListDialog.show(getFragmentManager(), "dialog");
+            }
+        });
+    }
+
+    @Override
+    public void onClick(DialogInterface dialog, int which) {
+
+    }
+
+    public static class ProfilePictureDialog extends DialogFragment {
+        public static View.OnClickListener mListener;
+
+        public static InsertDetailsActivity.ProfilePictureDialog newInstance() {
+            InsertDetailsActivity.ProfilePictureDialog fragment = new InsertDetailsActivity.ProfilePictureDialog();
+            return fragment;
+        }
+
+        @Override
+        public Dialog onCreateDialog(final Bundle savedInstanceState) {
+            final AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
+            final CharSequence[] items = {"Take Photo", "Choose From Gallery", "Cancel"};
+            dialog.setTitle("Add a photo");
+            dialog.setItems(items, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                        if(which == 0)
+                        {
+                            Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
+                            startActivity(intent);
+                        }
+                        if(which == 1)
+                        {
+                            Intent intent = new Intent(Intent.ACTION_PICK);
+
+                            intent.setType("image/*");
+                            startActivityForResult(intent,GALLERY_INTENT);
+                        }
+                }
+            });
+            return dialog.create();
+        }
+
+        @Override
+        public void onActivityResult(int requestCode, int resultCode, Intent data)
+        {
+            super.onActivityResult(requestCode,resultCode,data);
+
+            if(requestCode == GALLERY_INTENT && resultCode == RESULT_OK)
+            {
+
+                Uri uri = data.getData();
+                FirebaseStorage store = FirebaseStorage.getInstance();
+                StorageReference storageReference = store.getReference();
+                StorageReference userReference = storageReference.child(FirebaseAuth.getInstance().getCurrentUser().getUid().toString() + "/profile.jpg");
+                userReference.putFile(uri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+
+                    }
+                });
+            }
+        }
+    }
 }
