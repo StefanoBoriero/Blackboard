@@ -9,6 +9,7 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.drawable.Drawable;
+import android.os.PersistableBundle;
 import android.support.v4.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
@@ -52,6 +53,7 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
             DialogInterface.OnClickListener{
 
     private static final String TAG = "double_frag_activity";
+    private static final String CURRENT_HOUSE_INDEX = "current-house-index";
     private static final int ACCEPT_TASK_REQUEST = 1;
     private static final int ANIM_DURATION = 250;
 
@@ -68,7 +70,7 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
     protected CharSequence[] houses;
     protected boolean houseDownloadComplete;
 
-    protected FirebaseFirestore db;
+    protected FirebaseFirestore db = FirebaseFirestore.getInstance();
 
 
     @Override
@@ -76,14 +78,26 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         isDouble = isDouble();
 
+        if(savedInstanceState != null){
+            whichHouse = savedInstanceState.getInt(CURRENT_HOUSE_INDEX);
+        }
+        else{
+            whichHouse = 0;
+        }
+
+        getHouses();
         showFirstFragment();
         if(isDouble()){
             showSecondFragment();
         }
 
-        db = FirebaseFirestore.getInstance();
-        getHouses();
-        ((TodoItemListFragment)firstFragment).setHouse("Sexy");
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        savedInstanceState.putInt(CURRENT_HOUSE_INDEX, whichHouse);
+        // Always call the superclass so it can save the view hierarchy state
+        super.onSaveInstanceState(savedInstanceState);
     }
 
     @Override
@@ -127,7 +141,7 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
     }
 
     private void showFirstFragment(){
-        firstFragment = TodoItemListFragment.newInstance(1, itemList);
+        firstFragment = TodoItemListFragment.newInstance(1, itemList, (String)houses[whichHouse]);
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_list_container, firstFragment)
                 .commit();

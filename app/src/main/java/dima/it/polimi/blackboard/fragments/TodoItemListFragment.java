@@ -3,6 +3,7 @@ package dima.it.polimi.blackboard.fragments;
 import android.content.Context;
 import android.os.Bundle;
 
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -45,8 +46,8 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
 
 
     private static final String ARG_COLUMN_COUNT = "column-count";
-    private static final String ARG_TODO_ITEMS = "todo-items";
-    private static final String ARG_HOUSE_LIST = "house-list";
+    private static final String MY_LIST = "my-list";
+    private static final String ARG_DEFAULT_HOUSE = "house-list";
     private static final String TAG = "ITEM_LIST";
 
     private int mColumnCount = 1;
@@ -70,16 +71,17 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
     public TodoItemListFragment() {
     }
 
-    public static TodoItemListFragment newInstance(int columnCount, List<TodoItem> todoItems) {
+    public static TodoItemListFragment newInstance(int columnCount, List<TodoItem> todoItems, String defaultHouse) {
         TodoItemListFragment fragment = new TodoItemListFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
+        args.putString(ARG_DEFAULT_HOUSE, defaultHouse);
 
 
 
         //TODO change this with network fetching
         //args.putParcelableArrayList(ARG_TODO_ITEMS, new ArrayList<>(todoItems));
-        //fragment.setArguments(args);
+        fragment.setArguments(args);
         return fragment;
     }
 
@@ -89,6 +91,7 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
 
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
+            house = getArguments().getString(ARG_DEFAULT_HOUSE);
         }
 
         db = FirebaseFirestore.getInstance();
@@ -102,14 +105,15 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_list, container, false);
 
 
         AppCompatActivity parentActivity = ((AppCompatActivity)getActivity());
-        rootView = parentActivity.findViewById(R.id.root_view);
-
+        if(parentActivity != null) {
+            rootView = parentActivity.findViewById(R.id.root_view);
+        }
         // Setting up the RecyclerView adapter and helpers
         recyclerView = view.findViewById(R.id.recycler_view);
         Context context = view.getContext();
@@ -123,9 +127,11 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
         String swipeMessage;
         if(parentActivity instanceof HouseListActivity){
             swipeMessage = getResources().getString(R.string.house_list_swipe_msg);
+            myList = false;
         }
         else{
             swipeMessage = getResources().getString(R.string.my_list_swipe_msg);
+            myList = true;
         }
         ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new TodoItemTouchHelper(0,
                 ItemTouchHelper.LEFT, this, swipeMessage);
