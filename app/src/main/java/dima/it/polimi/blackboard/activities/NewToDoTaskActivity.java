@@ -8,6 +8,7 @@ import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.transition.Transition;
 import android.transition.TransitionInflater;
 import android.view.ContextMenu;
@@ -296,6 +297,7 @@ public class NewToDoTaskActivity extends AppCompatActivity {
         EditText currencyEditText = findViewById(R.id.costEditText);
         Spinner spinner = findViewById(R.id.spinner2);
         EditText description = findViewById(R.id.descriptionEditText);
+        Button submitButton = findViewById(R.id.submit_button);
         String amountString = currencyEditText.getText().toString().replace(",",".");
         Float amount = Float.parseFloat(amountString);
         Map<String, Object> additionalInfo = new HashMap<>() ;
@@ -306,9 +308,27 @@ public class NewToDoTaskActivity extends AppCompatActivity {
         }
 
 
+        String name = nameEditText.getText().toString().trim();
+        String type = typeButton.getText().toString();
 
-        TodoItem todoItem = new TodoItem(nameEditText.getText().toString().trim(),  typeButton.getText().toString(),spinner.getSelectedItem().toString(),additionalInfo);
+        if(TextUtils.isEmpty(name))
+        {
+            nameEditText.setError("Please enter name");
+
+            //We don't complete the request
+            return;
+        }
+
+        if(TextUtils.isEmpty(type))
+        {
+            typeButton.setError("Please select a type");
+
+            return;
+        }
+
+        TodoItem todoItem = new TodoItem(name, type ,spinner.getSelectedItem().toString(),additionalInfo);
         DocumentReference newDoc = db.collection("houses").document(house).collection("items").document();
+        submitButton.setClickable(false);
         String itemId = newDoc.getId();
         todoItem.setId(itemId);
         newDoc.set(todoItem);
