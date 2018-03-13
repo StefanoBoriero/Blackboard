@@ -109,7 +109,7 @@
             tools:text="12:02" />
 
         <ImageView
-            android:id="@+id/icon_priority"
+            android:id="@+id/suggestion_star"
             android:layout_width="@dimen/icon_star"
             android:layout_height="@dimen/icon_star"
             android:alpha="0.5"

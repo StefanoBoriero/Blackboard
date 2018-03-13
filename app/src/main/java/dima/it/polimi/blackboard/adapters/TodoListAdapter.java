@@ -13,6 +13,8 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -60,6 +62,7 @@ public class TodoListAdapter extends FirestoreAdapter<TodoListAdapter.ViewHolder
         DateFormat df = new SimpleDateFormat("MMM dd", Locale.US);
         holder.timestampView.setText(df.format(todoItem.getCreatedOn()));
         holder.todoItemType.setCompoundDrawablesWithIntrinsicBounds(resolveIcon(todoItem.getType()), null, null, null);
+        checkSuggestion(todoItem, holder.suggestionStar);
 
         // TODO: 11/03/2018 Refactor this code to get the correct image 
         FirebaseStorage storage = FirebaseStorage.getInstance();
@@ -72,6 +75,20 @@ public class TodoListAdapter extends FirestoreAdapter<TodoListAdapter.ViewHolder
         holder.itemView.setOnClickListener((v) ->
                 mListener.onTodoItemClicked(todoItem, v, holder.getAdapterPosition())
         );
+    }
+
+    private void checkSuggestion(TodoItem item, ImageView suggestionStar){
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if(user != null){
+            String uid = user.getUid();
+            String suggestedTo = item.getSuggestedTo();
+            if(uid.equals(suggestedTo)){
+                suggestionStar.setImageResource(R.drawable.ic_star_yellow_24dp);
+            }
+            else{
+                suggestionStar.setImageResource(R.drawable.ic_star_border_black_24dp);
+            }
+        }
     }
 
 
@@ -106,6 +123,7 @@ public class TodoListAdapter extends FirestoreAdapter<TodoListAdapter.ViewHolder
         private TextView todoItemName;
         private TextView todoItemType;
         private ImageView userIcon;
+        private ImageView suggestionStar;
         private TextView timestampView;
         public ConstraintLayout viewForeground;
         public ConstraintLayout viewBackground;
@@ -118,6 +136,7 @@ public class TodoListAdapter extends FirestoreAdapter<TodoListAdapter.ViewHolder
             todoItemType = itemView.findViewById(R.id.item_type);
             userIcon = itemView.findViewById(R.id.user_icon);
             timestampView = itemView.findViewById(R.id.timestamp);
+            suggestionStar = itemView.findViewById(R.id.suggestion_star);
         }
     }
 }
