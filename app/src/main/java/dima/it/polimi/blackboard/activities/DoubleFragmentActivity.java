@@ -37,6 +37,7 @@ import dima.it.polimi.blackboard.fragments.TodoItemDetailFragment;
 import dima.it.polimi.blackboard.fragments.TodoItemListFragment;
 import dima.it.polimi.blackboard.model.TodoItem;
 import dima.it.polimi.blackboard.model.User;
+import dima.it.polimi.blackboard.utils.UserDecoder;
 
 /**
  * This class represents an activity which shows one fragment on smaller devices,
@@ -350,29 +351,9 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
         this.houses = new CharSequence[houses.size()];
         for(int i=0; i<houses.size(); i++){
             this.houses[i] = (String)houses.get(i);
+            UserDecoder.getInstance().populateFromHouse((String)this.houses[i]);
         }
         houseDownloadComplete = true;
-        /*
-        DocumentReference user = db.collection("users").document("Serento");
-        user.get().addOnCompleteListener((task) -> {
-            if (task.isSuccessful()) {
-                {
-                    DocumentSnapshot document = task.getResult();
-                    Map<String, Object> userParam = document.getData();
-                    ArrayList<String> houses = (ArrayList<String>)userParam.get("houses");
-                    Log.d(TAG, document.getId() + " => " + document.getData());
-                    this.houses = new CharSequence[houses.size()];
-                    for(int i=0; i<houses.size(); i++){
-                        this.houses[i] = houses.get(i);
-                    }
-                    houseDownloadComplete = true;
-                }
-
-            } else {
-                Log.d(TAG, "Error getting documents: ", task.getException());
-            }
-        });
-        */
     }
 
     public void onChooseHouse(MenuItem menuItem){

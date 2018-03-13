@@ -5,6 +5,7 @@ import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
@@ -14,6 +15,10 @@ import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.util.List;
 
@@ -22,6 +27,7 @@ import dima.it.polimi.blackboard.R;
 import dima.it.polimi.blackboard.activities.PhotoDialogActivity;
 import dima.it.polimi.blackboard.adapters.HouseListAdapter;
 import dima.it.polimi.blackboard.model.House;
+import dima.it.polimi.blackboard.model.User;
 import dima.it.polimi.blackboard.utils.DataGeneratorUtil;
 
 /**
@@ -54,19 +60,21 @@ public class ProfileInfoFragment extends Fragment implements HouseListAdapter.Ho
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        /*
         if (getArguments() != null) {
 
         }
+        */
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_profile_info, container, false);
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         List<House> myHouses = DataGeneratorUtil.generateHouses(5);
         RecyclerView rv = view.findViewById(R.id.recycler_view_house);
@@ -74,11 +82,28 @@ public class ProfileInfoFragment extends Fragment implements HouseListAdapter.Ho
         rv.setLayoutManager(new GridLayoutManager(getContext(), 3));
         rv.setAdapter(adapter);
 
+        TextView nameView = view.findViewById(R.id.username);
+        TextView mailView = view.findViewById(R.id.email);
+
+
+        String name = (String)User.getInstance().getPersonal_info().get("name");
+        String surname = (String)User.getInstance().getPersonal_info().get("surname");
+        String completeName = name + " " + surname;
+        nameView.setText(completeName);
+
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if(user != null){
+            String mail = user.getEmail();
+            mailView.setText(mail);
+        }
+
         view.findViewById(R.id.menu_dots).setOnClickListener(
                 (this::onMenuExpand)
         );
 
-        View button = getView().findViewById(R.id.user_icon);
+
+        View button = view.findViewById(R.id.user_icon);
+        //TODO load image into view
         button.setOnClickListener(v -> {
             Intent intent = new Intent(getActivity(), PhotoDialogActivity.class);
             ActivityOptions options = ActivityOptions.
@@ -112,10 +137,13 @@ public class ProfileInfoFragment extends Fragment implements HouseListAdapter.Ho
     }
 
     public void onMenuExpand(View v){
-        PopupMenu popupMenu = new PopupMenu(getContext(),v);
-        MenuInflater inflater = popupMenu.getMenuInflater();
-        inflater.inflate(R.menu.menu_my_houses, popupMenu.getMenu());
-        popupMenu.show();
+        Context c = getContext();
+        if(c != null) {
+            PopupMenu popupMenu = new PopupMenu(c, v);
+            MenuInflater inflater = popupMenu.getMenuInflater();
+            inflater.inflate(R.menu.menu_my_houses, popupMenu.getMenu());
+            popupMenu.show();
+        }
     }
 
     public interface OnHouseListFragmentInteractionListener {

@@ -15,6 +15,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -39,6 +40,8 @@ public class MainActivity extends AppCompatActivity
 
     private FirebaseAuth firebaseAuth;
     private RecyclerView recyclerView;
+    private NavigationView navigationView;
+    private View navHeaderView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +57,8 @@ public class MainActivity extends AppCompatActivity
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView = findViewById(R.id.nav_view);
+        navHeaderView = navigationView.getHeaderView(0);
         navigationView.setNavigationItemSelectedListener(this);
 
         recyclerView = findViewById(R.id.dashboard);
@@ -138,10 +142,19 @@ public class MainActivity extends AppCompatActivity
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         FirebaseUser user = firebaseAuth.getCurrentUser();
         if(user != null) {
+            final String mail = user.getEmail();
+            final TextView mailView = navHeaderView.findViewById(R.id.email);
+            final TextView nameView = navHeaderView.findViewById(R.id.name);
             DocumentReference userRef = db.collection("users").document(user.getUid());
             userRef.get().addOnCompleteListener(task -> {
                 User u = task.getResult().toObject(User.class);
                 User.setInstance(u);
+                String name = (String)User.getInstance().getPersonal_info().get("name");
+                String surname =  (String)User.getInstance().getPersonal_info().get("surname");
+                String completeName = name + " " + surname;
+                mailView.setText(mail);
+                nameView.setText(completeName);
+                //TODO get also the profile picture
                 initializeDays();
             });
         }

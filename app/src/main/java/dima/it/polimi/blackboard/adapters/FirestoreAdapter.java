@@ -17,6 +17,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Abstract adapter that gets data from Firestore
@@ -34,6 +35,7 @@ public abstract class FirestoreAdapter<VH extends RecyclerView.ViewHolder>
     private List<DocumentSnapshot> mSnapshots;
     private List<DocumentSnapshot> mFilteredSnapshots;
     private DocumentSnapshot lastRemoved;
+    private boolean removedByMe;
 
     private OnCompleteListener mListener;
     private String filter="";
@@ -100,9 +102,11 @@ public abstract class FirestoreAdapter<VH extends RecyclerView.ViewHolder>
     private void onDocumentRemoved(DocumentChange change){
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if(user!= null){
-            String uid = user.getUid();
-            String takenBy = (String)change.getDocument().get("takenBy");
-            if(uid.equals(takenBy)){
+            //String uid = user.getUid();
+            //Map<String, Object> doc = change.getDocument().getData();
+            //String takenBy = (String)doc.get("takenBy");
+            if(removedByMe){
+                removedByMe = false;
                 mSnapshots.remove(lastRemoved);
             }
             else{
@@ -185,6 +189,7 @@ public abstract class FirestoreAdapter<VH extends RecyclerView.ViewHolder>
     }
 
     public void removeItem(int position){
+        removedByMe = true;
         lastRemoved = mFilteredSnapshots.remove(position);
         notifyItemRemoved(position);
     }
