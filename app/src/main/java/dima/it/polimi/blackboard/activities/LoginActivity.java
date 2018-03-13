@@ -148,6 +148,14 @@ public class LoginActivity extends AppCompatActivity {
         mAuth.addAuthStateListener(mAuthListener);
     }
 
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (mAuthListener != null) {
+            mAuth.removeAuthStateListener(mAuthListener);
+        }
+    }
+
     private void checkLogin()
     {
         if(mAuth.getCurrentUser() != null)
@@ -298,11 +306,10 @@ public class LoginActivity extends AppCompatActivity {
 
     public void onClick(View v)
     {
-        finish();
-        mAuth.removeAuthStateListener(mAuthListener);
         Intent intent = new Intent(LoginActivity.this, SignInActivity.class);
         startActivity(intent);
     }
+
 
 
     // the following three methods handles UI events like touches outside an editText or transitions
