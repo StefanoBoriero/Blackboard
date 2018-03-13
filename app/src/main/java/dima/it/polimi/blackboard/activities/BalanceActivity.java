@@ -68,37 +68,41 @@ public class BalanceActivity extends AppCompatActivity  implements PaymentListFr
         db = FirebaseFirestore.getInstance();
         getHouses();
 
-        displayListFragment(savedInstanceState);
+
+
         collapsingToolbar = findViewById(R.id.balance_toolbar);
         refreshBalanceColor();
 
 
 
 
-
     }
 
-    private void displayListFragment(Bundle savedInstanceState){
+    private void displayListFragment(){
         //Todo remove this call
 
 
         mViewPager = findViewById(R.id.viewpager);
         mViewPagerAdapter = new PaymentViewPagerAdapter(getSupportFragmentManager());
-        mViewPager.setAdapter(mViewPagerAdapter);
-        TabLayout tabLayout =  findViewById(R.id.tabs);
-        tabLayout.setupWithViewPager(mViewPager);
-
         mViewPagerAdapter.startUpdate(mViewPager);
-
         listFragmentNegative = (PaymentListFragment) mViewPagerAdapter.instantiateItem(mViewPager,0);
         listFragmentPositive = (PaymentListFragment) mViewPagerAdapter.instantiateItem(mViewPager,1);
 
         listFragmentPositive.setType("positive");
         listFragmentNegative.setType("negative");
-        listFragmentPositive.setHouse("Sexy");
-        listFragmentNegative.setHouse("Sexy");
 
+        listFragmentPositive.setHouse(houses[0].toString());
+        listFragmentNegative.setHouse(houses[0].toString());
         mViewPagerAdapter.finishUpdate(mViewPager);
+        mViewPager.setAdapter(mViewPagerAdapter);
+        TabLayout tabLayout =  findViewById(R.id.tabs);
+        tabLayout.setupWithViewPager(mViewPager);
+
+
+
+
+
+
 
 
 
@@ -245,7 +249,10 @@ public class BalanceActivity extends AppCompatActivity  implements PaymentListFr
                     this.houses = new CharSequence[houses.size()];
                     for(int i=0; i<houses.size(); i++){
                         this.houses[i] = houses.get(i);
+
+
                     }
+                    displayListFragment();
                 }
 
             } else {

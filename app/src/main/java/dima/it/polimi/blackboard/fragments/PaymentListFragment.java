@@ -86,8 +86,10 @@ public class PaymentListFragment extends Fragment implements PaymentListAdapter.
             adapter = new PaymentListAdapter(this.getContext(),this);
             db = FirebaseFirestore.getInstance();
             user = FirebaseAuth.getInstance().getCurrentUser();
-            prepareQuery();
-            enableRealTimeUpdate();
+            if(house != null) {
+                prepareQuery();
+                enableRealTimeUpdate();
+            }
 
     }
 
@@ -171,6 +173,7 @@ public class PaymentListFragment extends Fragment implements PaymentListAdapter.
     }
 
     private void prepareQuery(){
+
 
         CollectionReference housePayments = db.collection("houses")
                 .document(house)
