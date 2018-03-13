@@ -6,12 +6,23 @@ import android.app.DialogFragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
+import android.os.Environment;
+import android.os.StrictMode;
+import android.provider.MediaStore;
+import android.provider.SyncStateContract;
+import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Base64;
 import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.View;
@@ -22,6 +33,7 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -29,15 +41,19 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
+import dima.it.polimi.blackboard.Manifest;
 import dima.it.polimi.blackboard.R;
 import dima.it.polimi.blackboard.model.PersonalInfo;
 
 public class InsertDetailsActivity extends AppCompatActivity implements DialogInterface.OnClickListener {
     FirebaseFirestore db;
     ConstraintLayout myConstraintLayout;
+    private static final int REQUEST_IMAGE_CAPTURE = 1;
     private static final int GALLERY_INTENT = 2;
 
 
@@ -48,6 +64,10 @@ public class InsertDetailsActivity extends AppCompatActivity implements DialogIn
         db = FirebaseFirestore.getInstance();
         myConstraintLayout = findViewById(R.id.root_layout);
 
+        //TODO take this away, only for emulaotr
+        StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+        StrictMode.setVmPolicy(builder.build());
+
         setUpPhotoButton();
     }
 
@@ -55,6 +75,7 @@ public class InsertDetailsActivity extends AppCompatActivity implements DialogIn
     public void onBackPressed() {
         finishAffinity();
         FirebaseAuth.getInstance().signOut();
+        super.onBackPressed();
     }
 
     public void onSubmit(View v)
@@ -90,6 +111,7 @@ public class InsertDetailsActivity extends AppCompatActivity implements DialogIn
         finish();
         Intent i = new Intent(InsertDetailsActivity.this,MainActivity.class);
         startActivity(i);
+
     }
 
     //We override dispatchTouchEvent in order to take away the focus from
@@ -137,6 +159,61 @@ public class InsertDetailsActivity extends AppCompatActivity implements DialogIn
 
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        super.onActivityResult(requestCode,resultCode,data);
+
+
+
+        if(requestCode == GALLERY_INTENT && resultCode == RESULT_OK)
+        {
+
+            Uri uri = data.getData();
+            FirebaseStorage store = FirebaseStorage.getInstance();
+            StorageReference storageReference = store.getReference();
+            StorageReference userReference = storageReference.child(FirebaseAuth.getInstance().getCurrentUser().getUid().toString() + "/profile.jpg");
+            userReference.putFile(uri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+
+                }
+            });
+        }
+
+        if(requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK)
+        {
+           Bundle bundle = data.getExtras();
+           final Bitmap btm = (Bitmap)bundle.get("data");
+           encodeBitmapAndSaveToFirebase(btm);
+
+
+        }
+    }
+
+    public void encodeBitmapAndSaveToFirebase(Bitmap bitmap) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        byte[] data = baos.toByteArray();
+        FirebaseStorage store = FirebaseStorage.getInstance();
+        StorageReference storageReference = store.getReference();
+        StorageReference userReference = storageReference.child(FirebaseAuth.getInstance().getCurrentUser().getUid().toString() + "/profile.jpg");
+
+        UploadTask uploadTask = userReference.putBytes(data);
+        uploadTask.addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                // Handle unsuccessful uploads
+            }
+        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
+                Uri downloadUrl = taskSnapshot.getDownloadUrl();
+            }
+        });
+    }
+
     public static class ProfilePictureDialog extends DialogFragment {
         public static View.OnClickListener mListener;
 
@@ -153,10 +230,21 @@ public class InsertDetailsActivity extends AppCompatActivity implements DialogIn
             dialog.setItems(items, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
+                    String permission;
+
                         if(which == 0)
                         {
-                            Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
-                            startActivity(intent);
+                            permission = android.Manifest.permission.CAMERA;
+                            if(!hasPermissions(permission)) {
+                                ActivityCompat.requestPermissions(getActivity(), new String[]{permission},REQUEST_IMAGE_CAPTURE);
+                                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                                getActivity().startActivityForResult(intent,REQUEST_IMAGE_CAPTURE);
+                            }
+                            else
+                            {
+                                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                                getActivity().startActivityForResult(intent,REQUEST_IMAGE_CAPTURE);
+                            }
                         }
                         if(which == 1)
                         {
@@ -170,25 +258,18 @@ public class InsertDetailsActivity extends AppCompatActivity implements DialogIn
             return dialog.create();
         }
 
-        @Override
-        public void onActivityResult(int requestCode, int resultCode, Intent data)
+
+        private boolean hasPermissions( String... permissions)
         {
-            super.onActivityResult(requestCode,resultCode,data);
-
-            if(requestCode == GALLERY_INTENT && resultCode == RESULT_OK)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && permissions != null)
             {
-
-                Uri uri = data.getData();
-                FirebaseStorage store = FirebaseStorage.getInstance();
-                StorageReference storageReference = store.getReference();
-                StorageReference userReference = storageReference.child(FirebaseAuth.getInstance().getCurrentUser().getUid().toString() + "/profile.jpg");
-                userReference.putFile(uri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-
-                    }
-                });
+               for(String permission: permissions)
+               {
+                   if(ContextCompat.checkSelfPermission(getActivity(),permission) != PackageManager.PERMISSION_GRANTED)
+                       return false;
+               }
             }
+            return true;
         }
     }
 }

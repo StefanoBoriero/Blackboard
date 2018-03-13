@@ -62,9 +62,10 @@ public class PaymentListFragment extends Fragment implements PaymentListAdapter.
     public PaymentListFragment() {
     }
 
-    public static PaymentListFragment newInstance(int columnCount, String type) {
+    public static PaymentListFragment newInstance(int columnCount, String type, String house) {
         PaymentListFragment fragment = new PaymentListFragment();
         Bundle args = new Bundle();
+        args.putString("house",house);
         args.putInt(ARG_COLUMN_COUNT, columnCount);
         args.putString(ARG_TYPE, type);
         fragment.setArguments(args);
@@ -78,15 +79,16 @@ public class PaymentListFragment extends Fragment implements PaymentListAdapter.
 
         super.onCreate(savedInstanceState);
 
-        if (getArguments() != null) {
-            mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
-            type = getArguments().getString(ARG_TYPE);
+
+            //type = getArguments().getString(ARG_TYPE);
+            if(savedInstanceState != null && savedInstanceState.getString("house") != null)
+                this.house = savedInstanceState.getString("house");
             adapter = new PaymentListAdapter(this.getContext(),this);
             db = FirebaseFirestore.getInstance();
             user = FirebaseAuth.getInstance().getCurrentUser();
             prepareQuery();
             enableRealTimeUpdate();
-        }
+
     }
 
     @Override
@@ -206,4 +208,17 @@ public class PaymentListFragment extends Fragment implements PaymentListAdapter.
     public void setHouse(String house){
         this.house = house;
     }
+    public void setType(String type){
+        this.type = type;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState)
+    {
+        savedInstanceState.putString("house",house);
+    }
+
+
+
+
 }

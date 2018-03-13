@@ -11,7 +11,6 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".activities.LoginActivity"
-
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -90,28 +89,24 @@
             </intent-filter>
         </receiver>
 
-        <activity android:name=".activities.InsertDetailsActivity"
-            android:theme="@style/AppTheme.NoActionBar">
-           </activity>
+        <activity
+            android:name=".activities.InsertDetailsActivity"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
 
-        <service
-            android:name=".services.MyFirebaseMessagingService">
+        <service android:name=".services.MyFirebaseMessagingService">
             <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
-
-        <service
-            android:name=".services.MyFirebaseInstanceIDService">
+        <service android:name=".services.MyFirebaseInstanceIDService">
             <intent-filter>
-                <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
             </intent-filter>
         </service>
 
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
             android:resource="@drawable/custom_icon" />
-
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
             android:value="@string/default_notification_channel_id" />

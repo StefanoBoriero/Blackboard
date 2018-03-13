@@ -52,11 +52,15 @@ public class BalanceActivity extends AppCompatActivity  implements PaymentListFr
     private int selectedHouse = 0;
     private PaymentListFragment listFragmentPositive;
     private PaymentListFragment listFragmentNegative;
+    private ViewPager mViewPager;
+    private PaymentViewPagerAdapter mViewPagerAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_balance);
+
 
         mFab = findViewById(R.id.add_fab);
         mFab.setTransitionName("revealCircular");
@@ -64,7 +68,7 @@ public class BalanceActivity extends AppCompatActivity  implements PaymentListFr
         db = FirebaseFirestore.getInstance();
         getHouses();
 
-        displayListFragment();
+        displayListFragment(savedInstanceState);
         collapsingToolbar = findViewById(R.id.balance_toolbar);
         refreshBalanceColor();
 
@@ -74,27 +78,37 @@ public class BalanceActivity extends AppCompatActivity  implements PaymentListFr
 
     }
 
-    private void displayListFragment(){
+    private void displayListFragment(Bundle savedInstanceState){
         //Todo remove this call
 
 
-        items = DataGeneratorUtil.generatePaymentItems(15);
-        listFragmentPositive = PaymentListFragment.newInstance(1,"positive");
-        listFragmentNegative = PaymentListFragment.newInstance(1,"negative");
+        mViewPager = findViewById(R.id.viewpager);
+        mViewPagerAdapter = new PaymentViewPagerAdapter(getSupportFragmentManager());
+        mViewPager.setAdapter(mViewPagerAdapter);
+        TabLayout tabLayout =  findViewById(R.id.tabs);
+        tabLayout.setupWithViewPager(mViewPager);
+
+        mViewPagerAdapter.startUpdate(mViewPager);
+
+        listFragmentNegative = (PaymentListFragment) mViewPagerAdapter.instantiateItem(mViewPager,0);
+        listFragmentPositive = (PaymentListFragment) mViewPagerAdapter.instantiateItem(mViewPager,1);
+
+        listFragmentPositive.setType("positive");
+        listFragmentNegative.setType("negative");
         listFragmentPositive.setHouse("Sexy");
         listFragmentNegative.setHouse("Sexy");
-        ViewPager mViewPager = findViewById(R.id.viewpager);
-        PaymentViewPagerAdapter mViewPagerAdapter = new PaymentViewPagerAdapter(getSupportFragmentManager());
-        mViewPagerAdapter.addFragment(listFragmentNegative, "Negative");
-        mViewPagerAdapter.addFragment(listFragmentPositive, "Positive");
-        mViewPager.setAdapter(mViewPagerAdapter);
+
+        mViewPagerAdapter.finishUpdate(mViewPager);
+
+
+
+
         /*getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_payment_list_container, listFragment)
                 .commit();
         getSupportFragmentManager().executePendingTransactions();*/
 
-        TabLayout tabLayout =  findViewById(R.id.tabs);
-        tabLayout.setupWithViewPager(mViewPager);
+
     }
 
 
@@ -249,6 +263,18 @@ public class BalanceActivity extends AppCompatActivity  implements PaymentListFr
         ((PaymentListFragment)listFragmentNegative).changeHouse(currentHouse);
         dialog.dismiss();
 
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        savedInstanceState.putInt("house", selectedHouse);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        this.selectedHouse = savedInstanceState.getInt("house");
     }
 
 

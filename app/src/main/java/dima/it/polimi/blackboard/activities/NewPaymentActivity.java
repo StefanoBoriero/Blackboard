@@ -183,6 +183,7 @@ public class NewPaymentActivity extends AppCompatActivity {
         mFab.setVisibility(View.INVISIBLE);
         container_layout.setBackground(getResources().getDrawable(R.drawable.background_addition));
         editText.clearFocus();
+        selectedHouse = savedInstanceState.getString("house");
     }
 
     @Override
@@ -239,4 +240,12 @@ public class NewPaymentActivity extends AppCompatActivity {
         submitButton.setClickable(false);
         onBackPressed();
     }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        savedInstanceState.putString("house", selectedHouse);
+    }
+
+
 }
