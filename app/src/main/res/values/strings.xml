@@ -201,4 +201,6 @@
                                 Add something to do! </string>
     <string name="empty_list_content">Empty list message</string>
 
+    <string name="default_notification_channel_id" translatable="false">fcm_default_channel</string>
+
 </resources>

@@ -5,6 +5,8 @@ import android.util.Log;
 import android.widget.Filter;
 import android.widget.Filterable;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
@@ -96,9 +98,19 @@ public abstract class FirestoreAdapter<VH extends RecyclerView.ViewHolder>
     }
 
     private void onDocumentRemoved(DocumentChange change){
-        int oldIndex = change.getOldIndex();
-        mSnapshots.remove(lastRemoved);
-        //notifyItemRemoved(oldIndex);
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if(user!= null){
+            String uid = user.getUid();
+            String takenBy = (String)change.getDocument().get("takenBy");
+            if(uid.equals(takenBy)){
+                mSnapshots.remove(lastRemoved);
+            }
+            else{
+                int oldIndex = change.getOldIndex();
+                mSnapshots.remove(oldIndex);
+                notifyItemRemoved(oldIndex);
+            }
+        }
     }
 
     public void startListening(){
