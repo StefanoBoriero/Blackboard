@@ -363,6 +363,7 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
      */
     @Override
     public void onClick(DialogInterface dialog, int which) {
+        this.secondFragment = null;
         this.whichHouse = which;
         String currentHouse = (String)this.houses[whichHouse];
         ((TodoItemListFragment)firstFragment).changeHouse(currentHouse);
