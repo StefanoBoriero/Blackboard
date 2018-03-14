@@ -22,6 +22,7 @@ import android.widget.TextView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 
@@ -317,6 +318,11 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
        }
     }
 
+    @Override
+    public void onCompleteDouble(DocumentSnapshot snapshot){
+        mListener.onDownloadComplete(snapshot.toObject(TodoItem.class));
+    }
+
     public void stopListening(){
         adapter.stopListening();
     }
@@ -334,5 +340,6 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
     public interface OnListFragmentInteractionListener {
         void onItemClick(TodoItem item, View view, int clickedPosition);
         void onItemSwipe(int swipedPosition, int direction);
+        void onDownloadComplete(TodoItem item);
     }
 }

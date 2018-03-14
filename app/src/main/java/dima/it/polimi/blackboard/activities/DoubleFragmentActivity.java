@@ -87,9 +87,11 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
 
         getHouses();
         showFirstFragment();
+        /*
         if(isDouble()){
             showSecondFragment();
         }
+        */
 
     }
 
@@ -148,7 +150,16 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
         getFragmentManager().executePendingTransactions();
     }
 
-    private void showSecondFragment(){
+    @Override
+    public void onDownloadComplete(TodoItem item){
+        if(isDouble()){
+            if(secondFragment != null) {
+                showSecondFragment(item);
+            }
+        }
+    }
+
+    private void showSecondFragment(TodoItem item){
         secondFragment = TodoItemDetailFragment.newInstance(itemList.get(0), 0);
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_detail_container, secondFragment)

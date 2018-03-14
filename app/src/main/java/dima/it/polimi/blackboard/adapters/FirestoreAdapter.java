@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import dima.it.polimi.blackboard.model.TodoItem;
+
 /**
  * Abstract adapter that gets data from Firestore
  * Created by Stefano on 10/03/2018.
@@ -76,6 +78,9 @@ public abstract class FirestoreAdapter<VH extends RecyclerView.ViewHolder>
         }
         if(mListener != null) {
             mListener.onComplete(mSnapshots.isEmpty());
+            if(!mSnapshots.isEmpty()){
+                mListener.onCompleteDouble(mSnapshots.get(0));
+            }
         }
         getFilter().filter(filter);
 
@@ -201,5 +206,6 @@ public abstract class FirestoreAdapter<VH extends RecyclerView.ViewHolder>
 
     public interface OnCompleteListener{
         void onComplete(boolean emptyResult);
+        void onCompleteDouble(DocumentSnapshot item);
     }
 }

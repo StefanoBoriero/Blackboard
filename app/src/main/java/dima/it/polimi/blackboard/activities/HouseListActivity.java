@@ -38,7 +38,7 @@ public class HouseListActivity extends DoubleFragmentActivity{
     protected void onCreate(Bundle savedInstanceState) {
         setContentView(R.layout.activity_house_list);
 
-        super.setItemList(DataGeneratorUtil.generateTodoItems(30));
+        //super.setItemList(DataGeneratorUtil.generateTodoItems(30));
         super.onCreate(savedInstanceState);
 
         mFab = findViewById(R.id.add_fab);
