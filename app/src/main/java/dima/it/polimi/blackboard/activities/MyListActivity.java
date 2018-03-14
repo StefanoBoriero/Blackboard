@@ -4,12 +4,14 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Menu;
 import android.view.View;
 
 import com.google.firebase.firestore.DocumentReference;
 
 import dima.it.polimi.blackboard.R;
+import dima.it.polimi.blackboard.fragments.TodoItemDetailFragment;
 import dima.it.polimi.blackboard.fragments.TodoItemListFragment;
 import dima.it.polimi.blackboard.model.TodoItem;
 import dima.it.polimi.blackboard.utils.DataGeneratorUtil;
@@ -47,7 +49,7 @@ public class MyListActivity extends DoubleFragmentActivity implements DialogInte
     }
 
     @Override
-    protected void showUndoMessage(TodoItem removedItem, int position) {
+    protected void showUndoMessage(TodoItem removedItem, int position, String action) {
         View view = findViewById(android.R.id.content);
         Snackbar.make(view, "You completed the activity!",
                 Snackbar.LENGTH_LONG)
@@ -58,7 +60,7 @@ public class MyListActivity extends DoubleFragmentActivity implements DialogInte
                     @Override
                     public void onDismissed(Snackbar transientBottomBar, int event) {
                         if(event == DISMISS_EVENT_TIMEOUT) {
-                            handleItemAccepted(removedItem, position);
+                            handleItemAccepted(removedItem, position, action);
                         }
                     }
                 })
@@ -66,8 +68,18 @@ public class MyListActivity extends DoubleFragmentActivity implements DialogInte
     }
 
     @Override
-    protected void callNetwork(TodoItem removedItem) {
-        String itemId = removedItem.getId();
+    protected void callNetwork(TodoItem itemChanged, String action) {
+        switch(action){
+            case TodoItemDetailFragment.ACTION_TAKEN: completeItem(itemChanged);
+                break;
+            case TodoItemDetailFragment.ACTION_DELETED: refuseItem(itemChanged);
+                break;
+        }
+
+    }
+
+    private void completeItem(TodoItem completedItem){
+        String itemId = completedItem.getId();
         String house = houses[whichHouse].toString();
 
         DocumentReference completedDoc = db.collection("houses").document(house).collection("items")
@@ -78,9 +90,26 @@ public class MyListActivity extends DoubleFragmentActivity implements DialogInte
         );
     }
 
+    private void refuseItem(TodoItem refusedItem){
+        String itemId = refusedItem.getId();
+        String house = houses[whichHouse].toString();
+
+        DocumentReference refusedDoc = db.collection("houses").document(house).collection("items")
+                .document(itemId);
+        refusedDoc.update(
+                "taken", false,
+                "takenBy", null
+        );
+    }
+
     @Override
-    public void onItemSwipe(int swipedPosition) {
-        super.removeItem(swipedPosition);
+    public void onItemSwipe(int swipedPosition, int direction) {
+        if(direction == ItemTouchHelper.LEFT) {
+            super.removeItem(swipedPosition, TodoItemDetailFragment.ACTION_TAKEN);
+        }
+        else if(direction == ItemTouchHelper.RIGHT){
+            super.removeItem(swipedPosition, TodoItemDetailFragment.ACTION_DELETED);
+        }
     }
 
 }

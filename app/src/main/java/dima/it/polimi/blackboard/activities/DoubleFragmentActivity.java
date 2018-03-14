@@ -273,20 +273,21 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
             if (resultCode == RESULT_OK) {
                 isActivityResult = true;
                 final int position = data.getIntExtra(getResources().getString(R.string.position),0);
+                final String action = data.getStringExtra(DetailTodoItemActivity.RES_ACTION);
                 itemRowClicked.animate()
                         .scaleX(1f)
                         .scaleY(1f)
                         .translationZ(0f)
                         .setDuration(ANIM_DURATION)
-                        .withEndAction( () -> removeItem(position))
+                        .withEndAction( () -> removeItem(position, action))
                         .start();
             }
         }
     }
 
     @Override
-    public void onAcceptClick(TodoItem todoItem, int position) {
-        removeItem(position);
+    public void onAcceptClick(TodoItem todoItem, int position, String action) {
+        removeItem(position, action);
     }
 
     /**
@@ -294,16 +295,16 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
      * the action
      * @param position position of the item removed
      */
-    protected abstract void showUndoMessage(TodoItem removedItem, int position);
+    protected abstract void showUndoMessage(TodoItem removedItem, int position, String action);
 
     /**
      * Removes an item at a given position and sets the environment for showing next one
      * @param position the position to remove
      */
-    void removeItem(int position){
+    void removeItem(int position, String action){
         View nextItemView = ((TodoItemListFragment)firstFragment).getViewHolder(position + 1);
         TodoItem removedItem = ((TodoItemListFragment)firstFragment).removeItem(position);
-        showUndoMessage(removedItem, position);
+        showUndoMessage(removedItem, position, action);
         if(isDouble && checkSelected(position)){
             TodoItem nextItem = ((TodoItemListFragment)firstFragment).getItem(position);
             setFocusedItem(nextItemView);
@@ -337,11 +338,11 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
      * Handles the item's final acceptance after the Snackbar message
      * @param removedItem the item that has been removed
      */
-    void handleItemAccepted(TodoItem removedItem, int position){
-        callNetwork(removedItem);
+    void handleItemAccepted(TodoItem removedItem, int position, String action){
+        callNetwork(removedItem, action);
     }
 
-    protected abstract void callNetwork(TodoItem removedItem);
+    protected abstract void callNetwork(TodoItem changedItem, String action);
 
 
     /**

@@ -6,6 +6,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Menu;
 
 import android.view.View;
@@ -16,6 +17,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 
 import dima.it.polimi.blackboard.R;
+import dima.it.polimi.blackboard.fragments.TodoItemDetailFragment;
 import dima.it.polimi.blackboard.fragments.TodoItemListFragment;
 import dima.it.polimi.blackboard.model.TodoItem;
 import dima.it.polimi.blackboard.utils.DataGeneratorUtil;
@@ -27,7 +29,6 @@ import dima.it.polimi.blackboard.utils.DataGeneratorUtil;
  * fragment will be displayed permanently on the side of the screen
  */
 public class HouseListActivity extends DoubleFragmentActivity{
-
     private final static String TAG = "HOUSE_LIST";
     private final static String ARG_HOUSE = "house";
 
@@ -60,7 +61,7 @@ public class HouseListActivity extends DoubleFragmentActivity{
     }
 
     @Override
-    protected void showUndoMessage(TodoItem removedItem, int position) {
+    protected void showUndoMessage(TodoItem removedItem, int position, String action) {
         Snackbar.make(mFab, "You took charge of the activity",
                 Snackbar.LENGTH_LONG)
                 .setAction("UNDO", (v) ->
@@ -70,7 +71,7 @@ public class HouseListActivity extends DoubleFragmentActivity{
                     @Override
                     public void onDismissed(Snackbar transientBottomBar, int event) {
                         if(event == DISMISS_EVENT_TIMEOUT) {
-                            handleItemAccepted(removedItem, position);
+                            handleItemAccepted(removedItem, position, action);
                         }
                     }
                 })
@@ -78,8 +79,19 @@ public class HouseListActivity extends DoubleFragmentActivity{
     }
 
     @Override
-    protected void callNetwork(TodoItem removedItem) {
-        String id = removedItem.getId();
+    protected void callNetwork(TodoItem itemChanged, String action) {
+        switch(action){
+            case TodoItemDetailFragment.ACTION_TAKEN: acceptItem(itemChanged);
+                break;
+            case TodoItemDetailFragment.ACTION_DELETED: deleteItem(itemChanged);
+                break;
+        }
+
+
+    }
+
+    private void acceptItem(TodoItem itemAccepted){
+        String id = itemAccepted.getId();
         String house = (String)houses[whichHouse];
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if(user != null){
@@ -91,13 +103,26 @@ public class HouseListActivity extends DoubleFragmentActivity{
                     "takenBy", userId
             );
         }
+    }
+
+    private void deleteItem(TodoItem itemDeleted){
+        String id = itemDeleted.getId();
+        String house = (String)houses[whichHouse];
+        DocumentReference item = db.collection("houses").document(house).collection("items")
+                .document(id);
+        item.delete();
 
     }
 
 
     @Override
-    public void onItemSwipe( int swipedPosition) {
-        super.removeItem(swipedPosition);
+    public void onItemSwipe( int swipedPosition, int direction) {
+        if(direction == ItemTouchHelper.LEFT) {
+            super.removeItem(swipedPosition, TodoItemDetailFragment.ACTION_TAKEN);
+        }
+        else{
+            super.removeItem(swipedPosition, TodoItemDetailFragment.ACTION_DELETED);
+        }
     }
 
     /*

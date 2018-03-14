@@ -20,6 +20,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import dima.it.polimi.blackboard.R;
 import dima.it.polimi.blackboard.adapters.DetailAdapter;
 import dima.it.polimi.blackboard.model.TodoItem;
+import dima.it.polimi.blackboard.utils.UserDecoder;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -36,6 +37,8 @@ public class TodoItemDetailFragment extends Fragment {
     private static final String ARG_TR_NAME = "transitionName";
     private static final String ARG_TR_ICON = "transitionNameIcon";
     private static final String ARG_POS = "position";
+    public static final String ACTION_TAKEN = "taken";
+    public static final String ACTION_DELETED = "deleted";
 
     private TodoItem todoTask;
     private String transitionName;
@@ -113,8 +116,10 @@ public class TodoItemDetailFragment extends Fragment {
         nameView.setText(todoTask.getName());
         nameView.setTransitionName(transitionName);
 
-        TextView addedByView = view.findViewById(R.id.added_by);
-        //setCreator(addedByView);
+        TextView addedBy = view.findViewById(R.id.added_by);
+        String username = UserDecoder.getInstance().getNameFromId(todoTask.getCreatedBy());
+        String s = "Added by " + username;
+        addedBy.setText(s);
 
 
         // Binds dynamically the shared element through transition name
@@ -128,8 +133,12 @@ public class TodoItemDetailFragment extends Fragment {
         //Binds the button click action to parent activity
         View acceptBtn = view.findViewById(R.id.accept_button);
         acceptBtn.setOnClickListener((v)->
-                mListener.onAcceptClick(todoTask, position)
+                mListener.onAcceptClick(todoTask, position, ACTION_TAKEN)
         );
+
+        View deleteBtn = view.findViewById(R.id.delete);
+        deleteBtn.setOnClickListener((v) ->
+                mListener.onAcceptClick(todoTask, position, ACTION_DELETED));
     }
 
     private void setCreator(TextView addedByView){
@@ -232,14 +241,23 @@ public class TodoItemDetailFragment extends Fragment {
             TextView nameView = rootView.findViewById(R.id.item_name);
             nameView.setText(todoItem.getName());
 
+            TextView addedBy = rootView.findViewById(R.id.added_by);
+            String username = UserDecoder.getInstance().getNameFromId(todoItem.getCreatedBy());
+            String s = "Added by " + username;
+            addedBy.setText(s);
+
             RecyclerView rv = rootView.findViewById(R.id.recycler_view_detail);
             updateRecyclerView(rv);
 
             //Binds the button click action to parent activity
             View acceptBtn = rootView.findViewById(R.id.accept_button);
             acceptBtn.setOnClickListener((v) ->
-                    mListener.onAcceptClick(todoTask, position)
+                    mListener.onAcceptClick(todoTask, position, ACTION_TAKEN)
             );
+
+            View deleteBtn = rootView.findViewById(R.id.delete);
+            deleteBtn.setOnClickListener((v) ->
+                    mListener.onAcceptClick(todoTask, position, ACTION_DELETED));
         }
     }
 
@@ -263,6 +281,6 @@ public class TodoItemDetailFragment extends Fragment {
          * The user accepted the item
          * @param todoItem the item accepted
          */
-        void onAcceptClick(TodoItem todoItem, int position);
+        void onAcceptClick(TodoItem todoItem, int position, String action);
     }
 }

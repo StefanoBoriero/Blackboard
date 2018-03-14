@@ -134,7 +134,8 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
             myList = true;
         }
         ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new TodoItemTouchHelper(0,
-                ItemTouchHelper.LEFT, this, swipeMessage);
+                ItemTouchHelper.LEFT , this, swipeMessage);
+
         swipeHelper = new ItemTouchHelper(itemTouchHelperCallback);
         swipeHelper.attachToRecyclerView(recyclerView);
 
@@ -229,7 +230,7 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
      */
     @Override
     public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction, int position) {
-        mListener.onItemSwipe(position);
+        mListener.onItemSwipe(position, direction);
     }
 
     /**
@@ -332,6 +333,6 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
      */
     public interface OnListFragmentInteractionListener {
         void onItemClick(TodoItem item, View view, int clickedPosition);
-        void onItemSwipe(int swipedPosition);
+        void onItemSwipe(int swipedPosition, int direction);
     }
 }
