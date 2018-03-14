@@ -160,7 +160,7 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
     }
 
     private void showSecondFragment(TodoItem item){
-        secondFragment = TodoItemDetailFragment.newInstance(itemList.get(0), 0);
+        secondFragment = TodoItemDetailFragment.newInstance(item, 0);
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_detail_container, secondFragment)
                 .commit();
