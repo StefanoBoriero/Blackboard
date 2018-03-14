@@ -237,8 +237,7 @@ public class BalanceActivity extends AppCompatActivity  implements PaymentListFr
 
 
     private void getHouses(){
-        //TODO change this user
-        DocumentReference user = db.collection("users").document("Serento");
+        DocumentReference user = db.collection("users").document(FirebaseAuth.getInstance().getCurrentUser().getUid());
         user.get().addOnCompleteListener((task) -> {
             List<CharSequence> myHouses = new ArrayList<>();
             if (task.isSuccessful()) {
