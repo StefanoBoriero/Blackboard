@@ -153,7 +153,7 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
     @Override
     public void onDownloadComplete(TodoItem item){
         if(isDouble()){
-            if(secondFragment != null) {
+            if(secondFragment == null) {
                 showSecondFragment(item);
             }
         }
