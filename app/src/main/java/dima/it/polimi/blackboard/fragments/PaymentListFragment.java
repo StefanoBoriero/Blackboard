@@ -83,6 +83,8 @@ public class PaymentListFragment extends Fragment implements PaymentListAdapter.
             //type = getArguments().getString(ARG_TYPE);
             if(savedInstanceState != null && savedInstanceState.getString("house") != null)
                 this.house = savedInstanceState.getString("house");
+        if(savedInstanceState != null && savedInstanceState.getString("type") != null)
+            this.type = savedInstanceState.getString("type");
             adapter = new PaymentListAdapter(this.getContext(),this);
             db = FirebaseFirestore.getInstance();
             user = FirebaseAuth.getInstance().getCurrentUser();
@@ -219,6 +221,7 @@ public class PaymentListFragment extends Fragment implements PaymentListAdapter.
     public void onSaveInstanceState(Bundle savedInstanceState)
     {
         savedInstanceState.putString("house",house);
+        savedInstanceState.putString("type",type);
     }
 
 
