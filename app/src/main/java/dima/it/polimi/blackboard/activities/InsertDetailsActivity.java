@@ -29,10 +29,13 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -55,6 +58,7 @@ public class InsertDetailsActivity extends AppCompatActivity implements DialogIn
     ConstraintLayout myConstraintLayout;
     private static final int REQUEST_IMAGE_CAPTURE = 1;
     private static final int GALLERY_INTENT = 2;
+
 
 
     @Override
@@ -168,7 +172,6 @@ public class InsertDetailsActivity extends AppCompatActivity implements DialogIn
 
         if(requestCode == GALLERY_INTENT && resultCode == RESULT_OK)
         {
-
             Uri uri = data.getData();
             FirebaseStorage store = FirebaseStorage.getInstance();
             StorageReference storageReference = store.getReference();
@@ -176,7 +179,12 @@ public class InsertDetailsActivity extends AppCompatActivity implements DialogIn
             userReference.putFile(uri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-
+                    FirebaseStorage storage = FirebaseStorage.getInstance();
+                    StorageReference reference = storage.getReference().child(FirebaseAuth.getInstance().getCurrentUser().getUid().toString() + "/profile.jpg");
+                    Glide.with(getBaseContext()).
+                            load(reference)
+                            .apply(RequestOptions.circleCropTransform())
+                            .into((ImageView)findViewById(R.id.user_icon));
                 }
             });
         }
@@ -186,8 +194,6 @@ public class InsertDetailsActivity extends AppCompatActivity implements DialogIn
            Bundle bundle = data.getExtras();
            final Bitmap btm = (Bitmap)bundle.get("data");
            encodeBitmapAndSaveToFirebase(btm);
-
-
         }
     }
 
@@ -248,10 +254,20 @@ public class InsertDetailsActivity extends AppCompatActivity implements DialogIn
                         }
                         if(which == 1)
                         {
-                            Intent intent = new Intent(Intent.ACTION_PICK);
+                            permission = android.Manifest.permission.READ_EXTERNAL_STORAGE;
+                            if(!hasPermissions(permission)){
+                                ActivityCompat.requestPermissions(getActivity(),new String[]{permission},GALLERY_INTENT);
+                                Intent intent = new Intent(Intent.ACTION_PICK);
+                                intent.setType("image/*");
+                                getActivity().startActivityForResult(intent,GALLERY_INTENT);
+                            }
+                            else
+                            {
+                                Intent intent = new Intent(Intent.ACTION_PICK);
+                                intent.setType("image/*");
+                                getActivity().startActivityForResult(intent,GALLERY_INTENT);
+                            }
 
-                            intent.setType("image/*");
-                            startActivityForResult(intent,GALLERY_INTENT);
                         }
                 }
             });

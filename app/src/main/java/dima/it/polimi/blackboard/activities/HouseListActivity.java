@@ -47,8 +47,6 @@ public class HouseListActivity extends DoubleFragmentActivity{
         Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle(R.string.title_activity_house_list);
         setSupportActionBar(toolbar);
-
-        ((TodoItemListFragment)firstFragment).setMyList(false);
     }
 
     @Override

@@ -174,6 +174,7 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
     public void onAttach(Context context) {
         super.onAttach(context);
         if (context instanceof OnListFragmentInteractionListener) {
+
             mListener = (OnListFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
@@ -219,6 +220,16 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
                 return false;
             }
         });
+    }
+
+    public View getRowView(int position){
+        View view = getView();
+        if(view != null)
+        {
+            recyclerView = view.findViewById(R.id.recycler_view);
+            return recyclerView.getChildAt(position);
+        }
+        return null;
     }
 
     /**

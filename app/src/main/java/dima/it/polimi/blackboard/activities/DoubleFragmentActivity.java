@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.app.FragmentManager;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -54,6 +55,9 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
 
     private static final String TAG = "double_frag_activity";
     private static final String CURRENT_HOUSE_INDEX = "current-house-index";
+    private static final String CURRENT_ITEM_INDEX = "current-item-index";
+    private static final String CURRENT_ITEM = "current-item";
+    private static final String CURRENT_VIEW = "current-view";
     private static final int ACCEPT_TASK_REQUEST = 1;
     private static final int ANIM_DURATION = 250;
 
@@ -61,6 +65,8 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
     private Fragment secondFragment;
 
     private View itemRowClicked;
+    private int clickedPosition;
+    private TodoItem clickedItem;
 
     private List<TodoItem> itemList;
     private boolean isDouble;
@@ -77,16 +83,28 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         isDouble = isDouble();
-
+        getHouses();
         if(savedInstanceState != null){
             whichHouse = savedInstanceState.getInt(CURRENT_HOUSE_INDEX);
+            clickedPosition = savedInstanceState.getInt(CURRENT_ITEM_INDEX);
+            firstFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_list_container);
+            ((TodoItemListFragment)firstFragment).changeHouse((String)houses[whichHouse]);
+
+            if(isDouble){
+                clickedItem = savedInstanceState.getParcelable(CURRENT_ITEM);
+                itemRowClicked = ((TodoItemListFragment)firstFragment).getRowView(clickedPosition);
+                secondFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_detail_container);
+                doubleFragmentClickHandler(itemRowClicked, clickedItem, clickedPosition);
+                //((TodoItemDetailFragment)secondFragment).updateFragment(clickedItem, clickedPosition);
+            }
         }
         else{
+            showFirstFragment();
             whichHouse = 0;
         }
 
-        getHouses();
-        showFirstFragment();
+
+
         /*
         if(isDouble()){
             showSecondFragment();
@@ -98,6 +116,8 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
         savedInstanceState.putInt(CURRENT_HOUSE_INDEX, whichHouse);
+        savedInstanceState.putInt(CURRENT_ITEM_INDEX, clickedPosition);
+        savedInstanceState.putParcelable(CURRENT_ITEM, clickedItem);
         // Always call the superclass so it can save the view hierarchy state
         super.onSaveInstanceState(savedInstanceState);
     }
@@ -168,12 +188,14 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
 
     @Override
     public void onItemClick(TodoItem item, View view, int clickedPosition) {
+        this.clickedPosition = clickedPosition;
+        this.clickedItem = item;
         if(isDouble){
             doubleFragmentClickHandler(view, item, clickedPosition);
         } else {
             // Disable swipe while the animation is going
-            ((TodoItemListFragment)firstFragment).disableSwipe();
             itemRowClicked = view;
+            ((TodoItemListFragment)firstFragment).disableSwipe();
             isActivityResult = false;
             // Animate the view clicked
             view.animate()
@@ -202,6 +224,7 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
 
     @Override
     protected void onResume() {
+        firstFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_list_container);
         ((TodoItemListFragment)firstFragment).enableSwipe();
         if(!isActivityResult)
             if(itemRowClicked != null) {
