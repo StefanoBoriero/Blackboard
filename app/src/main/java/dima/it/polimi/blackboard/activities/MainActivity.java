@@ -1,8 +1,10 @@
 package dima.it.polimi.blackboard.activities;
 
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -15,8 +17,15 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.Target;
+import com.bumptech.glide.signature.ObjectKey;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
@@ -24,6 +33,8 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +45,7 @@ import dima.it.polimi.blackboard.adapters.FirestoreAdapter;
 import dima.it.polimi.blackboard.model.DayResume;
 import dima.it.polimi.blackboard.model.User;
 import dima.it.polimi.blackboard.utils.DataGeneratorUtil;
+import dima.it.polimi.blackboard.utils.GlideApp;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -42,6 +54,7 @@ public class MainActivity extends AppCompatActivity
     private RecyclerView recyclerView;
     private NavigationView navigationView;
     private View navHeaderView;
+    private ImageView ivProfile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,8 +77,10 @@ public class MainActivity extends AppCompatActivity
         recyclerView = findViewById(R.id.dashboard);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
+        ivProfile = navHeaderView.findViewById(R.id.user_icon);
 
         initializeUser();
+        loadProfilePicture();
     }
 
     @Override
@@ -172,5 +187,30 @@ public class MainActivity extends AppCompatActivity
             recyclerView.setAdapter(adapter);
             adapter.startListening();
         }
+    }
+
+    private void loadProfilePicture()
+    {
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        StorageReference reference = storage.getReference().child(FirebaseAuth.getInstance().getCurrentUser().getUid().toString() + "/profile.jpg");
+        GlideApp.with(getBaseContext())
+                .load(reference)
+                .signature(new ObjectKey(String.valueOf(System.currentTimeMillis())))
+                .listener(new RequestListener<Drawable>() {
+                    @Override
+                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                        ivProfile.setVisibility(View.VISIBLE);
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                        ivProfile.setVisibility(View.VISIBLE);
+                        return false;
+                    }
+                })
+                .error(R.drawable.empty_profile_blue_circle)
+                .apply(RequestOptions.circleCropTransform())
+                .into(ivProfile);
     }
 }
