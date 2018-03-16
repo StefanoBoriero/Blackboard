@@ -8,34 +8,33 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Environment;
 import android.os.StrictMode;
 import android.provider.MediaStore;
-import android.provider.SyncStateContract;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Base64;
-import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.Target;
+import com.bumptech.glide.signature.ObjectKey;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -45,13 +44,11 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-import dima.it.polimi.blackboard.Manifest;
 import dima.it.polimi.blackboard.R;
-import dima.it.polimi.blackboard.model.PersonalInfo;
+import dima.it.polimi.blackboard.utils.GlideApp;
 
 public class InsertDetailsActivity extends AppCompatActivity implements DialogInterface.OnClickListener {
     FirebaseFirestore db;
@@ -72,7 +69,10 @@ public class InsertDetailsActivity extends AppCompatActivity implements DialogIn
         StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
         StrictMode.setVmPolicy(builder.build());
 
+
         setUpPhotoButton();
+        loadProfilePicture();
+
     }
 
     @Override
@@ -148,7 +148,7 @@ public class InsertDetailsActivity extends AppCompatActivity implements DialogIn
 
     private void setUpPhotoButton()
     {
-        findViewById(R.id.user_icon).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.imageViewProfile).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 InsertDetailsActivity.ProfilePictureDialog.mListener = this;
@@ -176,15 +176,16 @@ public class InsertDetailsActivity extends AppCompatActivity implements DialogIn
             FirebaseStorage store = FirebaseStorage.getInstance();
             StorageReference storageReference = store.getReference();
             StorageReference userReference = storageReference.child(FirebaseAuth.getInstance().getCurrentUser().getUid().toString() + "/profile.jpg");
+            final ProgressBar progressBar = (ProgressBar) findViewById(R.id.progress);
+            ImageView ivProfile = findViewById(R.id.imageViewProfile);
+            ivProfile.setVisibility(View.GONE);
+            progressBar.setVisibility(View.VISIBLE);
             userReference.putFile(uri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                    FirebaseStorage storage = FirebaseStorage.getInstance();
-                    StorageReference reference = storage.getReference().child(FirebaseAuth.getInstance().getCurrentUser().getUid().toString() + "/profile.jpg");
-                    Glide.with(getBaseContext()).
-                            load(reference)
-                            .apply(RequestOptions.circleCropTransform())
-                            .into((ImageView)findViewById(R.id.user_icon));
+                    loadProfilePicture();
+                    ivProfile.setVisibility(View.VISIBLE);
+                    progressBar.setVisibility(View.GONE);
                 }
             });
         }
@@ -204,20 +205,58 @@ public class InsertDetailsActivity extends AppCompatActivity implements DialogIn
         FirebaseStorage store = FirebaseStorage.getInstance();
         StorageReference storageReference = store.getReference();
         StorageReference userReference = storageReference.child(FirebaseAuth.getInstance().getCurrentUser().getUid().toString() + "/profile.jpg");
+        final ProgressBar progressBar = (ProgressBar) findViewById(R.id.progress);
+        ImageView ivProfile = findViewById(R.id.imageViewProfile);
+        ivProfile.setVisibility(View.GONE);
+        progressBar.setVisibility(View.VISIBLE);
+
 
         UploadTask uploadTask = userReference.putBytes(data);
         uploadTask.addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception exception) {
-                // Handle unsuccessful uploads
+                ivProfile.setVisibility(View.VISIBLE);
+                progressBar.setVisibility(View.GONE);
             }
         }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                 // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
                 Uri downloadUrl = taskSnapshot.getDownloadUrl();
+                ivProfile.setVisibility(View.VISIBLE);
+                progressBar.setVisibility(View.GONE);
+                loadProfilePicture();
             }
         });
+    }
+
+    private void loadProfilePicture()
+    {
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        StorageReference reference = storage.getReference().child(FirebaseAuth.getInstance().getCurrentUser().getUid().toString() + "/profile.jpg");
+        ImageView ivProfile = findViewById(R.id.imageViewProfile);
+        final ProgressBar progressBar = (ProgressBar) findViewById(R.id.progress);
+        GlideApp.with(getBaseContext())
+                .load(reference)
+                .signature(new ObjectKey(String.valueOf(System.currentTimeMillis())))
+                .listener(new RequestListener<Drawable>() {
+                    @Override
+                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                        progressBar.setVisibility(View.GONE);
+                        ivProfile.setVisibility(View.VISIBLE);
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                        progressBar.setVisibility(View.GONE);
+                        ivProfile.setVisibility(View.VISIBLE);
+                        return false;
+                    }
+                })
+                .error(R.drawable.empty_profile_blue_circle)
+                .apply(RequestOptions.circleCropTransform())
+                .into(ivProfile);
     }
 
     public static class ProfilePictureDialog extends DialogFragment {
@@ -288,4 +327,5 @@ public class InsertDetailsActivity extends AppCompatActivity implements DialogIn
             return true;
         }
     }
+
 }
