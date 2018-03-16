@@ -4,6 +4,7 @@ package dima.it.polimi.blackboard.fragments;
 import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -139,6 +140,7 @@ public class ProfileInfoFragment extends Fragment implements HouseListAdapter.Ho
         if(requestCode == 2 && resultCode == 3) {
 
             loadProfilePicture();
+            getActivity().setResult(3);
         }
     }
 
@@ -183,10 +185,10 @@ public class ProfileInfoFragment extends Fragment implements HouseListAdapter.Ho
     private void loadProfilePicture()
     {
         FirebaseStorage storage = FirebaseStorage.getInstance();
-        StorageReference reference = storage.getReference().child(FirebaseAuth.getInstance().getCurrentUser().getUid().toString() + "/profile.jpg");
+        String lastEdit = readSharedPreferenceForCache();
+        StorageReference reference = storage.getReference().child(FirebaseAuth.getInstance().getCurrentUser().getUid().toString() + "/profile.jpg" + lastEdit);
         GlideApp.with(getActivity())
                 .load(reference)
-                .signature(new ObjectKey(String.valueOf(System.currentTimeMillis())))
                 .listener(new RequestListener<Drawable>() {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
@@ -203,5 +205,11 @@ public class ProfileInfoFragment extends Fragment implements HouseListAdapter.Ho
                 .error(R.drawable.empty_profile_blue_circle)
                 .apply(RequestOptions.circleCropTransform())
                 .into(ivProfile);
+    }
+
+    private String readSharedPreferenceForCache()
+    {
+        SharedPreferences sharedPref = getActivity().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE);
+        return  sharedPref.getString("imageCaching","0");
     }
 }
