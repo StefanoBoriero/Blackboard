@@ -19,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
@@ -28,10 +29,15 @@ import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.signature.ObjectKey;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import dima.it.polimi.blackboard.R;
 
@@ -186,7 +192,7 @@ public class ProfileInfoFragment extends Fragment implements HouseListAdapter.Ho
     {
         FirebaseStorage storage = FirebaseStorage.getInstance();
         String lastEdit = readSharedPreferenceForCache();
-        StorageReference reference = storage.getReference().child(FirebaseAuth.getInstance().getCurrentUser().getUid().toString() + "/profile.jpg" + lastEdit);
+        StorageReference reference = storage.getReference().child(FirebaseAuth.getInstance().getCurrentUser().getUid().toString() + "/profile" + lastEdit);
         GlideApp.with(getActivity())
                 .load(reference)
                 .listener(new RequestListener<Drawable>() {
@@ -207,9 +213,33 @@ public class ProfileInfoFragment extends Fragment implements HouseListAdapter.Ho
                 .into(ivProfile);
     }
 
+    //retrieve the last update to the photo profile, so we can get the URL
     private String readSharedPreferenceForCache()
     {
         SharedPreferences sharedPref = getActivity().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE);
+
+        String imageCaching =  sharedPref.getString("imageCaching","0");
+        //this means cache has been cleaned, we need to retrieve the value
+        if(imageCaching == "0")
+        {
+            DocumentReference userReference = FirebaseFirestore.getInstance().collection("users").document(FirebaseAuth.getInstance().getCurrentUser().getUid());
+            userReference.get().addOnCompleteListener((task) -> {
+                List<CharSequence> myHouses = new ArrayList<>();
+                if (task.isSuccessful()) {
+                    {
+                        DocumentSnapshot document = task.getResult();
+                        Map<String, Object> userParam = document.getData();
+                        String lastEdit = (String)userParam.get("lastEdit");
+                        SharedPreferences.Editor editor = sharedPref.edit();
+                        editor.putString("imageCaching", lastEdit);
+                        editor.commit();
+                    }
+
+                } else {
+                    Toast.makeText(getActivity(),"Failed in retrieving profile image",Toast.LENGTH_SHORT);
+                }
+            });
+        }
         return  sharedPref.getString("imageCaching","0");
     }
 }

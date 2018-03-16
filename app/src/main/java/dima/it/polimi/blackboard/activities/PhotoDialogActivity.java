@@ -31,12 +31,18 @@ import com.bumptech.glide.signature.ObjectKey;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
 import java.security.Permission;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import dima.it.polimi.blackboard.R;
 import dima.it.polimi.blackboard.utils.GlideApp;
@@ -61,7 +67,7 @@ public class PhotoDialogActivity extends Activity {
     {
         FirebaseStorage storage = FirebaseStorage.getInstance();
         String lastEdit = readSharedPreferenceForCache();
-        StorageReference reference = storage.getReference().child(FirebaseAuth.getInstance().getCurrentUser().getUid().toString() + "/profile.jpg" + lastEdit);
+        StorageReference reference = storage.getReference().child(FirebaseAuth.getInstance().getCurrentUser().getUid().toString() + "/profile" + lastEdit);
         ImageView ivProfile = findViewById(R.id.expanded_image);
         final View progressBar =  findViewById(R.id.my_constraint_layout);
         GlideApp.with(getBaseContext())
@@ -127,7 +133,7 @@ public class PhotoDialogActivity extends Activity {
             }
         });
 
-        
+
 
     }
 
@@ -144,6 +150,7 @@ public class PhotoDialogActivity extends Activity {
         return true;
     }
 
+    //called when the user has finished updating picture
     public void onActivityResult(int requestCode, int resultCode, Intent data)
     {
         super.onActivityResult(requestCode,resultCode,data);
@@ -156,7 +163,7 @@ public class PhotoDialogActivity extends Activity {
             FirebaseStorage store = FirebaseStorage.getInstance();
             StorageReference storageReference = store.getReference();
             String lastEdit = String.valueOf(System.currentTimeMillis());
-            StorageReference userReference = storageReference.child(FirebaseAuth.getInstance().getCurrentUser().getUid().toString() + "/profile.jpg" + lastEdit);
+            StorageReference userReference = storageReference.child(FirebaseAuth.getInstance().getCurrentUser().getUid().toString() + "/profile" + lastEdit);
             final View progressBar =  findViewById(R.id.my_constraint_layout);
             ImageView ivProfile = findViewById(R.id.expanded_image);
             ivProfile.setVisibility(View.GONE);
@@ -168,6 +175,10 @@ public class PhotoDialogActivity extends Activity {
                     SharedPreferences.Editor editor = sharedPref.edit();
                     editor.putString("imageCaching", lastEdit);
                     editor.commit();
+                    StorageReference previousPhotoreference = storageReference.child(FirebaseAuth.getInstance().getCurrentUser().getUid().toString());
+                    previousPhotoreference.delete();
+                    DocumentReference userReference = FirebaseFirestore.getInstance().collection("users").document(FirebaseAuth.getInstance().getCurrentUser().getUid());
+                    userReference.update("lastEdit",lastEdit);
                     loadProfilePicture();
                     ivProfile.setVisibility(View.VISIBLE);
                     progressBar.setVisibility(View.GONE);
@@ -191,7 +202,7 @@ public class PhotoDialogActivity extends Activity {
         FirebaseStorage store = FirebaseStorage.getInstance();
         StorageReference storageReference = store.getReference();
         String lastEdit = String.valueOf(System.currentTimeMillis());
-        StorageReference userReference = storageReference.child(FirebaseAuth.getInstance().getCurrentUser().getUid().toString() + "/profile.jpg" + lastEdit);
+        StorageReference userReference = storageReference.child(FirebaseAuth.getInstance().getCurrentUser().getUid().toString() + "/profile" + lastEdit);
         final View progressBar =  findViewById(R.id.my_constraint_layout);
         ImageView ivProfile = findViewById(R.id.expanded_image);
         ivProfile.setVisibility(View.GONE);
@@ -213,6 +224,8 @@ public class PhotoDialogActivity extends Activity {
                 SharedPreferences.Editor editor = sharedPref.edit();
                 editor.putString("imageCaching", lastEdit);
                 editor.commit();
+                DocumentReference userReference = FirebaseFirestore.getInstance().collection("users").document(FirebaseAuth.getInstance().getCurrentUser().getUid());
+                userReference.update("lastEdit",lastEdit);
                 Uri downloadUrl = taskSnapshot.getDownloadUrl();
                 ivProfile.setVisibility(View.VISIBLE);
                 progressBar.setVisibility(View.GONE);
@@ -223,9 +236,33 @@ public class PhotoDialogActivity extends Activity {
         });
     }
 
+    //retrieve the last update to the photo profile, so we can get the URL
     private String readSharedPreferenceForCache()
     {
         SharedPreferences sharedPref = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE);
+
+        String imageCaching =  sharedPref.getString("imageCaching","0");
+        //this means cache has been cleaned, we need to retrieve the value
+        if(imageCaching == "0")
+        {
+            DocumentReference userReference = FirebaseFirestore.getInstance().collection("users").document(FirebaseAuth.getInstance().getCurrentUser().getUid());
+            userReference.get().addOnCompleteListener((task) -> {
+                List<CharSequence> myHouses = new ArrayList<>();
+                if (task.isSuccessful()) {
+                    {
+                        DocumentSnapshot document = task.getResult();
+                        Map<String, Object> userParam = document.getData();
+                        String lastEdit = (String)userParam.get("lastEdit");
+                        SharedPreferences.Editor editor = sharedPref.edit();
+                        editor.putString("imageCaching", lastEdit);
+                        editor.commit();
+                    }
+
+                } else {
+                    Toast.makeText(this,"Failed in retrieving profile image",Toast.LENGTH_SHORT);
+                }
+            });
+        }
         return  sharedPref.getString("imageCaching","0");
     }
 }

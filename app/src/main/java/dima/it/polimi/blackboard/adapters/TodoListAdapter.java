@@ -1,5 +1,6 @@
 package dima.it.polimi.blackboard.adapters;
 
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
@@ -11,18 +12,25 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import dima.it.polimi.blackboard.R;
 import dima.it.polimi.blackboard.fragments.TodoItemListFragment;
@@ -91,12 +99,27 @@ public class TodoListAdapter extends FirestoreAdapter<TodoListAdapter.ViewHolder
 
         // TODO: 11/03/2018 Refactor this code to get the correct image 
         FirebaseStorage storage = FirebaseStorage.getInstance();
-        StorageReference reference = storage.getReference().child(todoItem.getCreatedBy() + "/profile.jpg");
-        GlideApp.with( (TodoItemListFragment)mListener)
-                .load(reference)
-                .error(R.drawable.empty_profile_blue_circle)
-                .apply(RequestOptions.circleCropTransform())
-                .into(holder.userIcon);
+        DocumentReference userReference = FirebaseFirestore.getInstance().collection("users").document(todoItem.getCreatedBy());
+        userReference.get().addOnCompleteListener((task) -> {
+            List<CharSequence> myHouses = new ArrayList<>();
+            if (task.isSuccessful()) {
+                {
+                    DocumentSnapshot document = task.getResult();
+                    Map<String, Object> userParam = document.getData();
+                    String lastEdit = (String)userParam.get("lastEdit");
+                    StorageReference reference = storage.getReference().child(todoItem.getCreatedBy() + "/profile" + lastEdit);
+                    GlideApp.with( (TodoItemListFragment)mListener)
+                            .load(reference)
+                            .error(R.drawable.empty_profile_blue_circle)
+                            .apply(RequestOptions.circleCropTransform())
+                            .into(holder.userIcon);
+                }
+
+            } else {
+                //TODO display error message
+            }
+        });
+
 
         holder.itemView.setOnClickListener((v) ->
                 mListener.onTodoItemClicked(todoItem, v, holder.getAdapterPosition())

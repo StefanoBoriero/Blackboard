@@ -21,6 +21,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
@@ -40,6 +41,7 @@ import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import dima.it.polimi.blackboard.R;
 import dima.it.polimi.blackboard.adapters.DayResumeAdapter;
@@ -207,7 +209,7 @@ public class MainActivity extends AppCompatActivity
     {
         String lastEdit = readSharedPreferenceForCache();
         FirebaseStorage storage = FirebaseStorage.getInstance();
-        StorageReference reference = storage.getReference().child(FirebaseAuth.getInstance().getCurrentUser().getUid().toString() + "/profile.jpg" + lastEdit);
+        StorageReference reference = storage.getReference().child(FirebaseAuth.getInstance().getCurrentUser().getUid().toString() + "/profile" + lastEdit);
         GlideApp.with(getBaseContext())
                 .load(reference)
                 .listener(new RequestListener<Drawable>() {
@@ -228,9 +230,33 @@ public class MainActivity extends AppCompatActivity
                 .into(ivProfile);
     }
 
+    //retrieve the last update to the photo profile, so we can get the URL
     private String readSharedPreferenceForCache()
     {
         SharedPreferences sharedPref = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE);
+
+        String imageCaching =  sharedPref.getString("imageCaching","0");
+        //this means cache has been cleaned, we need to retrieve the value
+        if(imageCaching == "0")
+        {
+            DocumentReference userReference = FirebaseFirestore.getInstance().collection("users").document(FirebaseAuth.getInstance().getCurrentUser().getUid());
+            userReference.get().addOnCompleteListener((task) -> {
+                List<CharSequence> myHouses = new ArrayList<>();
+                if (task.isSuccessful()) {
+                    {
+                        DocumentSnapshot document = task.getResult();
+                        Map<String, Object> userParam = document.getData();
+                        String lastEdit = (String)userParam.get("lastEdit");
+                        SharedPreferences.Editor editor = sharedPref.edit();
+                        editor.putString("imageCaching", lastEdit);
+                        editor.commit();
+                    }
+
+                } else {
+                    Toast.makeText(this,"Failed in retrieving profile image",Toast.LENGTH_SHORT);
+                }
+            });
+        }
         return  sharedPref.getString("imageCaching","0");
     }
 }

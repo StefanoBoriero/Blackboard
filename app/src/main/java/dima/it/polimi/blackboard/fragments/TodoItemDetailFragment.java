@@ -17,9 +17,15 @@ import android.widget.TextView;
 
 
 import com.bumptech.glide.request.RequestOptions;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import dima.it.polimi.blackboard.R;
 import dima.it.polimi.blackboard.adapters.DetailAdapter;
@@ -147,15 +153,29 @@ public class TodoItemDetailFragment extends Fragment {
         ImageView userIconView = view.findViewById(R.id.user_icon);
         userIconView.setTransitionName(transitionNameIcon);
 
-        FirebaseStorage storage = FirebaseStorage.getInstance();
-        StorageReference reference = storage.getReference().child(todoTask.getCreatedBy() + "/profile.jpg");
         Context parentActivity = getActivity();
         if(parentActivity != null) {
-            GlideApp.with(getActivity())
-                    .load(reference)
-                    .error(R.drawable.empty_profile_blue_circle)
-                    .apply(RequestOptions.circleCropTransform())
-                    .into(userIconView);
+            FirebaseStorage storage = FirebaseStorage.getInstance();
+            DocumentReference userReference = FirebaseFirestore.getInstance().collection("users").document(todoTask.getCreatedBy());
+            userReference.get().addOnCompleteListener((task) -> {
+                List<CharSequence> myHouses = new ArrayList<>();
+                if (task.isSuccessful()) {
+                    {
+                        DocumentSnapshot document = task.getResult();
+                        Map<String, Object> userParam = document.getData();
+                        String lastEdit = (String)userParam.get("lastEdit");
+                        StorageReference reference = storage.getReference().child(todoTask.getCreatedBy() + "/profile" + lastEdit);
+                        GlideApp.with(this)
+                                .load(reference)
+                                .error(R.drawable.empty_profile_blue_circle)
+                                .apply(RequestOptions.circleCropTransform())
+                                .into(userIconView);
+                    }
+
+                } else {
+                    //TODO display error message
+                }
+            });
         }
 /*
         TextView typeView = view.findViewById(R.id.type_detail);
@@ -283,15 +303,30 @@ public class TodoItemDetailFragment extends Fragment {
                     mListener.onAcceptClick(todoTask, position, ACTION_DELETED));
 
             ImageView userIconView = rootView.findViewById(R.id.user_icon);
-            FirebaseStorage storage = FirebaseStorage.getInstance();
-            StorageReference reference = storage.getReference().child(todoTask.getCreatedBy() + "/profile.jpg");
+
             Context parentActivity = getActivity();
             if(parentActivity != null) {
-                GlideApp.with(getActivity())
-                        .load(reference)
-                        .error(R.drawable.empty_profile_blue_circle)
-                        .apply(RequestOptions.circleCropTransform())
-                        .into(userIconView);
+                FirebaseStorage storage = FirebaseStorage.getInstance();
+                DocumentReference userReference = FirebaseFirestore.getInstance().collection("users").document(todoTask.getCreatedBy());
+                userReference.get().addOnCompleteListener((task) -> {
+                    List<CharSequence> myHouses = new ArrayList<>();
+                    if (task.isSuccessful()) {
+                        {
+                            DocumentSnapshot document = task.getResult();
+                            Map<String, Object> userParam = document.getData();
+                            String lastEdit = (String)userParam.get("lastEdit");
+                            StorageReference reference = storage.getReference().child(todoTask.getCreatedBy() + "/profile" + lastEdit);
+                            GlideApp.with( this)
+                                    .load(reference)
+                                    .error(R.drawable.empty_profile_blue_circle)
+                                    .apply(RequestOptions.circleCropTransform())
+                                    .into(userIconView);
+                        }
+
+                    } else {
+                        //TODO display error message
+                    }
+                });
             }
         }
     }
