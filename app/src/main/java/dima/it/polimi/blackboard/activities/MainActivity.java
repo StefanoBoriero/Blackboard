@@ -1,6 +1,8 @@
 package dima.it.polimi.blackboard.activities;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -132,7 +134,7 @@ public class MainActivity extends AppCompatActivity
             startActivity(intent);
         } else if(id == R.id.nav_profile){
             Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
-            startActivity(intent);
+            startActivityForResult(intent,2);
         } else if (id == R.id.nav_share) {
 
         } else if (id == R.id.nav_send) {
@@ -175,6 +177,18 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    public void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        super.onActivityResult(requestCode,resultCode,data);
+
+
+        if(requestCode == 2 && resultCode == 3) {
+
+            loadProfilePicture();
+
+        }
+    }
+
     private void initializeDays(){
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -191,11 +205,11 @@ public class MainActivity extends AppCompatActivity
 
     private void loadProfilePicture()
     {
+        String lastEdit = readSharedPreferenceForCache();
         FirebaseStorage storage = FirebaseStorage.getInstance();
-        StorageReference reference = storage.getReference().child(FirebaseAuth.getInstance().getCurrentUser().getUid().toString() + "/profile.jpg");
+        StorageReference reference = storage.getReference().child(FirebaseAuth.getInstance().getCurrentUser().getUid().toString() + "/profile.jpg" + lastEdit);
         GlideApp.with(getBaseContext())
                 .load(reference)
-                .signature(new ObjectKey(String.valueOf(System.currentTimeMillis())))
                 .listener(new RequestListener<Drawable>() {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
@@ -212,5 +226,11 @@ public class MainActivity extends AppCompatActivity
                 .error(R.drawable.empty_profile_blue_circle)
                 .apply(RequestOptions.circleCropTransform())
                 .into(ivProfile);
+    }
+
+    private String readSharedPreferenceForCache()
+    {
+        SharedPreferences sharedPref = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE);
+        return  sharedPref.getString("imageCaching","0");
     }
 }

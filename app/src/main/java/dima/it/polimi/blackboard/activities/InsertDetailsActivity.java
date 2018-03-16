@@ -6,6 +6,7 @@ import android.app.DialogFragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
@@ -109,6 +110,7 @@ public class InsertDetailsActivity extends AppCompatActivity implements DialogIn
 
 
 
+
         db.collection("users").document(FirebaseAuth.getInstance().getCurrentUser().getUid()).set(user);
 
 
@@ -175,7 +177,8 @@ public class InsertDetailsActivity extends AppCompatActivity implements DialogIn
             Uri uri = data.getData();
             FirebaseStorage store = FirebaseStorage.getInstance();
             StorageReference storageReference = store.getReference();
-            StorageReference userReference = storageReference.child(FirebaseAuth.getInstance().getCurrentUser().getUid().toString() + "/profile.jpg");
+            String lastEdit = String.valueOf(System.currentTimeMillis());
+            StorageReference userReference = storageReference.child(FirebaseAuth.getInstance().getCurrentUser().getUid().toString() + "/profile.jpg" + lastEdit);
             final ProgressBar progressBar = (ProgressBar) findViewById(R.id.progress);
             ImageView ivProfile = findViewById(R.id.imageViewProfile);
             ivProfile.setVisibility(View.GONE);
@@ -183,6 +186,10 @@ public class InsertDetailsActivity extends AppCompatActivity implements DialogIn
             userReference.putFile(uri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    SharedPreferences sharedPref = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPref.edit();
+                    editor.putString("imageCaching", lastEdit);
+                    editor.commit();
                     loadProfilePicture();
                     ivProfile.setVisibility(View.VISIBLE);
                     progressBar.setVisibility(View.GONE);
@@ -204,7 +211,8 @@ public class InsertDetailsActivity extends AppCompatActivity implements DialogIn
         byte[] data = baos.toByteArray();
         FirebaseStorage store = FirebaseStorage.getInstance();
         StorageReference storageReference = store.getReference();
-        StorageReference userReference = storageReference.child(FirebaseAuth.getInstance().getCurrentUser().getUid().toString() + "/profile.jpg");
+        String lastEdit = String.valueOf(System.currentTimeMillis());
+        StorageReference userReference = storageReference.child(FirebaseAuth.getInstance().getCurrentUser().getUid().toString() + "/profile.jpg" + lastEdit);
         final ProgressBar progressBar = (ProgressBar) findViewById(R.id.progress);
         ImageView ivProfile = findViewById(R.id.imageViewProfile);
         ivProfile.setVisibility(View.GONE);
@@ -225,6 +233,10 @@ public class InsertDetailsActivity extends AppCompatActivity implements DialogIn
                 Uri downloadUrl = taskSnapshot.getDownloadUrl();
                 ivProfile.setVisibility(View.VISIBLE);
                 progressBar.setVisibility(View.GONE);
+                SharedPreferences sharedPref = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPref.edit();
+                editor.putString("imageCaching", lastEdit);
+                editor.commit();
                 loadProfilePicture();
             }
         });
@@ -233,12 +245,12 @@ public class InsertDetailsActivity extends AppCompatActivity implements DialogIn
     private void loadProfilePicture()
     {
         FirebaseStorage storage = FirebaseStorage.getInstance();
-        StorageReference reference = storage.getReference().child(FirebaseAuth.getInstance().getCurrentUser().getUid().toString() + "/profile.jpg");
+        String lastEdit = readSharedPreferenceForCache();
+        StorageReference reference = storage.getReference().child(FirebaseAuth.getInstance().getCurrentUser().getUid().toString() + "/profile.jpg" + lastEdit);
         ImageView ivProfile = findViewById(R.id.imageViewProfile);
         final ProgressBar progressBar = (ProgressBar) findViewById(R.id.progress);
         GlideApp.with(getBaseContext())
                 .load(reference)
-                .signature(new ObjectKey(String.valueOf(System.currentTimeMillis())))
                 .listener(new RequestListener<Drawable>() {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
@@ -326,6 +338,12 @@ public class InsertDetailsActivity extends AppCompatActivity implements DialogIn
             }
             return true;
         }
+    }
+
+    private String readSharedPreferenceForCache()
+    {
+        SharedPreferences sharedPref = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE);
+        return  sharedPref.getString("imageCaching","0");
     }
 
 }

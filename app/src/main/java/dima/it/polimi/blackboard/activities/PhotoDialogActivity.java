@@ -1,7 +1,9 @@
 package dima.it.polimi.blackboard.activities;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
@@ -58,12 +60,12 @@ public class PhotoDialogActivity extends Activity {
     private void loadProfilePicture()
     {
         FirebaseStorage storage = FirebaseStorage.getInstance();
-        StorageReference reference = storage.getReference().child(FirebaseAuth.getInstance().getCurrentUser().getUid().toString() + "/profile.jpg");
+        String lastEdit = readSharedPreferenceForCache();
+        StorageReference reference = storage.getReference().child(FirebaseAuth.getInstance().getCurrentUser().getUid().toString() + "/profile.jpg" + lastEdit);
         ImageView ivProfile = findViewById(R.id.expanded_image);
         final View progressBar =  findViewById(R.id.my_constraint_layout);
         GlideApp.with(getBaseContext())
                 .load(reference)
-                .signature(new ObjectKey(String.valueOf(System.currentTimeMillis())))
                 .listener(new RequestListener<Drawable>() {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
@@ -87,7 +89,6 @@ public class PhotoDialogActivity extends Activity {
     {
         ImageButton buttonCamera =  findViewById(R.id.buttonCamera);
         ImageButton buttonGallery =  findViewById(R.id.buttonGallery);
-        ImageButton buttonDelete =  findViewById(R.id.buttonDelete);
 
         buttonCamera.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -126,29 +127,7 @@ public class PhotoDialogActivity extends Activity {
             }
         });
 
-        buttonDelete.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                FirebaseStorage store = FirebaseStorage.getInstance();
-                StorageReference storageReference = store.getReference();
-                StorageReference userReference = storageReference.child(FirebaseAuth.getInstance().getCurrentUser().getUid().toString() + "/profile.jpg");
-
-                userReference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Toast.makeText(PhotoDialogActivity.this,"Photo deleted succesfully",Toast.LENGTH_SHORT);
-                        setResult(3);
-                        loadProfilePicture();
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception exception) {
-                        Toast.makeText(PhotoDialogActivity.this,"Can't delete image",Toast.LENGTH_SHORT);
-                    }
-                });
-
-            }
-        });
+        
 
     }
 
@@ -176,7 +155,8 @@ public class PhotoDialogActivity extends Activity {
             Uri uri = data.getData();
             FirebaseStorage store = FirebaseStorage.getInstance();
             StorageReference storageReference = store.getReference();
-            StorageReference userReference = storageReference.child(FirebaseAuth.getInstance().getCurrentUser().getUid().toString() + "/profile.jpg");
+            String lastEdit = String.valueOf(System.currentTimeMillis());
+            StorageReference userReference = storageReference.child(FirebaseAuth.getInstance().getCurrentUser().getUid().toString() + "/profile.jpg" + lastEdit);
             final View progressBar =  findViewById(R.id.my_constraint_layout);
             ImageView ivProfile = findViewById(R.id.expanded_image);
             ivProfile.setVisibility(View.GONE);
@@ -184,6 +164,10 @@ public class PhotoDialogActivity extends Activity {
             userReference.putFile(uri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    SharedPreferences sharedPref = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPref.edit();
+                    editor.putString("imageCaching", lastEdit);
+                    editor.commit();
                     loadProfilePicture();
                     ivProfile.setVisibility(View.VISIBLE);
                     progressBar.setVisibility(View.GONE);
@@ -206,7 +190,8 @@ public class PhotoDialogActivity extends Activity {
         byte[] data = baos.toByteArray();
         FirebaseStorage store = FirebaseStorage.getInstance();
         StorageReference storageReference = store.getReference();
-        StorageReference userReference = storageReference.child(FirebaseAuth.getInstance().getCurrentUser().getUid().toString() + "/profile.jpg");
+        String lastEdit = String.valueOf(System.currentTimeMillis());
+        StorageReference userReference = storageReference.child(FirebaseAuth.getInstance().getCurrentUser().getUid().toString() + "/profile.jpg" + lastEdit);
         final View progressBar =  findViewById(R.id.my_constraint_layout);
         ImageView ivProfile = findViewById(R.id.expanded_image);
         ivProfile.setVisibility(View.GONE);
@@ -224,6 +209,10 @@ public class PhotoDialogActivity extends Activity {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                 // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
+                SharedPreferences sharedPref = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPref.edit();
+                editor.putString("imageCaching", lastEdit);
+                editor.commit();
                 Uri downloadUrl = taskSnapshot.getDownloadUrl();
                 ivProfile.setVisibility(View.VISIBLE);
                 progressBar.setVisibility(View.GONE);
@@ -232,5 +221,11 @@ public class PhotoDialogActivity extends Activity {
                 loadProfilePicture();
             }
         });
+    }
+
+    private String readSharedPreferenceForCache()
+    {
+        SharedPreferences sharedPref = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE);
+        return  sharedPref.getString("imageCaching","0");
     }
 }

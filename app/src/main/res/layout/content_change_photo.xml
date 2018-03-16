@@ -47,15 +47,6 @@
         app:layout_constraintTop_toBottomOf="@+id/expanded_image">
 
         <ImageButton
-            android:id="@+id/buttonDelete"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:contentDescription="@string/content_description_recycling_bin_icon"
-            android:background="@drawable/imag_button_background"
-            android:src="@drawable/ic_delete_grey_24dp" />
-
-        <ImageButton
             android:id="@+id/buttonCamera"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
