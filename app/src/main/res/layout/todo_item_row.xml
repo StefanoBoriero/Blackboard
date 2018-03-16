@@ -90,7 +90,7 @@
             android:layout_width="@dimen/icon_width_height"
             android:layout_height="@dimen/icon_width_height"
             android:layout_margin="@dimen/margin_icon"
-            android:background="@drawable/background_user_circle"
+            android:src="@drawable/empty_profile_blue_circle"
             android:contentDescription="@string/content_description_user_icon"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"

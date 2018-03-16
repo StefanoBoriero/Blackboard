@@ -12,14 +12,19 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 
+import com.bumptech.glide.request.RequestOptions;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import dima.it.polimi.blackboard.R;
 import dima.it.polimi.blackboard.adapters.DetailAdapter;
 import dima.it.polimi.blackboard.model.TodoItem;
+import dima.it.polimi.blackboard.utils.GlideApp;
 import dima.it.polimi.blackboard.utils.UserDecoder;
 
 /**
@@ -139,8 +144,19 @@ public class TodoItemDetailFragment extends Fragment {
 
 
         // Binds dynamically the shared element through transition name
-        View userIconView = view.findViewById(R.id.user_icon);
+        ImageView userIconView = view.findViewById(R.id.user_icon);
         userIconView.setTransitionName(transitionNameIcon);
+
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        StorageReference reference = storage.getReference().child(todoTask.getCreatedBy() + "/profile.jpg");
+        Context parentActivity = getActivity();
+        if(parentActivity != null) {
+            GlideApp.with(getActivity())
+                    .load(reference)
+                    .error(R.drawable.empty_profile_blue_circle)
+                    .apply(RequestOptions.circleCropTransform())
+                    .into(userIconView);
+        }
 /*
         TextView typeView = view.findViewById(R.id.type_detail);
         typeView.setText(todoTask.getType());
@@ -265,6 +281,18 @@ public class TodoItemDetailFragment extends Fragment {
             View deleteBtn = rootView.findViewById(R.id.delete);
             deleteBtn.setOnClickListener((v) ->
                     mListener.onAcceptClick(todoTask, position, ACTION_DELETED));
+
+            ImageView userIconView = rootView.findViewById(R.id.user_icon);
+            FirebaseStorage storage = FirebaseStorage.getInstance();
+            StorageReference reference = storage.getReference().child(todoTask.getCreatedBy() + "/profile.jpg");
+            Context parentActivity = getActivity();
+            if(parentActivity != null) {
+                GlideApp.with(getActivity())
+                        .load(reference)
+                        .error(R.drawable.empty_profile_blue_circle)
+                        .apply(RequestOptions.circleCropTransform())
+                        .into(userIconView);
+            }
         }
     }
 

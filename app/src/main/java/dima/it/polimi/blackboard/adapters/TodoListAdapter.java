@@ -82,13 +82,19 @@ public class TodoListAdapter extends FirestoreAdapter<TodoListAdapter.ViewHolder
                 Drawable selected = new ColorDrawable(0xFF448AFF);
                 toHighlight.findViewById(R.id.selected_flag).setBackground(selected);
             }
+            else{
+                View toNotHighlight = holder.itemView;
+                toNotHighlight.findViewById(R.id.selected_flag).setBackground(null);
+
+            }
         }
 
         // TODO: 11/03/2018 Refactor this code to get the correct image 
         FirebaseStorage storage = FirebaseStorage.getInstance();
-        StorageReference reference = storage.getReference().child("bonnie.jpg");
+        StorageReference reference = storage.getReference().child(todoItem.getCreatedBy() + "/profile.jpg");
         GlideApp.with( (TodoItemListFragment)mListener)
                 .load(reference)
+                .error(R.drawable.empty_profile_blue_circle)
                 .apply(RequestOptions.circleCropTransform())
                 .into(holder.userIcon);
 
