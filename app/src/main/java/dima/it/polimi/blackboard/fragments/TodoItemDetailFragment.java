@@ -39,6 +39,7 @@ public class TodoItemDetailFragment extends Fragment {
     private static final String ARG_POS = "position";
     public static final String ACTION_TAKEN = "taken";
     public static final String ACTION_DELETED = "deleted";
+    private static final String CURRENT_TASK = "current_task";
 
     private TodoItem todoTask;
     private String transitionName;
@@ -87,9 +88,18 @@ public class TodoItemDetailFragment extends Fragment {
         return fragment;
     }
 
+    @NonNull
+    public static TodoItemDetailFragment newInstance(){
+        return new TodoItemDetailFragment();
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if(savedInstanceState != null){
+            todoTask = savedInstanceState.getParcelable(CURRENT_TASK);
+        }
         if (getArguments() != null) {
             todoTask = getArguments().getParcelable(ARG_TODO);
             transitionNameIcon = getArguments().getString(ARG_TR_ICON);
@@ -97,6 +107,12 @@ public class TodoItemDetailFragment extends Fragment {
             position = getArguments().getInt(ARG_POS);
         }
 
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        outState.putParcelable(CURRENT_TASK, todoTask);
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -141,17 +157,6 @@ public class TodoItemDetailFragment extends Fragment {
                 mListener.onAcceptClick(todoTask, position, ACTION_DELETED));
     }
 
-    private void setCreator(TextView addedByView){
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("users").document(todoTask.getCreatedBy()).
-                get().addOnCompleteListener( task -> {
-            if(task.isSuccessful()){
-                String userName = (String)task.getResult().getData().get("name");
-                addedByView.setText(userName);
-            }
-        });
-    }
-
     /**
      * Populates the recyclerView with the current content
      * @param recyclerView the recycler to be populated
@@ -190,6 +195,8 @@ public class TodoItemDetailFragment extends Fragment {
                 .setStartDelay(FADE_DELAY)
                 .start();
     }
+
+
 
     //TODO extract this method in Utility class OR put iconResId in todoItem
     private Drawable resolveIcon(String type){

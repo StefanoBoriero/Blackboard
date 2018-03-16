@@ -1,6 +1,7 @@
 package dima.it.polimi.blackboard.adapters;
 
 import android.content.res.Resources;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
@@ -37,11 +38,21 @@ public class TodoListAdapter extends FirestoreAdapter<TodoListAdapter.ViewHolder
     {
     private TodoListAdapterListener mListener;
     private ViewGroup parent;
+    private int initialHighlighted;
+    private boolean isDouble;
 
     public TodoListAdapter(Query query, TodoListAdapterListener listener, OnCompleteListener completeListener){
         super(query, completeListener);
         this.mListener = listener;
+        this.isDouble = false;
     }
+
+    public TodoListAdapter(Query query, TodoListAdapterListener listener, OnCompleteListener completeListener, int initialHighlighted){
+        super(query, completeListener);
+        this.mListener = listener;
+        this.initialHighlighted = initialHighlighted;
+        this.isDouble = true;
+        }
 
     @Override
     @NonNull
@@ -55,6 +66,7 @@ public class TodoListAdapter extends FirestoreAdapter<TodoListAdapter.ViewHolder
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
         final TodoItem todoItem = getFilteredSnapshot(position).toObject(TodoItem.class);
+        holder.itemView.setId(position);
         holder.todoItemName.setText(todoItem.getName());
         holder.todoItemType.setText(todoItem.getType());
         holder.todoItemName.setTransitionName(todoItem.getName() + "Name" + todoItem.getId());
@@ -63,6 +75,14 @@ public class TodoListAdapter extends FirestoreAdapter<TodoListAdapter.ViewHolder
         holder.timestampView.setText(df.format(todoItem.getCreatedOn()));
         holder.todoItemType.setCompoundDrawablesWithIntrinsicBounds(resolveIcon(todoItem.getType()), null, null, null);
         checkSuggestion(todoItem, holder.suggestionStar);
+
+        if(isDouble) {
+            if (position == initialHighlighted) {
+                View toHighlight = holder.itemView;
+                Drawable selected = new ColorDrawable(0xFF448AFF);
+                toHighlight.findViewById(R.id.selected_flag).setBackground(selected);
+            }
+        }
 
         // TODO: 11/03/2018 Refactor this code to get the correct image 
         FirebaseStorage storage = FirebaseStorage.getInstance();
@@ -108,7 +128,14 @@ public class TodoListAdapter extends FirestoreAdapter<TodoListAdapter.ViewHolder
     }
 
     public TodoItem getItem(int position){
-        return getFilteredSnapshot(position).toObject(TodoItem.class);
+        TodoItem item;
+        try{
+            item = getFilteredSnapshot(position).toObject(TodoItem.class);
+        }
+        catch (IndexOutOfBoundsException e){
+            return null;
+        }
+        return item;
     }
 
     public void insertItem(TodoItem item, int position){

@@ -28,14 +28,14 @@ public class MyListActivity extends DoubleFragmentActivity implements DialogInte
     protected void onCreate(Bundle savedInstanceState) {
         setContentView(R.layout.activity_my_list);
 
-        super.setItemList(DataGeneratorUtil.generateTodoItems(30));
+        //super.setItemList(DataGeneratorUtil.generateTodoItems(30));
         super.onCreate(savedInstanceState);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle(R.string.title_activity_my_list);
         setSupportActionBar(toolbar);
 
-        ((TodoItemListFragment)firstFragment).setMyList(true);
+        //((TodoItemListFragment)firstFragment).setMyList(true);
 
     }
 

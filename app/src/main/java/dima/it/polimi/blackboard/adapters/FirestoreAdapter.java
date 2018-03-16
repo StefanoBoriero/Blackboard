@@ -153,7 +153,7 @@ public abstract class FirestoreAdapter<VH extends RecyclerView.ViewHolder>
         return mSnapshots.get(index);
     }
 
-    DocumentSnapshot getFilteredSnapshot(int index){
+    DocumentSnapshot getFilteredSnapshot(int index) throws IndexOutOfBoundsException{
         return mFilteredSnapshots.get(index);
     }
 

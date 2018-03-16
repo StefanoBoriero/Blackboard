@@ -61,8 +61,8 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
     private static final int ACCEPT_TASK_REQUEST = 1;
     private static final int ANIM_DURATION = 250;
 
-    protected Fragment firstFragment;
-    private Fragment secondFragment;
+    protected TodoItemListFragment firstFragment;
+    private TodoItemDetailFragment secondFragment;
 
     private View itemRowClicked;
     private int clickedPosition;
@@ -87,30 +87,25 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
         if(savedInstanceState != null){
             whichHouse = savedInstanceState.getInt(CURRENT_HOUSE_INDEX);
             clickedPosition = savedInstanceState.getInt(CURRENT_ITEM_INDEX);
-            firstFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_list_container);
-            ((TodoItemListFragment)firstFragment).changeHouse((String)houses[whichHouse]);
+            firstFragment = (TodoItemListFragment)getSupportFragmentManager().findFragmentById(R.id.fragment_list_container);
+            firstFragment.setAuthId(User.getInstance().getAuth_id());
+            //firstFragment.setHouse((String)houses[whichHouse]);
 
             if(isDouble){
                 clickedItem = savedInstanceState.getParcelable(CURRENT_ITEM);
-                itemRowClicked = ((TodoItemListFragment)firstFragment).getRowView(clickedPosition);
-                secondFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_detail_container);
+                //firstFragment.setSelectedItem(clickedPosition);
+                secondFragment = (TodoItemDetailFragment)getSupportFragmentManager().findFragmentById(R.id.fragment_detail_container);
                 doubleFragmentClickHandler(itemRowClicked, clickedItem, clickedPosition);
-                //((TodoItemDetailFragment)secondFragment).updateFragment(clickedItem, clickedPosition);
+                //secondFragment.updateFragment(clickedItem, clickedPosition);
             }
         }
         else{
+            setDefaultHouse();
+            instantiateFirstFragment();
+            firstFragment.setAuthId(User.getInstance().getAuth_id());
             showFirstFragment();
-            whichHouse = 0;
+
         }
-
-
-
-        /*
-        if(isDouble()){
-            showSecondFragment();
-        }
-        */
-
     }
 
     @Override
@@ -138,15 +133,17 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
             searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         }
         searchView.setMaxWidth(Integer.MAX_VALUE);
-        ((TodoItemListFragment)firstFragment).setSearchView(searchView);
+        firstFragment.setSearchView(searchView);
 
         super.onCreateOptionsMenu(menu);
         return true;
     }
 
-    void setItemList(List<TodoItem> items){
-        itemList = items;
+    private void setDefaultHouse(){
+        // TODO: 15/03/2018 get the index from the Settings
+        whichHouse = 0;
     }
+
 
     /**
      * This method checks if the second fragment is displayed in the activity, and sets all the
@@ -163,24 +160,39 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
     }
 
     private void showFirstFragment(){
-        firstFragment = TodoItemListFragment.newInstance(1, itemList, (String)houses[whichHouse]);
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_list_container, firstFragment)
                 .commit();
         getFragmentManager().executePendingTransactions();
     }
 
+    private void instantiateFirstFragment(){
+        firstFragment = TodoItemListFragment.newInstance(1, isDouble(), (String)houses[whichHouse]);
+    }
+
+    private void setHouse(String house){
+        firstFragment.setHouse(house);
+    }
+
+    private void instantiateSecondFragment(){
+        secondFragment = TodoItemDetailFragment.newInstance();
+    }
+
+
+
     @Override
     public void onDownloadComplete(TodoItem item){
         if(isDouble()){
             if(secondFragment == null) {
-                showSecondFragment(item);
+                instantiateSecondFragment();
+                secondFragment.updateFragment(item, 0);
+                //firstFragment.setSelectedItem(0);
+                showSecondFragment();
             }
         }
     }
 
-    private void showSecondFragment(TodoItem item){
-        secondFragment = TodoItemDetailFragment.newInstance(item, 0);
+    private void showSecondFragment(){
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_detail_container, secondFragment)
                 .commit();
@@ -195,7 +207,7 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
         } else {
             // Disable swipe while the animation is going
             itemRowClicked = view;
-            ((TodoItemListFragment)firstFragment).disableSwipe();
+            firstFragment.disableSwipe();
             isActivityResult = false;
             // Animate the view clicked
             view.animate()
@@ -224,8 +236,8 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
 
     @Override
     protected void onResume() {
-        firstFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_list_container);
-        ((TodoItemListFragment)firstFragment).enableSwipe();
+        firstFragment = (TodoItemListFragment)getSupportFragmentManager().findFragmentById(R.id.fragment_list_container);
+        firstFragment.enableSwipe();
         if(!isActivityResult)
             if(itemRowClicked != null) {
                 if (!isDouble) {
@@ -234,6 +246,12 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
             }
         super.onResume();
     }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+    }
+
 
     /**
      * Starts another activity for result in case of single fragment activity
@@ -273,11 +291,9 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
      */
     private void doubleFragmentClickHandler(View clickedView, TodoItem item, int position){
         if(clickedView != itemRowClicked) {
-            setFocusedItem(clickedView);
-            if(itemRowClicked != null) {
-                itemRowClicked.findViewById(R.id.selected_flag).setBackground(null);
-            }
-            ((TodoItemDetailFragment)secondFragment).updateFragment(item, position);
+            //setFocusedItem(clickedView);
+            firstFragment.setSelectedItem(position);
+            secondFragment.updateFragment(item, position);
         }
         itemRowClicked = clickedView;
 
@@ -336,14 +352,22 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
      * @param position the position to remove
      */
     void removeItem(int position, String action){
-        View nextItemView = ((TodoItemListFragment)firstFragment).getViewHolder(position + 1);
-        TodoItem removedItem = ((TodoItemListFragment)firstFragment).removeItem(position);
+        View nextItemView = firstFragment.getViewHolder(position + 1);
+        TodoItem removedItem = firstFragment.removeItem(position);
         showUndoMessage(removedItem, position, action);
         if(isDouble && checkSelected(position)){
-            TodoItem nextItem = ((TodoItemListFragment)firstFragment).getItem(position);
-            setFocusedItem(nextItemView);
+            TodoItem nextItem = firstFragment.getItem(position);
+            if(nextItem == null){
+                //It was the last of the list
+                nextItem = firstFragment.getItem(position - 1);
+                secondFragment.updateFragment(nextItem, position - 1);
+                firstFragment.setSelectedItem(position - 1);
+            }
+            else{
+                secondFragment.updateFragment(nextItem, position);
+                firstFragment.setSelectedItem(position + 1);
+            }
             itemRowClicked = nextItemView;
-            ((TodoItemDetailFragment)secondFragment).updateFragment(nextItem, position);
         }
     }
 
@@ -353,7 +377,7 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
      * @return true if the removed position is the one currently shown
      */
     private boolean checkSelected(int removedPosition){
-        return removedPosition == ((TodoItemDetailFragment)secondFragment).getPosition();
+        return removedPosition == secondFragment.getPosition();
     }
 
     /**
@@ -362,9 +386,10 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
      * @param position the position where to insert it
      */
     void insertItem(TodoItem item, int position){
-        ((TodoItemListFragment)firstFragment).insertItem(item, position);
+        firstFragment.insertItem(item, position);
         if(isDouble && checkSelected(position)){
-            ((TodoItemDetailFragment)secondFragment).updateFragment(item, position);
+            //secondFragment.updateFragment(item, position);
+            firstFragment.setSelectedItem(position);
         }
     }
 
@@ -389,7 +414,7 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
         this.secondFragment = null;
         this.whichHouse = which;
         String currentHouse = (String)this.houses[whichHouse];
-        ((TodoItemListFragment)firstFragment).changeHouse(currentHouse);
+        firstFragment.setHouse(currentHouse);
         dialog.dismiss();
 
     }
