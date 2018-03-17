@@ -15,6 +15,7 @@ import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -27,6 +28,8 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.signature.ObjectKey;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -41,6 +44,7 @@ import java.util.Map;
 
 import dima.it.polimi.blackboard.R;
 
+import dima.it.polimi.blackboard.activities.AddHouseDialogActivity;
 import dima.it.polimi.blackboard.activities.PhotoDialogActivity;
 import dima.it.polimi.blackboard.adapters.HouseListAdapter;
 import dima.it.polimi.blackboard.model.House;
@@ -59,7 +63,9 @@ public class ProfileInfoFragment extends Fragment implements HouseListAdapter.Ho
 
     private ProfileInfoFragment.OnHouseListFragmentInteractionListener mListener;
     private ImageView ivProfile;
-    private boolean changedImage;
+    private FirebaseFirestore db;
+    private List<House> houses;
+    private RecyclerView rv;
 
     public ProfileInfoFragment() {
         // Required empty public constructor
@@ -98,12 +104,10 @@ public class ProfileInfoFragment extends Fragment implements HouseListAdapter.Ho
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        changedImage = false;
-        List<House> myHouses = DataGeneratorUtil.generateHouses(5);
-        RecyclerView rv = view.findViewById(R.id.recycler_view_house);
-        RecyclerView.Adapter adapter = new HouseListAdapter(myHouses,this);
-        rv.setLayoutManager(new GridLayoutManager(getContext(), 3));
-        rv.setAdapter(adapter);
+        db = FirebaseFirestore.getInstance();
+        getHouses();
+        rv = view.findViewById(R.id.recycler_view_house);
+
 
         TextView nameView = view.findViewById(R.id.username);
         TextView mailView = view.findViewById(R.id.email);
@@ -180,6 +184,15 @@ public class ProfileInfoFragment extends Fragment implements HouseListAdapter.Ho
             PopupMenu popupMenu = new PopupMenu(c, v);
             MenuInflater inflater = popupMenu.getMenuInflater();
             inflater.inflate(R.menu.menu_my_houses, popupMenu.getMenu());
+            popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+
+                @Override
+                public boolean onMenuItemClick(MenuItem item) {
+                    Intent intent = new Intent(getActivity(), AddHouseDialogActivity.class);
+                    startActivity(intent);
+                    return true;
+                }
+            });
             popupMenu.show();
         }
     }
@@ -242,4 +255,43 @@ public class ProfileInfoFragment extends Fragment implements HouseListAdapter.Ho
         }
         return  sharedPref.getString("imageCaching","0");
     }
+
+    private void getHouses(){
+        DocumentReference user = db.collection("users").document(FirebaseAuth.getInstance().getCurrentUser().getUid());
+        user.get().addOnCompleteListener((task) -> {
+            List<CharSequence> myHouses = new ArrayList<>();
+            if (task.isSuccessful()) {
+                {
+                    DocumentSnapshot document = task.getResult();
+                    Map<String, Object> userParam = document.getData();
+                    ArrayList<String> houses = (ArrayList<String>)userParam.get("houses");
+                    List<House> userHouses = new ArrayList<>();
+                    for(int i=0; i<houses.size(); i++){
+                        String houseId = houses.get(i).toString();
+                        db.collection("houses").document(houseId).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                if(task.isSuccessful())
+                                {
+
+                                    userHouses.add(new House((String)task.getResult().getData().get("name"),houseId));
+                                    RecyclerView.Adapter adapter = new HouseListAdapter(userHouses,ProfileInfoFragment.this);
+                                    rv.setLayoutManager(new GridLayoutManager(getContext(), 3));
+                                    rv.setAdapter(adapter);
+                                }
+                            }
+                        });
+
+
+
+                    }
+
+                }
+
+            } else {
+                Toast.makeText(this.getActivity(),"Error retrieving houses",Toast.LENGTH_SHORT);
+            }
+        });
+    }
+
 }

@@ -23,6 +23,10 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import dima.it.polimi.blackboard.R;
 
@@ -95,6 +99,9 @@ public class SignInActivity extends AppCompatActivity {
                 if(task.isSuccessful())
                 {
                     Toast.makeText(SignInActivity.this,"You registered successfully",Toast.LENGTH_SHORT).show();
+                    Map<String,Object> email = new HashMap<>();
+                    email.put("uid",firebaseAuth.getCurrentUser().getUid().toString());
+                    FirebaseFirestore.getInstance().collection("e-mail").document(firebaseAuth.getCurrentUser().getEmail()).set(email);
                     finish();
                     Intent i = new Intent(SignInActivity.this, InsertDetailsActivity.class);
                     startActivity(i);

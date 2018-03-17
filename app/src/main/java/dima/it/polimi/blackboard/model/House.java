@@ -11,18 +11,22 @@ import android.os.Parcelable;
 
 public class House implements Parcelable {
     private final String name;
+    private final String id;
 
-    public House(String name){
+    public House(String name,String id){
         this.name = name;
+        this.id = id;
     }
 
     private House(Parcel in) {
         name = in.readString();
+        id = in.readString();
     }
 
     public String getName(){
         return name;
     }
+    public String getId(){return id;}
 
     @Override
     public int describeContents() {
@@ -32,6 +36,7 @@ public class House implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(name);
+        dest.writeString(id);
     }
 
 

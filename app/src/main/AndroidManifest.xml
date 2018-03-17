@@ -91,7 +91,7 @@
 
         <activity
             android:name=".activities.InsertDetailsActivity"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
 
         <service android:name=".services.MyFirebaseMessagingService">
             <intent-filter>
@@ -111,6 +111,10 @@
             android:name="com.google.firebase.messaging.default_notification_channel_id"
             android:value="@string/default_notification_channel_id" />
 
+        <activity
+            android:name=".activities.AddHouseDialogActivity"
+            android:theme="@android:style/Theme.Material.Light.DialogWhenLarge.NoActionBar"
+            android:screenOrientation="portrait"></activity>
     </application>
 
 </manifest>

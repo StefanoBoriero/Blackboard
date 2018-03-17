@@ -102,8 +102,8 @@ public class DataGeneratorUtil {
         List<House> houses = new ArrayList<>(amount);
 
         for(i=0; i<amount; i++){
-            House h = new House("House " + i);
-            houses.add(h);
+            //House h = new House("House " + i);
+            //houses.add(h);
         }
 
         return houses;

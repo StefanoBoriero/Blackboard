@@ -6,6 +6,7 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
@@ -16,9 +17,12 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ListAdapter;
 import android.widget.Toast;
 
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
@@ -37,6 +41,7 @@ import dima.it.polimi.blackboard.R;
 import dima.it.polimi.blackboard.adapters.PaymentViewPagerAdapter;
 import dima.it.polimi.blackboard.fragments.PaymentListFragment;
 import dima.it.polimi.blackboard.fragments.TodoItemListFragment;
+import dima.it.polimi.blackboard.model.House;
 import dima.it.polimi.blackboard.model.PaymentItem;
 import dima.it.polimi.blackboard.model.TodoItem;
 import dima.it.polimi.blackboard.utils.DataGeneratorUtil;
@@ -47,7 +52,7 @@ public class BalanceActivity extends AppCompatActivity  implements PaymentListFr
     private CollapsingToolbarLayout collapsingToolbar;
     private List<PaymentItem> items = DataGeneratorUtil.generatePaymentItems(30);
     private FloatingActionButton mFab;
-    private CharSequence[] houses;
+    private ArrayList<House> houses;
     private FirebaseFirestore db;
     private int selectedHouse = 0;
     private PaymentListFragment listFragmentPositive;
@@ -91,8 +96,8 @@ public class BalanceActivity extends AppCompatActivity  implements PaymentListFr
         listFragmentPositive.setType("positive");
         listFragmentNegative.setType("negative");
 
-        listFragmentPositive.setHouse(houses[0].toString());
-        listFragmentNegative.setHouse(houses[0].toString());
+        listFragmentPositive.setHouse(houses.get(selectedHouse).getId().toString());
+        listFragmentNegative.setHouse(houses.get(selectedHouse).getId().toString());
         mViewPagerAdapter.finishUpdate(mViewPager);
         mViewPager.setAdapter(mViewPagerAdapter);
         TabLayout tabLayout =  findViewById(R.id.tabs);
@@ -228,7 +233,7 @@ public class BalanceActivity extends AppCompatActivity  implements PaymentListFr
 
     public void fabListener(View v){
         Intent intent = new Intent(this, NewPaymentActivity.class);
-        intent.putExtra("HouseName",houses[selectedHouse]);
+        intent.putExtra("HouseName",houses.get(selectedHouse).getId());
 
         ActivityOptions options = ActivityOptions.
                 makeSceneTransitionAnimation(this, mFab, mFab.getTransitionName());
@@ -244,14 +249,26 @@ public class BalanceActivity extends AppCompatActivity  implements PaymentListFr
                 {
                     DocumentSnapshot document = task.getResult();
                     Map<String, Object> userParam = document.getData();
-                    ArrayList<String> houses = (ArrayList<String>)userParam.get("houses");
-                    this.houses = new CharSequence[houses.size()];
-                    for(int i=0; i<houses.size(); i++){
-                        this.houses[i] = houses.get(i);
+                    ArrayList<String> housesIds = (ArrayList<String>)userParam.get("houses");
+                    houses = new ArrayList<>();
+                    for(int i=0; i<housesIds.size(); i++){
+                        String houseId = housesIds.get(i);
+                        db.collection("houses").document(houseId).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                if(task.isSuccessful()){
+                                    String houseName = (String)task.getResult().getData().get("name");
+                                    houses.add(new House(houseName,houseId));
 
+                                    if(houses.size() == housesIds.size())
+                                    {
+                                        displayListFragment();
+                                    }
+                                }
 
+                            }
+                        });
                     }
-                    displayListFragment();
                 }
 
             } else {
@@ -261,10 +278,12 @@ public class BalanceActivity extends AppCompatActivity  implements PaymentListFr
     }
 
 
+
+
     @Override
     public void onClick(DialogInterface dialog, int selected) {
         this.selectedHouse = selected;
-        String currentHouse = (String)this.houses[selectedHouse];
+        String currentHouse = (String)this.houses.get(selectedHouse).getId();
         ((PaymentListFragment)listFragmentPositive).changeHouse(currentHouse);
         ((PaymentListFragment)listFragmentNegative).changeHouse(currentHouse);
         dialog.dismiss();
@@ -288,10 +307,15 @@ public class BalanceActivity extends AppCompatActivity  implements PaymentListFr
     public static class ChooseHouseDialog extends DialogFragment{
         public static Dialog.OnClickListener mListener;
 
-        public static BalanceActivity.ChooseHouseDialog newInstance(int selectedHouse, CharSequence[] houses) {
+        public static BalanceActivity.ChooseHouseDialog newInstance(int selectedHouse, ArrayList<House> houses) {
             Bundle args = new Bundle();
             args.putInt("chosen_house", selectedHouse);
-            args.putCharSequenceArray("houses", houses);
+            CharSequence[] houseChars = new CharSequence[houses.size()];
+            for(int i = 0; i < houses.size(); i++)
+            {
+                houseChars[i] = houses.get(i).getName();
+            }
+            args.putCharSequenceArray("houses", houseChars);
             BalanceActivity.ChooseHouseDialog fragment = new BalanceActivity.ChooseHouseDialog();
             fragment.setArguments(args);
             return fragment;
@@ -299,10 +323,13 @@ public class BalanceActivity extends AppCompatActivity  implements PaymentListFr
 
         @Override
         public Dialog onCreateDialog(final Bundle savedInstanceState) {
+
             int selectedHouse = getArguments().getInt("chosen_house");
             CharSequence[] houses = getArguments().getCharSequenceArray("houses");
             final AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
             dialog.setTitle(R.string.action_choose_house);
+
+
             dialog.setSingleChoiceItems(houses, selectedHouse, mListener);
             return dialog.create();
         }
