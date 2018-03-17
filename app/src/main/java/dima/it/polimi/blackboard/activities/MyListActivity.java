@@ -103,6 +103,11 @@ public class MyListActivity extends DoubleFragmentActivity implements DialogInte
     }
 
     @Override
+    protected void showErrorToast(TodoItem item) {
+        //Todo probably this won't be needed, someone should complete his own task concurrently
+    }
+
+    @Override
     public void onItemSwipe(int swipedPosition, int direction) {
         if(direction == ItemTouchHelper.LEFT) {
             super.removeItem(swipedPosition, TodoItemDetailFragment.ACTION_TAKEN);

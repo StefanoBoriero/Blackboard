@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 
 import dima.it.polimi.blackboard.R;
+import dima.it.polimi.blackboard.exceptions.AlreadyRemovedException;
 import dima.it.polimi.blackboard.fragments.TodoItemDetailFragment;
 import dima.it.polimi.blackboard.fragments.TodoItemListFragment;
 import dima.it.polimi.blackboard.model.TodoItem;
@@ -57,7 +58,6 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
     private static final String CURRENT_HOUSE_INDEX = "current-house-index";
     private static final String CURRENT_ITEM_INDEX = "current-item-index";
     private static final String CURRENT_ITEM = "current-item";
-    private static final String CURRENT_VIEW = "current-view";
     private static final int ACCEPT_TASK_REQUEST = 1;
     private static final int ANIM_DURATION = 250;
 
@@ -71,6 +71,7 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
     private List<TodoItem> itemList;
     private boolean isDouble;
     private boolean isActivityResult;
+    private boolean isEmpty;
 
     protected int whichHouse = 0;
     protected CharSequence[] houses;
@@ -93,10 +94,10 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
 
             if(isDouble){
                 clickedItem = savedInstanceState.getParcelable(CURRENT_ITEM);
-                //firstFragment.setSelectedItem(clickedPosition);
                 secondFragment = (TodoItemDetailFragment)getSupportFragmentManager().findFragmentById(R.id.fragment_detail_container);
-                doubleFragmentClickHandler(itemRowClicked, clickedItem, clickedPosition);
-                //secondFragment.updateFragment(clickedItem, clickedPosition);
+                if(!isEmpty) {
+                    doubleFragmentClickHandler(itemRowClicked, clickedItem, clickedPosition);
+                }
             }
         }
         else{
@@ -185,9 +186,19 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
         if(isDouble()){
             if(secondFragment == null) {
                 instantiateSecondFragment();
-                secondFragment.updateFragment(item, 0);
-                //firstFragment.setSelectedItem(0);
+                if(item != null) {
+                    secondFragment.updateFragment(item, 0);
+                }
+                else{
+                    secondFragment.emptyFragment();
+                }
                 showSecondFragment();
+            }
+            else if(firstFragment.getRemainingItems() == 1){
+                secondFragment.updateFragment(item, 0);
+            }
+            if(firstFragment.getRemainingItems() == 0){
+                secondFragment.emptyFragment();
             }
         }
     }
@@ -296,7 +307,6 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
             secondFragment.updateFragment(item, position);
         }
         itemRowClicked = clickedView;
-
     }
 
     /**
@@ -317,6 +327,9 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        /*TODO pass also the item, try to remove it from the list and catch the exception at line 359
+        // if there was an exception, it had been taken by someone in the meantime
+        */
         // Check which request we're responding to
         if (requestCode == ACCEPT_TASK_REQUEST) {
             // Make sure the request was successful
@@ -324,12 +337,13 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
                 isActivityResult = true;
                 final int position = data.getIntExtra(getResources().getString(R.string.position),0);
                 final String action = data.getStringExtra(DetailTodoItemActivity.RES_ACTION);
+                final TodoItem shownItem= data.getParcelableExtra(DetailTodoItemActivity.SHOWN_ITEM);
                 itemRowClicked.animate()
                         .scaleX(1f)
                         .scaleY(1f)
                         .translationZ(0f)
                         .setDuration(ANIM_DURATION)
-                        .withEndAction( () -> removeItem(position, action))
+                        .withEndAction( () -> removeItem(shownItem, position, action))
                         .start();
             }
         }
@@ -337,7 +351,7 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
 
     @Override
     public void onAcceptClick(TodoItem todoItem, int position, String action) {
-        removeItem(position, action);
+        removeItem(todoItem, position, action);
     }
 
     /**
@@ -351,23 +365,72 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
      * Removes an item at a given position and sets the environment for showing next one
      * @param position the position to remove
      */
-    void removeItem(int position, String action){
+    void removeItem(TodoItem shownItem, int position, String action){
         View nextItemView = firstFragment.getViewHolder(position + 1);
+        try{
+            firstFragment.contains(shownItem);
+            TodoItem removedItem = firstFragment.removeItem(position);
+            showUndoMessage(removedItem, position, action);
+            if(isDouble && checkSelected(position)) {
+                if(firstFragment.getRemainingItems() == 0){
+                    //We're removing the last item
+                    secondFragment.emptyFragment();
+                    isEmpty = true;
+                }
+                else {
+                    isEmpty = false;
+                    TodoItem nextItem = firstFragment.getItem(position);
+                    if (nextItem == null) {
+                        //It was the last of the list
+                        nextItem = firstFragment.getItem(position - 1);
+                        secondFragment.updateFragment(nextItem, position - 1);
+                        firstFragment.setSelectedItem(position - 1);
+                    } else {
+                        secondFragment.updateFragment(nextItem, position);
+                        firstFragment.setSelectedItem(position + 1);
+                    }
+                    itemRowClicked = nextItemView;
+                }
+            }
+        }
+        catch (AlreadyRemovedException e){
+            Log.e(TAG, e.getMessage());
+            showErrorToast(shownItem);
+        }
+
+    }
+
+    /**
+     * Removes an item in a double fragment environment.
+     * Selects also the next one to show
+     * @param position position of removed item
+     * @param action action to take with removed item
+     */
+    public void removeItem(int position, String action){
         TodoItem removedItem = firstFragment.removeItem(position);
         showUndoMessage(removedItem, position, action);
-        if(isDouble && checkSelected(position)){
-            TodoItem nextItem = firstFragment.getItem(position);
-            if(nextItem == null){
-                //It was the last of the list
-                nextItem = firstFragment.getItem(position - 1);
-                secondFragment.updateFragment(nextItem, position - 1);
-                firstFragment.setSelectedItem(position - 1);
+        if(firstFragment.getRemainingItems() == 0){
+            //We're removing the last item
+            secondFragment.emptyFragment();
+            isEmpty = true;
+        }
+        else {
+            //We have to determine which will be the next item shown
+            isEmpty = false;
+            View nextItemView = firstFragment.getViewHolder(position + 1);
+            if (isDouble && checkSelected(position)) {
+                TodoItem nextItem = firstFragment.getItem(position);
+                if (nextItem == null) {
+                    //It was the last of the list
+                    nextItem = firstFragment.getItem(position - 1);
+                    secondFragment.updateFragment(nextItem, position - 1);
+                    firstFragment.setSelectedItem(position - 1);
+                } else {
+                    secondFragment.updateFragment(nextItem, position);
+                    firstFragment.setSelectedItem(position + 1);
+                }
+                itemRowClicked = nextItemView;
             }
-            else{
-                secondFragment.updateFragment(nextItem, position);
-                firstFragment.setSelectedItem(position + 1);
-            }
-            itemRowClicked = nextItemView;
         }
     }
 
@@ -402,6 +465,8 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
     }
 
     protected abstract void callNetwork(TodoItem changedItem, String action);
+
+    protected abstract void showErrorToast(TodoItem item);
 
 
     /**

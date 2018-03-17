@@ -100,6 +100,19 @@ public class HouseListActivity extends DoubleFragmentActivity{
                     "taken", true,
                     "takenBy", userId
             );
+            /*
+            item.get().addOnCompleteListener( task -> {
+                if(task.isSuccessful()){
+                    if( (boolean)task.getResult().getData().get("taken")){
+                        Toast.makeText(this, "Uh-oh, someone already took this one!", Toast.LENGTH_SHORT)
+                            .show();
+                    }
+                    else {
+
+                    }
+                }
+            });
+            */
         }
     }
 
@@ -123,9 +136,16 @@ public class HouseListActivity extends DoubleFragmentActivity{
         }
     }
 
+    @Override
+    protected void showErrorToast(TodoItem item) {
+        String message = "Uh-oh, someone already took " + item.getName() + "!";
+        Toast.makeText(this, message, Toast.LENGTH_SHORT)
+                .show();
+    }
+
     /*
-    FAB listener set in XML layout
-     */
+        FAB listener set in XML layout
+         */
     public void fabListener(View v){
         if(houseDownloadComplete) {
             Intent intent = new Intent(this, NewToDoTaskActivity.class);
@@ -143,7 +163,7 @@ public class HouseListActivity extends DoubleFragmentActivity{
 
     @Override
     public void onBackPressed() {
-        ((TodoItemListFragment)firstFragment).stopListening();
+        firstFragment.stopListening();
         super.onBackPressed();
     }
 }

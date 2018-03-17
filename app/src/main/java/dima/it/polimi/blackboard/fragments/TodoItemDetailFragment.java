@@ -9,6 +9,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -51,6 +52,7 @@ public class TodoItemDetailFragment extends Fragment {
     public static final String ACTION_TAKEN = "taken";
     public static final String ACTION_DELETED = "deleted";
     private static final String CURRENT_TASK = "current_task";
+    private static final String TAG = "detail-frag";
 
     private TodoItem todoTask;
     private String transitionName;
@@ -136,61 +138,63 @@ public class TodoItemDetailFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        RecyclerView rv = view.findViewById(R.id.recycler_view_detail);
-        populateRecyclerView(rv);
+        if(todoTask != null) {
+            RecyclerView rv = view.findViewById(R.id.recycler_view_detail);
+            populateRecyclerView(rv);
 
-        TextView nameView = view.findViewById(R.id.item_name);
-        nameView.setText(todoTask.getName());
-        nameView.setTransitionName(transitionName);
+            TextView nameView = view.findViewById(R.id.item_name);
+            nameView.setText(todoTask.getName());
+            nameView.setTransitionName(transitionName);
 
-        TextView addedBy = view.findViewById(R.id.added_by);
-        String username = UserDecoder.getInstance().getNameFromId(todoTask.getCreatedBy());
-        String s = "Added by " + username;
-        addedBy.setText(s);
+            TextView addedBy = view.findViewById(R.id.added_by);
+            String username = UserDecoder.getInstance().getNameFromId(todoTask.getCreatedBy());
+            String s = "Added by " + username;
+            addedBy.setText(s);
 
 
-        // Binds dynamically the shared element through transition name
-        ImageView userIconView = view.findViewById(R.id.user_icon);
-        userIconView.setTransitionName(transitionNameIcon);
+            // Binds dynamically the shared element through transition name
+            ImageView userIconView = view.findViewById(R.id.user_icon);
+            userIconView.setTransitionName(transitionNameIcon);
 
-        Context parentActivity = getActivity();
-        if(parentActivity != null) {
-            FirebaseStorage storage = FirebaseStorage.getInstance();
-            DocumentReference userReference = FirebaseFirestore.getInstance().collection("users").document(todoTask.getCreatedBy());
-            userReference.get().addOnCompleteListener((task) -> {
-                List<CharSequence> myHouses = new ArrayList<>();
-                if (task.isSuccessful()) {
-                    {
-                        DocumentSnapshot document = task.getResult();
-                        Map<String, Object> userParam = document.getData();
-                        String lastEdit = (String)userParam.get("lastEdit");
-                        StorageReference reference = storage.getReference().child(todoTask.getCreatedBy() + "/profile" + lastEdit);
-                        GlideApp.with(this)
-                                .load(reference)
-                                .error(R.drawable.empty_profile_blue_circle)
-                                .apply(RequestOptions.circleCropTransform())
-                                .into(userIconView);
+            Context parentActivity = getActivity();
+            if (parentActivity != null) {
+                FirebaseStorage storage = FirebaseStorage.getInstance();
+                DocumentReference userReference = FirebaseFirestore.getInstance().collection("users").document(todoTask.getCreatedBy());
+                userReference.get().addOnCompleteListener((task) -> {
+                    List<CharSequence> myHouses = new ArrayList<>();
+                    if (task.isSuccessful()) {
+                        {
+                            DocumentSnapshot document = task.getResult();
+                            if (document.exists()) {
+                                Map<String, Object> userParam = document.getData();
+                                String lastEdit = (String) userParam.get("lastEdit");
+                                StorageReference reference = storage.getReference().child(todoTask.getCreatedBy() + "/profile" + lastEdit);
+                                GlideApp.with(this)
+                                        .load(reference)
+                                        .error(R.drawable.empty_profile_blue_circle)
+                                        .apply(RequestOptions.circleCropTransform())
+                                        .into(userIconView);
+                            }
+                        }
+
+                    } else {
+                        //TODO display error message
                     }
+                });
+            }
+            //Binds the button click action to parent activity
+            View acceptBtn = view.findViewById(R.id.accept_button);
+            acceptBtn.setOnClickListener((v) ->
+                    mListener.onAcceptClick(todoTask, position, ACTION_TAKEN)
+            );
 
-                } else {
-                    //TODO display error message
-                }
-            });
+            View deleteBtn = view.findViewById(R.id.delete);
+            deleteBtn.setOnClickListener((v) ->
+                    mListener.onAcceptClick(todoTask, position, ACTION_DELETED));
         }
-/*
-        TextView typeView = view.findViewById(R.id.type_detail);
-        typeView.setText(todoTask.getType());
-        typeView.setCompoundDrawablesWithIntrinsicBounds(resolveIcon(todoTask.getType()), null, null, null);
-*/
-        //Binds the button click action to parent activity
-        View acceptBtn = view.findViewById(R.id.accept_button);
-        acceptBtn.setOnClickListener((v)->
-                mListener.onAcceptClick(todoTask, position, ACTION_TAKEN)
-        );
-
-        View deleteBtn = view.findViewById(R.id.delete);
-        deleteBtn.setOnClickListener((v) ->
-                mListener.onAcceptClick(todoTask, position, ACTION_DELETED));
+        else{
+            emptyFragment();
+        }
     }
 
     /**
@@ -200,10 +204,12 @@ public class TodoItemDetailFragment extends Fragment {
     private void populateRecyclerView(RecyclerView recyclerView){
         Context context = this.getActivity();
         if(context != null){
-            RecyclerView.Adapter adapter = new DetailAdapter(todoTask.getDetails());
-            recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-            recyclerView.addItemDecoration(new DividerItemDecoration(context, LinearLayoutManager.VERTICAL));
-            recyclerView.setAdapter(adapter);
+            if(todoTask != null) {
+                RecyclerView.Adapter adapter = new DetailAdapter(todoTask.getDetails());
+                recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+                recyclerView.addItemDecoration(new DividerItemDecoration(context, LinearLayoutManager.VERTICAL));
+                recyclerView.setAdapter(adapter);
+            }
         }
     }
 
@@ -281,6 +287,8 @@ public class TodoItemDetailFragment extends Fragment {
         this.position = position;
 
         if(rootView != null) {
+            rootView.findViewById(R.id.content).setVisibility(View.VISIBLE);
+            rootView.findViewById(R.id.empty_message).setVisibility(View.INVISIBLE);
             TextView nameView = rootView.findViewById(R.id.item_name);
             nameView.setText(todoItem.getName());
 
@@ -313,6 +321,7 @@ public class TodoItemDetailFragment extends Fragment {
                     if (task.isSuccessful()) {
                         {
                             DocumentSnapshot document = task.getResult();
+                            if(document.exists()){
                             Map<String, Object> userParam = document.getData();
                             String lastEdit = (String)userParam.get("lastEdit");
                             StorageReference reference = storage.getReference().child(todoTask.getCreatedBy() + "/profile" + lastEdit);
@@ -321,6 +330,7 @@ public class TodoItemDetailFragment extends Fragment {
                                     .error(R.drawable.empty_profile_blue_circle)
                                     .apply(RequestOptions.circleCropTransform())
                                     .into(userIconView);
+                            }
                         }
 
                     } else {
@@ -328,6 +338,18 @@ public class TodoItemDetailFragment extends Fragment {
                     }
                 });
             }
+        }
+    }
+
+    /**
+     * Shows a message if there's no item to show details
+     */
+    public void emptyFragment(){
+        Log.d(TAG, "Emptying the detail view");
+        View view = getView();
+        if(view != null){
+            view.findViewById(R.id.content).setVisibility(View.INVISIBLE);
+            view.findViewById(R.id.empty_message).setVisibility(View.VISIBLE);
         }
     }
 

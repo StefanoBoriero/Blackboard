@@ -33,6 +33,7 @@ import dima.it.polimi.blackboard.R;
 import dima.it.polimi.blackboard.activities.HouseListActivity;
 import dima.it.polimi.blackboard.adapters.FirestoreAdapter;
 import dima.it.polimi.blackboard.adapters.TodoListAdapter;
+import dima.it.polimi.blackboard.exceptions.AlreadyRemovedException;
 import dima.it.polimi.blackboard.helper.TodoItemTouchHelper;
 import dima.it.polimi.blackboard.model.TodoItem;
 import dima.it.polimi.blackboard.receivers.BatteryStatusReceiver;
@@ -396,6 +397,14 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
        }
     }
 
+    public boolean contains(TodoItem item) throws AlreadyRemovedException{
+        return adapter.contains(item);
+    }
+
+    public int getRemainingItems(){
+        return adapter.getItemCount();
+    }
+
     private void highlight(View view){
         Drawable selected = getResources().getDrawable(R.color.colorAccent);
         view.findViewById(R.id.selected_flag).setBackground(selected);
@@ -404,7 +413,12 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
     @Override
     public void onCompleteDouble(DocumentSnapshot snapshot){
         if(mListener != null) {
-            mListener.onDownloadComplete(snapshot.toObject(TodoItem.class));
+            if(snapshot != null) {
+                mListener.onDownloadComplete(snapshot.toObject(TodoItem.class));
+            }
+            else{
+                mListener.onDownloadComplete(null);
+            }
         }
     }
 

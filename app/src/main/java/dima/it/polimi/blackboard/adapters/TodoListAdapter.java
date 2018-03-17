@@ -33,6 +33,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import dima.it.polimi.blackboard.R;
+import dima.it.polimi.blackboard.exceptions.AlreadyRemovedException;
 import dima.it.polimi.blackboard.fragments.TodoItemListFragment;
 import dima.it.polimi.blackboard.model.TodoItem;
 import dima.it.polimi.blackboard.utils.GlideApp;
@@ -105,14 +106,16 @@ public class TodoListAdapter extends FirestoreAdapter<TodoListAdapter.ViewHolder
             if (task.isSuccessful()) {
                 {
                     DocumentSnapshot document = task.getResult();
-                    Map<String, Object> userParam = document.getData();
-                    String lastEdit = (String)userParam.get("lastEdit");
-                    StorageReference reference = storage.getReference().child(todoItem.getCreatedBy() + "/profile" + lastEdit);
-                    GlideApp.with( (TodoItemListFragment)mListener)
-                            .load(reference)
-                            .error(R.drawable.empty_profile_blue_circle)
-                            .apply(RequestOptions.circleCropTransform())
-                            .into(holder.userIcon);
+                    if(document.exists()) {
+                        Map<String, Object> userParam = document.getData();
+                        String lastEdit = (String) userParam.get("lastEdit");
+                        StorageReference reference = storage.getReference().child(todoItem.getCreatedBy() + "/profile" + lastEdit);
+                        GlideApp.with((TodoItemListFragment) mListener)
+                                .load(reference)
+                                .error(R.drawable.empty_profile_blue_circle)
+                                .apply(RequestOptions.circleCropTransform())
+                                .into(holder.userIcon);
+                    }
                 }
 
             } else {
@@ -173,6 +176,19 @@ public class TodoListAdapter extends FirestoreAdapter<TodoListAdapter.ViewHolder
 
     public interface TodoListAdapterListener {
         void onTodoItemClicked(TodoItem todoItem, View todoItemView, int clickedPosition);
+    }
+
+
+    public boolean contains(TodoItem item) throws AlreadyRemovedException{
+        int size = getItemCount();
+        String id = item.getId();
+        for(int i=0; i<size; i++){
+            DocumentSnapshot doc = getSnapshot(i);
+            if(doc.getId().equals(id)){
+                return true;
+            }
+        }
+        throw new AlreadyRemovedException(item);
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder{

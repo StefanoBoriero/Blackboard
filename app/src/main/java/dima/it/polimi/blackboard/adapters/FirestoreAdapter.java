@@ -81,6 +81,9 @@ public abstract class FirestoreAdapter<VH extends RecyclerView.ViewHolder>
             if(!mSnapshots.isEmpty()){
                 mListener.onCompleteDouble(mSnapshots.get(0));
             }
+            else{
+                mListener.onCompleteDouble(null);
+            }
         }
         getFilter().filter(filter);
 
@@ -94,8 +97,13 @@ public abstract class FirestoreAdapter<VH extends RecyclerView.ViewHolder>
     private void onDocumentModified(DocumentChange change){
         if (change.getOldIndex() == change.getNewIndex()) {
             // Item changed but remained in same position
-            mSnapshots.set(change.getOldIndex(), change.getDocument());
-            notifyItemChanged(change.getOldIndex());
+            try {
+                mSnapshots.set(change.getOldIndex(), change.getDocument());
+                notifyItemChanged(change.getOldIndex());
+            }
+            catch (IndexOutOfBoundsException e){
+                Log.e(TAG, e.getMessage());
+            }
         } else {
             // Item changed and changed position
             mSnapshots.remove(change.getOldIndex());
@@ -194,9 +202,15 @@ public abstract class FirestoreAdapter<VH extends RecyclerView.ViewHolder>
     }
 
     public void removeItem(int position){
-        removedByMe = true;
-        lastRemoved = mFilteredSnapshots.remove(position);
-        notifyItemRemoved(position);
+        try {
+            lastRemoved = mFilteredSnapshots.remove(position);
+            removedByMe = true;
+            notifyItemRemoved(position);
+        }
+        catch (IndexOutOfBoundsException e){
+            Log.d("FirestoreAdapter", e.getMessage());
+        }
+
     }
 
     void insertItem(int position){
