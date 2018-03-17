@@ -13,6 +13,8 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -38,13 +40,16 @@ import java.util.List;
 import java.util.Map;
 
 import dima.it.polimi.blackboard.R;
+import dima.it.polimi.blackboard.adapters.HouseListAdapter;
 import dima.it.polimi.blackboard.adapters.PaymentViewPagerAdapter;
 import dima.it.polimi.blackboard.fragments.PaymentListFragment;
+import dima.it.polimi.blackboard.fragments.ProfileInfoFragment;
 import dima.it.polimi.blackboard.fragments.TodoItemListFragment;
 import dima.it.polimi.blackboard.model.House;
 import dima.it.polimi.blackboard.model.PaymentItem;
 import dima.it.polimi.blackboard.model.TodoItem;
 import dima.it.polimi.blackboard.utils.DataGeneratorUtil;
+import dima.it.polimi.blackboard.utils.UserDecoder;
 
 public class BalanceActivity extends AppCompatActivity  implements PaymentListFragment.OnListFragmentInteractionListener, DialogInterface.OnClickListener{
 
@@ -59,6 +64,7 @@ public class BalanceActivity extends AppCompatActivity  implements PaymentListFr
     private PaymentListFragment listFragmentNegative;
     private ViewPager mViewPager;
     private PaymentViewPagerAdapter mViewPagerAdapter;
+    private ListenerRegistration myListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,7 +77,7 @@ public class BalanceActivity extends AppCompatActivity  implements PaymentListFr
         mFab.setTransitionName("revealCircular");
 
         db = FirebaseFirestore.getInstance();
-        getHouses();
+        newGetHoues();
 
 
 
@@ -96,8 +102,10 @@ public class BalanceActivity extends AppCompatActivity  implements PaymentListFr
         listFragmentPositive.setType("positive");
         listFragmentNegative.setType("negative");
 
-        listFragmentPositive.setHouse(houses.get(selectedHouse).getId().toString());
-        listFragmentNegative.setHouse(houses.get(selectedHouse).getId().toString());
+        if(houses.size()> 0) {
+            listFragmentPositive.setHouse(houses.get(selectedHouse).getId().toString());
+            listFragmentNegative.setHouse(houses.get(selectedHouse).getId().toString());
+        }
         mViewPagerAdapter.finishUpdate(mViewPager);
         mViewPager.setAdapter(mViewPagerAdapter);
         TabLayout tabLayout =  findViewById(R.id.tabs);
@@ -274,6 +282,36 @@ public class BalanceActivity extends AppCompatActivity  implements PaymentListFr
             } else {
                 Toast.makeText(this,"Error retrieving houses",Toast.LENGTH_SHORT);
             }
+        });
+    }
+
+    private void newGetHoues()
+    {
+        CollectionReference user = db.collection("houses");
+        houses = new ArrayList<>();
+
+        myListener = user.addSnapshotListener( (querySnapshot, error) ->
+        {
+            if (error != null) {
+                return;
+            }
+
+            for(DocumentChange dc: querySnapshot.getDocumentChanges()){
+                if(dc.getType() == DocumentChange.Type.ADDED){
+                    String name = (String)dc.getDocument().getData().get("name");
+                    String id = dc.getDocument().getId();
+                    Map<String,Object> houseData = dc.getDocument().getData();
+                    Map<String,Object> roommates = (Map<String, Object>) houseData.get("roommates");
+                    ArrayList<String> roomMatesList = (ArrayList<String>) roommates.get("roommates");
+                    if(roomMatesList.contains(FirebaseAuth.getInstance().getCurrentUser().getUid().toString())) {
+                        House newHouse = new House(name, id);
+                        UserDecoder.getInstance().populateFromHouse(id);
+                        houses.add(newHouse);
+
+                    }
+                }
+            }
+            displayListFragment();
         });
     }
 

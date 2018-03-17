@@ -32,12 +32,16 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -48,9 +52,11 @@ import dima.it.polimi.blackboard.activities.AddHouseDialogActivity;
 import dima.it.polimi.blackboard.activities.PhotoDialogActivity;
 import dima.it.polimi.blackboard.adapters.HouseListAdapter;
 import dima.it.polimi.blackboard.model.House;
+import dima.it.polimi.blackboard.model.PaymentItem;
 import dima.it.polimi.blackboard.model.User;
 import dima.it.polimi.blackboard.utils.DataGeneratorUtil;
 import dima.it.polimi.blackboard.utils.GlideApp;
+import dima.it.polimi.blackboard.utils.UserDecoder;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -66,6 +72,7 @@ public class ProfileInfoFragment extends Fragment implements HouseListAdapter.Ho
     private FirebaseFirestore db;
     private List<House> houses;
     private RecyclerView rv;
+    private ListenerRegistration myListener;
 
     public ProfileInfoFragment() {
         // Required empty public constructor
@@ -105,8 +112,9 @@ public class ProfileInfoFragment extends Fragment implements HouseListAdapter.Ho
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         db = FirebaseFirestore.getInstance();
-        getHouses();
+
         rv = view.findViewById(R.id.recycler_view_house);
+        newGetHoues();
 
 
         TextView nameView = view.findViewById(R.id.username);
@@ -256,41 +264,37 @@ public class ProfileInfoFragment extends Fragment implements HouseListAdapter.Ho
         return  sharedPref.getString("imageCaching","0");
     }
 
-    private void getHouses(){
-        DocumentReference user = db.collection("users").document(FirebaseAuth.getInstance().getCurrentUser().getUid());
-        user.get().addOnCompleteListener((task) -> {
-            List<CharSequence> myHouses = new ArrayList<>();
-            if (task.isSuccessful()) {
-                {
-                    DocumentSnapshot document = task.getResult();
-                    Map<String, Object> userParam = document.getData();
-                    ArrayList<String> houses = (ArrayList<String>)userParam.get("houses");
-                    List<House> userHouses = new ArrayList<>();
-                    for(int i=0; i<houses.size(); i++){
-                        String houseId = houses.get(i).toString();
-                        db.collection("houses").document(houseId).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                            @Override
-                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                if(task.isSuccessful())
-                                {
-
-                                    userHouses.add(new House((String)task.getResult().getData().get("name"),houseId));
-                                    RecyclerView.Adapter adapter = new HouseListAdapter(userHouses,ProfileInfoFragment.this);
-                                    rv.setLayoutManager(new GridLayoutManager(getContext(), 3));
-                                    rv.setAdapter(adapter);
-                                }
-                            }
-                        });
 
 
+    private void newGetHoues()
+    {
+       CollectionReference user = db.collection("houses");
+       houses = new ArrayList<>();
 
-                    }
-
-                }
-
-            } else {
-                Toast.makeText(this.getActivity(),"Error retrieving houses",Toast.LENGTH_SHORT);
+        myListener = user.addSnapshotListener( (querySnapshot, error) ->
+        {
+            if (error != null) {
+                return;
             }
+
+            for(DocumentChange dc: querySnapshot.getDocumentChanges()){
+                if(dc.getType() == DocumentChange.Type.ADDED){
+                    String name = (String)dc.getDocument().getData().get("name");
+                    String id = dc.getDocument().getId();
+                    Map<String,Object> houseData = dc.getDocument().getData();
+                    Map<String,Object> roommates = (Map<String, Object>) houseData.get("roommates");
+                    ArrayList<String> roomMatesList = (ArrayList<String>) roommates.get("roommates");
+                    if(roomMatesList.contains(FirebaseAuth.getInstance().getCurrentUser().getUid().toString())) {
+                        House newHouse = new House(name, id);
+                        UserDecoder.getInstance().populateFromHouse(id);
+                        houses.add(newHouse);
+                        RecyclerView.Adapter adapter = new HouseListAdapter(houses, ProfileInfoFragment.this);
+                        rv.setLayoutManager(new GridLayoutManager(getContext(), 3));
+                        rv.setAdapter(adapter);
+                    }
+                }
+            }
+
         });
     }
 
