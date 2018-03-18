@@ -15,6 +15,8 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -23,13 +25,13 @@ import android.widget.TextView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 
 import java.util.List;
 
 import dima.it.polimi.blackboard.R;
+import dima.it.polimi.blackboard.activities.DoubleFragmentActivity;
 import dima.it.polimi.blackboard.activities.HouseListActivity;
 import dima.it.polimi.blackboard.adapters.FirestoreAdapter;
 import dima.it.polimi.blackboard.adapters.TodoListAdapter;
@@ -58,12 +60,13 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
 
     private int mColumnCount = 1;
     private OnListFragmentInteractionListener mListener;
+    private FirestoreAdapter.OnCompleteListener mOnCompleteListener;
     private RecyclerView recyclerView;
     private ItemTouchHelper swipeHelper;
     private TodoListAdapter adapter;
 
     private View rootView;
-    private View oldHighlited;
+    private View oldHighlighted;
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private String authId;
@@ -132,6 +135,11 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
     }
 
     @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_list, container, false);
@@ -191,15 +199,11 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
             setSelectedItem(toHighlightIndex);
         }
 
-        /*
-        prepareQuery();
-        adapter.startListening();
-        */
         setHouse(house);
         return view;
     }
 
-    //Remebering the current selected item
+    //Remembering the current selected item
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         outState.putInt(CURRENT_SELECTED_INDEX, toHighlightIndex);
@@ -219,6 +223,9 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
         super.onAttach(context);
         if (context instanceof OnListFragmentInteractionListener) {
             mListener = (OnListFragmentInteractionListener) context;
+            if(context instanceof FirestoreAdapter.OnCompleteListener){
+                mOnCompleteListener = (FirestoreAdapter.OnCompleteListener) context;
+            }
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement OnListFragmentInteractionListener");
@@ -243,35 +250,34 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
         if(adapter == null){
             //We're initialing the fragment the first time or after rotation
             if(isDouble) {
-                adapter = new TodoListAdapter(myQuery, this, this, toHighlightIndex);
+                adapter = new TodoListAdapter(myQuery, this, mOnCompleteListener, toHighlightIndex);
             }
             else{
-                adapter = new TodoListAdapter(myQuery, this, this);
+                adapter = new TodoListAdapter(myQuery, this, mOnCompleteListener);
             }
             recyclerView.setAdapter(adapter);
         }else{
             //We're changing the house
-            oldHighlited = null;
+            oldHighlighted = null;
             toHighlightIndex = 0;
         }
-        //adapter.startListening();
         this.adapter.setQuery(myQuery);
     }
 
     public void setSelectedItem(int index){
 
-        if(oldHighlited != null){
-            oldHighlited.findViewById(R.id.selected_flag).setBackground(null);
+        if(oldHighlighted != null){
+            oldHighlighted.findViewById(R.id.selected_flag).setBackground(null);
         }else{
-            oldHighlited = recyclerView.getChildAt(toHighlightIndex);
-            if(oldHighlited != null){
-                oldHighlited.findViewById(R.id.selected_flag).setBackground(null);
+            oldHighlighted = recyclerView.getChildAt(toHighlightIndex);
+            if(oldHighlighted != null){
+                oldHighlighted.findViewById(R.id.selected_flag).setBackground(null);
             }
         }
         toHighlightIndex = index;
         View toHighlight = recyclerView.getChildAt(toHighlightIndex);
         if(toHighlight != null) {
-            oldHighlited = toHighlight;
+            oldHighlighted = toHighlight;
             highlight(toHighlight);
         }
     }
@@ -285,19 +291,22 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
     }
 
     public void setSearchView(SearchView searchView){
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                adapter.getFilter().filter(query);
-                return false;
-            }
+        DoubleFragmentActivity parent = (DoubleFragmentActivity)getActivity();
+        if(parent != null) {
+            searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextSubmit(String query) {
+                    adapter.getFilter().filter(query, parent);
+                    return false;
+                }
 
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                adapter.getFilter().filter(newText);
-                return false;
-            }
-        });
+                @Override
+                public boolean onQueryTextChange(String newText) {
+                    adapter.getFilter().filter(newText, parent);
+                    return false;
+                }
+            });
+        }
     }
 
     /**
@@ -397,6 +406,22 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
        }
     }
 
+    public void emptyFragment(){
+        View rootView = getView();
+        if(rootView != null) {
+            View emptyMessage = rootView.findViewById(R.id.empty_message);
+            emptyMessage.setVisibility(View.VISIBLE);
+        }
+    }
+
+    public void fillFragment(){
+        View rootView = getView();
+        if(rootView != null) {
+            View emptyMessage = rootView.findViewById(R.id.empty_message);
+            emptyMessage.setVisibility(View.INVISIBLE);
+        }
+    }
+
     public boolean contains(TodoItem item) throws AlreadyRemovedException{
         return adapter.contains(item);
     }
@@ -408,18 +433,6 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
     private void highlight(View view){
         Drawable selected = getResources().getDrawable(R.color.colorAccent);
         view.findViewById(R.id.selected_flag).setBackground(selected);
-    }
-
-    @Override
-    public void onCompleteDouble(DocumentSnapshot snapshot){
-        if(mListener != null) {
-            if(snapshot != null) {
-                mListener.onDownloadComplete(snapshot.toObject(TodoItem.class));
-            }
-            else{
-                mListener.onDownloadComplete(null);
-            }
-        }
     }
 
     public void stopListening(){
@@ -439,6 +452,5 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
     public interface OnListFragmentInteractionListener {
         void onItemClick(TodoItem item, View view, int clickedPosition);
         void onItemSwipe(int swipedPosition, int direction);
-        void onDownloadComplete(TodoItem item);
     }
 }

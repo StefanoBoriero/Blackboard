@@ -282,11 +282,19 @@ public class TodoItemDetailFragment extends Fragment {
      * @param position the position of the new item
      */
     public void updateFragment(TodoItem todoItem, int position){
+        if(todoTask != null){
+            if(todoItem.getId().equals(todoTask.getId())){
+                //We are already showing the correct information
+                return;
+            }
+        }
         View rootView = getView();
         todoTask = todoItem;
         this.position = position;
 
         if(rootView != null) {
+            fillFragment();
+            Log.d(TAG, "Updating the content of detail fragment");
             rootView.findViewById(R.id.content).setVisibility(View.VISIBLE);
             rootView.findViewById(R.id.empty_message).setVisibility(View.INVISIBLE);
             TextView nameView = rootView.findViewById(R.id.item_name);
@@ -350,6 +358,14 @@ public class TodoItemDetailFragment extends Fragment {
         if(view != null){
             view.findViewById(R.id.content).setVisibility(View.INVISIBLE);
             view.findViewById(R.id.empty_message).setVisibility(View.VISIBLE);
+        }
+    }
+
+    public void fillFragment(){
+        View view = getView();
+        if(view != null){
+            view.findViewById(R.id.content).setVisibility(View.VISIBLE);
+            view.findViewById(R.id.empty_message).setVisibility(View.INVISIBLE);
         }
     }
 

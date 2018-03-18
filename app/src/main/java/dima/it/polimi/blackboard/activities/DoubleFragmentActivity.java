@@ -25,6 +25,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Filter;
 
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -35,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 
 import dima.it.polimi.blackboard.R;
+import dima.it.polimi.blackboard.adapters.FirestoreAdapter;
 import dima.it.polimi.blackboard.exceptions.AlreadyRemovedException;
 import dima.it.polimi.blackboard.fragments.TodoItemDetailFragment;
 import dima.it.polimi.blackboard.fragments.TodoItemListFragment;
@@ -52,12 +54,14 @@ import dima.it.polimi.blackboard.utils.UserDecoder;
 public abstract class DoubleFragmentActivity extends AppCompatActivity
         implements TodoItemListFragment.OnListFragmentInteractionListener,
             TodoItemDetailFragment.OnTodoItemDetailInteraction,
-            DialogInterface.OnClickListener{
+            DialogInterface.OnClickListener,
+        FirestoreAdapter.OnCompleteListener, Filter.FilterListener{
 
     private static final String TAG = "double_frag_activity";
     private static final String CURRENT_HOUSE_INDEX = "current-house-index";
     private static final String CURRENT_ITEM_INDEX = "current-item-index";
     private static final String CURRENT_ITEM = "current-item";
+    private static final String CURRENT_SEARCH_QUERY = "current-search-query";
     private static final int ACCEPT_TASK_REQUEST = 1;
     private static final int ANIM_DURATION = 250;
 
@@ -72,6 +76,10 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
     private boolean isDouble;
     private boolean isActivityResult;
     private boolean isEmpty;
+    private boolean wasEmpty;
+
+    private CharSequence searchQuery;
+    private SearchView searchView;
 
     protected int whichHouse = 0;
     protected CharSequence[] houses;
@@ -90,6 +98,7 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
             clickedPosition = savedInstanceState.getInt(CURRENT_ITEM_INDEX);
             firstFragment = (TodoItemListFragment)getSupportFragmentManager().findFragmentById(R.id.fragment_list_container);
             firstFragment.setAuthId(User.getInstance().getAuth_id());
+            searchQuery = savedInstanceState.getCharSequence(CURRENT_SEARCH_QUERY);
             //firstFragment.setHouse((String)houses[whichHouse]);
 
             if(isDouble){
@@ -114,6 +123,7 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
         savedInstanceState.putInt(CURRENT_HOUSE_INDEX, whichHouse);
         savedInstanceState.putInt(CURRENT_ITEM_INDEX, clickedPosition);
         savedInstanceState.putParcelable(CURRENT_ITEM, clickedItem);
+        savedInstanceState.putCharSequence(CURRENT_SEARCH_QUERY, searchView.getQuery());
         // Always call the superclass so it can save the view hierarchy state
         super.onSaveInstanceState(savedInstanceState);
     }
@@ -128,13 +138,18 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
 
         // Implementing the search functionality
         SearchManager searchManager = (SearchManager)getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView = (SearchView)menu.findItem(R.id.action_search)
+        searchView = (SearchView)menu.findItem(R.id.action_search)
                 .getActionView();
         if(searchManager != null) {
             searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         }
         searchView.setMaxWidth(Integer.MAX_VALUE);
+
         firstFragment.setSearchView(searchView);
+        if(searchQuery != null && !searchQuery.equals("")) {
+            searchView.setQuery(searchQuery, true);
+            searchView.setIconified(false);
+        }
 
         super.onCreateOptionsMenu(menu);
         return true;
@@ -171,35 +186,66 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
         firstFragment = TodoItemListFragment.newInstance(1, isDouble(), (String)houses[whichHouse]);
     }
 
-    private void setHouse(String house){
-        firstFragment.setHouse(house);
-    }
-
     private void instantiateSecondFragment(){
         secondFragment = TodoItemDetailFragment.newInstance();
     }
 
-
-
+    /**
+     * Method called at the end of update from Firestore
+     * @param isEmpty represents the fact whether the item list is empty or not
+     */
     @Override
-    public void onDownloadComplete(TodoItem item){
-        if(isDouble()){
-            if(secondFragment == null) {
+    public void onComplete(boolean isEmpty) {
+        //Check if the second fragment has been instantiated
+        if(isDouble){
+            if(secondFragment == null){
+                Log.d(TAG, "Instantiating second fragment");
+                // instantiate it
                 instantiateSecondFragment();
-                if(item != null) {
-                    secondFragment.updateFragment(item, 0);
-                }
-                else{
-                    secondFragment.emptyFragment();
-                }
+                // update its state with the first item in the list
+                TodoItem firstItem = firstFragment.getItem(0);
+                secondFragment.updateFragment(firstItem, 0);
+                // show it
                 showSecondFragment();
             }
-            else if(firstFragment.getRemainingItems() == 1){
-                secondFragment.updateFragment(item, 0);
-            }
-            if(firstFragment.getRemainingItems() == 0){
+        }
+        if(isEmpty){
+            // If the list of items is empty, show a message
+            Log.d(TAG, "Showing empty message");
+            firstFragment.emptyFragment();
+            if(isDouble){
+                wasEmpty = true;
                 secondFragment.emptyFragment();
             }
+        }
+        else{
+            Log.d(TAG, "Showing the content");
+            if(wasEmpty) {
+                // Show the correct content
+                firstFragment.fillFragment();
+                if (isDouble) {
+                    if (wasEmpty) {
+                        wasEmpty = false;
+                        // If it's the first item in the list
+                        secondFragment.updateFragment(firstFragment.getItem(0), 0);
+                    }
+                    secondFragment.fillFragment();
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onFilterComplete(int i) {
+        if(isDouble){
+            if(firstFragment.getRemainingItems() == 0){
+                // The search didn't match any item
+                secondFragment.emptyFragment();
+                return;
+            }
+            TodoItem firstItem = firstFragment.getItem(0);
+            firstFragment.setSelectedItem(0);
+            secondFragment.updateFragment(firstItem, 0);
         }
     }
 

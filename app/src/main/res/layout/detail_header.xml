@@ -18,7 +18,7 @@
         android:layout_width="56dp"
         android:layout_height="56dp"
         android:layout_margin="@dimen/margin_icon"
-        android:src="@drawable/empty_profile_blue_circle"
+        tools:src="@drawable/empty_profile_blue_circle"
         android:contentDescription="@string/content_description_user_icon"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"

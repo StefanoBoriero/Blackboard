@@ -27,7 +27,7 @@ import dima.it.polimi.blackboard.model.TodoItem;
  */
 
 public abstract class FirestoreAdapter<VH extends RecyclerView.ViewHolder>
-        extends RecyclerView.Adapter<VH> implements EventListener<QuerySnapshot>, Filterable {
+        extends RecyclerView.Adapter<VH> implements EventListener<QuerySnapshot>, Filterable, Filter.FilterListener {
 
     private static final String TAG = "FirestoreAdapter";
 
@@ -76,16 +76,15 @@ public abstract class FirestoreAdapter<VH extends RecyclerView.ViewHolder>
 
             }
         }
+        getFilter().filter(filter, this);
+    }
+
+    @Override
+    public void onFilterComplete(int i) {
         if(mListener != null) {
-            mListener.onComplete(mSnapshots.isEmpty());
-            if(!mSnapshots.isEmpty()){
-                mListener.onCompleteDouble(mSnapshots.get(0));
-            }
-            else{
-                mListener.onCompleteDouble(null);
-            }
+            Log.d(TAG, "Completed sync: numDocuments:" + mFilteredSnapshots.size());
+            mListener.onComplete(mFilteredSnapshots.isEmpty());
         }
-        getFilter().filter(filter);
 
     }
 
@@ -220,6 +219,6 @@ public abstract class FirestoreAdapter<VH extends RecyclerView.ViewHolder>
 
     public interface OnCompleteListener{
         void onComplete(boolean emptyResult);
-        void onCompleteDouble(DocumentSnapshot item);
+        //void onCompleteDouble(DocumentSnapshot item);
     }
 }
