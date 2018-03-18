@@ -183,7 +183,7 @@ public class TodoListAdapter extends FirestoreAdapter<TodoListAdapter.ViewHolder
         int size = getItemCount();
         String id = item.getId();
         for(int i=0; i<size; i++){
-            DocumentSnapshot doc = getSnapshot(i);
+            DocumentSnapshot doc = getFilteredSnapshot(i);
             if(doc.getId().equals(id)){
                 return true;
             }
