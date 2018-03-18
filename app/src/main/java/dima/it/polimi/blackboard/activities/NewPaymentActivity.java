@@ -235,8 +235,9 @@ public class NewPaymentActivity extends AppCompatActivity {
             return;
         }
 
-        PaymentItem paymentItem = new PaymentItem(name,amount);
-        db.collection("houses").document(selectedHouse).collection("payments").document().set(paymentItem);
+        String id = name + System.currentTimeMillis();
+        PaymentItem paymentItem = new PaymentItem(id,name,amount);
+        db.collection("houses").document(selectedHouse).collection("payments").document(id).set(paymentItem);
         submitButton.setClickable(false);
         onBackPressed();
     }

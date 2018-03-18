@@ -2,6 +2,7 @@ package dima.it.polimi.blackboard.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -9,22 +10,30 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import dima.it.polimi.blackboard.R;
+import dima.it.polimi.blackboard.activities.BalanceActivity;
 import dima.it.polimi.blackboard.adapters.PaymentListAdapter;
 import dima.it.polimi.blackboard.adapters.TodoListAdapter;
 import dima.it.polimi.blackboard.model.PaymentItem;
@@ -189,25 +198,56 @@ public class PaymentListFragment extends Fragment implements PaymentListAdapter.
     }
 
     public void enableRealTimeUpdate(){
-        myListener = myPaymentsQuery.addSnapshotListener( (querySnapshot, error) ->
-        {
-            if (error != null) {
-                return;
-            }
 
-            for(DocumentChange dc: querySnapshot.getDocumentChanges()){
-                if(dc.getType() == DocumentChange.Type.ADDED){
-                    PaymentItem newItem = dc.getDocument().toObject(PaymentItem.class);
-                    if((type.equals("positive") && newItem.getPerformedBy().equals(user.getUid()) || (type.equals("negative") && !newItem.getPerformedBy().equals(user.getUid()))))
-                        insertPayment(newItem);
-                }
-            }
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("houses").document(house).get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if(task.isSuccessful())
+                        {
+                            Map<String,Object> roommates = (Map<String, Object>) task.getResult().getData().get("roommates");
+                            List<String> roommatesList = (List<String>) roommates.get("roommates");
+                            double numberOfRoommates = roommatesList.size();
 
-        });
+                            myListener = myPaymentsQuery.addSnapshotListener( (querySnapshot, error) ->
+                            {
+                                if (error != null) {
+                                    return;
+                                }
+
+                                for(DocumentChange dc: querySnapshot.getDocumentChanges()){
+                                    if(dc.getType() == DocumentChange.Type.ADDED){
+                                        PaymentItem newItem = dc.getDocument().toObject(PaymentItem.class);
+                                        if((type.equals("positive") && newItem.getPerformedBy().equals(user.getUid()) || (type.equals("negative") && !newItem.getPerformedBy().equals(user.getUid())))) {
+                                            insertPayment(newItem);
+                                            if(newItem.getPerformedBy().equals(user.getUid()))
+                                            {
+                                                double payment = newItem.getPrice() * ((numberOfRoommates - 1)/ (numberOfRoommates));
+                                                BalanceActivity.refreshBalanceColor(payment);
+                                            }
+                                            else {
+                                                double payment = newItem.getPrice() / (numberOfRoommates);
+                                                BalanceActivity.refreshBalanceColor(-payment);
+                                            }
+                                        }
+                                    if(dc.getType() == DocumentChange.Type.REMOVED){
+                                            PaymentItem oldItem = dc.getDocument().toObject(PaymentItem.class);
+                                            adapter.removeItem(oldItem.getId());
+                                    }
+                                    }
+                                }
+
+                            });
+                        }
+                    }
+                });
+
     }
 
     public void disableRealTimeUpdate(){
-        myListener.remove();
+        if(myListener != null)
+            myListener.remove();
     }
 
     public void setHouse(String house){
@@ -226,5 +266,23 @@ public class PaymentListFragment extends Fragment implements PaymentListAdapter.
 
 
 
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        if (getUserVisibleHint()) {
+            switch (item.getItemId()) {
+                case R.id.firstOption:
+                        String id = adapter.getItem(item.getGroupId()).getId();
+                        db.collection("houses").document(house).collection("payments").document(id).delete();
+                        adapter.removeItem(item.getGroupId());
+                    break;
+                case R.id.secondOption:
+                    // do nothing
+                    break;
+            }
+            return true;
+        }
+        return false;
+    }
 
 }

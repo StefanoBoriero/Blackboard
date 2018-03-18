@@ -54,7 +54,7 @@ import dima.it.polimi.blackboard.utils.UserDecoder;
 public class BalanceActivity extends AppCompatActivity  implements PaymentListFragment.OnListFragmentInteractionListener, DialogInterface.OnClickListener{
 
 
-    private CollapsingToolbarLayout collapsingToolbar;
+    private static  CollapsingToolbarLayout collapsingToolbar;
     private List<PaymentItem> items = DataGeneratorUtil.generatePaymentItems(30);
     private FloatingActionButton mFab;
     private ArrayList<House> houses;
@@ -77,12 +77,11 @@ public class BalanceActivity extends AppCompatActivity  implements PaymentListFr
         mFab.setTransitionName("revealCircular");
 
         db = FirebaseFirestore.getInstance();
-        newGetHoues();
+        newGetHouses();
 
 
 
         collapsingToolbar = findViewById(R.id.balance_toolbar);
-        refreshBalanceColor();
 
 
 
@@ -101,6 +100,7 @@ public class BalanceActivity extends AppCompatActivity  implements PaymentListFr
 
         listFragmentPositive.setType("positive");
         listFragmentNegative.setType("negative");
+
 
         if(houses.size()> 0) {
             listFragmentPositive.setHouse(houses.get(selectedHouse).getId().toString());
@@ -164,69 +164,26 @@ public class BalanceActivity extends AppCompatActivity  implements PaymentListFr
         }
     }
 
-    private List<PaymentItem> getPosItems()
-    {
-        //TODO change Stefy and simo
-        //TODO fetch items from firebase
-        List<PaymentItem> posItems = new ArrayList<>();
-
-        for(PaymentItem p : items)
-        {
-                posItems.add(p);
-
-        }
-
-        return posItems;
-
-    }
-
-    private List<PaymentItem> getNegItems()
-    {
-        //TODO change Stefy and simo
-        //TODO fetch items from firebase
-        List<PaymentItem> negItems = new ArrayList<>();
-        for(PaymentItem p : items)
-        {
-
-                negItems.add(p);
-
-        }
-
-        return negItems;
-    }
 
     public void onRefresh()
     {
-        refreshBalanceColor();
 
     }
 
-    private void refreshBalanceColor()
+    public static void refreshBalanceColor(double newPayment)
     {
 
-
-
-        List<PaymentItem> posItems = getPosItems();
-        List<PaymentItem> negItems = getNegItems();
-
-        double sum  = 0;
-
-        for(PaymentItem p : posItems)
+        if(collapsingToolbar.getTitle() == null)
+            collapsingToolbar.setTitle(String.format("%.2f",newPayment) + "€");
+        else
         {
-            sum = sum + p.getPrice();
+            double oldBalance = Double.parseDouble(collapsingToolbar.getTitle().toString().replace("€",""));
+            double newBalance = oldBalance + newPayment;
+            collapsingToolbar.setTitle(String.format("%.2f",newBalance) + "€");
         }
 
 
 
-
-        for(PaymentItem p : negItems)
-        {
-            sum = sum - p.getPrice();
-        }
-
-
-
-        collapsingToolbar.setTitle(String.format("%.2f",sum) + "€");
 
         if(collapsingToolbar.getTitle() != null && !collapsingToolbar.getTitle().toString().contains("-")) {
 
@@ -285,7 +242,7 @@ public class BalanceActivity extends AppCompatActivity  implements PaymentListFr
         });
     }
 
-    private void newGetHoues()
+    private void newGetHouses()
     {
         CollectionReference user = db.collection("houses");
         houses = new ArrayList<>();
@@ -324,6 +281,9 @@ public class BalanceActivity extends AppCompatActivity  implements PaymentListFr
         String currentHouse = (String)this.houses.get(selectedHouse).getId();
         ((PaymentListFragment)listFragmentPositive).changeHouse(currentHouse);
         ((PaymentListFragment)listFragmentNegative).changeHouse(currentHouse);
+        collapsingToolbar.setTitle("0.00");
+        collapsingToolbar.setCollapsedTitleTextAppearance(R.style.CollapsedAppBarPositive);
+        collapsingToolbar.setExpandedTitleTextAppearance(R.style.ExpandedAppBarPositive);
         dialog.dismiss();
 
     }

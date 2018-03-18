@@ -12,6 +12,7 @@ import com.google.firebase.auth.FirebaseUser;
  */
 
 public class PaymentItem implements Parcelable{
+    private String id;
     private  String name;
     private  float price;
     private  String performedBy;
@@ -23,12 +24,14 @@ public class PaymentItem implements Parcelable{
 
     protected PaymentItem(Parcel in) {
         //Order must be the same of writeToParcel
+        this.id = in.readString();
         this.name = in.readString();
         this.price = in.readFloat();
         this.performedBy = in.readString();
     }
 
-    public PaymentItem( String name, float price){
+    public PaymentItem( String id,String name, float price){
+        this.id = id;
         this.name = name;
         this.price = price;
 
@@ -46,6 +49,13 @@ public class PaymentItem implements Parcelable{
 
     public void setPrice(Float price){ this.price = price;}
 
+    public void setId(String id){this.id = id;}
+
+    public String getId()
+    {
+        return this.id;
+    }
+
 
     public String getName(){
         return this.name;
@@ -56,6 +66,7 @@ public class PaymentItem implements Parcelable{
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.id);
         dest.writeString(this.name);
         dest.writeDouble(this.price);
         dest.writeString(this.performedBy);

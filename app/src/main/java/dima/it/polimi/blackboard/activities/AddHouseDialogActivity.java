@@ -152,7 +152,14 @@ public class AddHouseDialogActivity extends Activity {
                                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                                         if (task.isSuccessful()) {
                                             Map<String, Object> userParams = task.getResult().getData();
-                                            List<String> houses = (ArrayList<String>) userParams.get("houses");
+                                            List<String> houses;
+                                            if(userParams.get("houses")!= null) {
+                                                houses = (ArrayList<String>) userParams.get("houses");
+                                            }
+                                            else
+                                            {
+                                                houses = new ArrayList<>();
+                                            }
                                             houses.add(houseId);
                                             userParams.put("houses", houses);
                                             db.collection("users").document(uid).set(userParams);
@@ -177,7 +184,14 @@ public class AddHouseDialogActivity extends Activity {
                 public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                     if (task.isSuccessful()) {
                         Map<String, Object> userParams = task.getResult().getData();
-                        List<String> houses = (ArrayList<String>) userParams.get("houses");
+                        List<String> houses;
+                        if(userParams.get("houses")!= null) {
+                            houses = (ArrayList<String>) userParams.get("houses");
+                        }
+                        else
+                        {
+                            houses = new ArrayList<>();
+                        }
                         houses.add(houseId);
                         userParams.put("houses", houses);
                         db.collection("users").document(auth.getCurrentUser().getUid()).set(userParams);
