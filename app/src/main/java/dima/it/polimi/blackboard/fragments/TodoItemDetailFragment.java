@@ -281,11 +281,14 @@ public class TodoItemDetailFragment extends Fragment {
      * @param todoItem the new item which details are to be shown
      * @param position the position of the new item
      */
-    public void updateFragment(TodoItem todoItem, int position){
-        if(todoTask != null){
-            if(todoItem.getId().equals(todoTask.getId())){
-                //We are already showing the correct information
-                return;
+    public void updateFragment(TodoItem todoItem, int position, boolean force){
+        if(!force) {
+            //If the update is not forced, avoid it in useless cases
+            if (todoTask != null) {
+                if (todoItem.getId().equals(todoTask.getId())) {
+                    //We are already showing the correct information
+                    return;
+                }
             }
         }
         View rootView = getView();

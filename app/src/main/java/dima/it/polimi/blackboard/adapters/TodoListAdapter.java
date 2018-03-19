@@ -1,6 +1,5 @@
 package dima.it.polimi.blackboard.adapters;
 
-import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
@@ -12,9 +11,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
+
 import com.bumptech.glide.request.RequestOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -49,6 +47,8 @@ public class TodoListAdapter extends FirestoreAdapter<TodoListAdapter.ViewHolder
     private ViewGroup parent;
     private int initialHighlighted;
     private boolean isDouble;
+    private boolean firstTime = true;
+    private boolean secondTime = false;
 
     public TodoListAdapter(Query query, TodoListAdapterListener listener, OnCompleteListener completeListener){
         super(query, completeListener);
@@ -86,15 +86,24 @@ public class TodoListAdapter extends FirestoreAdapter<TodoListAdapter.ViewHolder
         checkSuggestion(todoItem, holder.suggestionStar);
 
         if(isDouble) {
-            if (position == initialHighlighted) {
-                View toHighlight = holder.itemView;
-                Drawable selected = new ColorDrawable(0xFF448AFF);
-                toHighlight.findViewById(R.id.selected_flag).setBackground(selected);
-            }
-            else{
-                View toNotHighlight = holder.itemView;
-                toNotHighlight.findViewById(R.id.selected_flag).setBackground(null);
-
+            if(!secondTime) {
+                if (position == initialHighlighted) {
+                    View toHighlight = holder.itemView;
+                    Drawable selected = new ColorDrawable(0xFF448AFF);
+                    toHighlight.findViewById(R.id.selected_flag).setBackground(selected);
+                    if(firstTime) {
+                        firstTime = false;
+                    }
+                    else{
+                        secondTime = true;
+                    }
+                }
+                /*
+                else {
+                    View toNotHighlight = holder.itemView;
+                    toNotHighlight.findViewById(R.id.selected_flag).setBackground(null);
+                }
+                */
             }
         }
 

@@ -60,7 +60,16 @@ public class HouseListActivity extends DoubleFragmentActivity{
 
     @Override
     protected void showUndoMessage(TodoItem removedItem, int position, String action) {
-        Snackbar.make(mFab, "You took charge of the activity",
+        String message;
+        switch(action){
+            case TodoItemDetailFragment.ACTION_TAKEN: message = "You took charge of the activity";
+                break;
+            case TodoItemDetailFragment.ACTION_DELETED: message = "You deleted the activity!";
+                break;
+            default:
+                message = "Wella bomber";
+        }
+        Snackbar.make(mFab, message,
                 Snackbar.LENGTH_LONG)
                 .setAction("UNDO", (v) ->
                         super.insertItem(removedItem, position)

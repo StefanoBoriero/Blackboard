@@ -50,8 +50,17 @@ public class MyListActivity extends DoubleFragmentActivity implements DialogInte
 
     @Override
     protected void showUndoMessage(TodoItem removedItem, int position, String action) {
+        String message;
+        switch(action){
+            case TodoItemDetailFragment.ACTION_TAKEN: message = "You completed the activity!";
+                break;
+            case TodoItemDetailFragment.ACTION_DELETED: message = "You refused the activity!";
+                break;
+            default:
+                message = "Wella bomber";
+        }
         View view = findViewById(android.R.id.content);
-        Snackbar.make(view, "You completed the activity!",
+        Snackbar.make(view, message,
                 Snackbar.LENGTH_LONG)
                 .setAction("UNDO", (v) ->
                     super.insertItem(removedItem, position)

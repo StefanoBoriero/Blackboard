@@ -145,6 +145,7 @@ public abstract class FirestoreAdapter<VH extends RecyclerView.ViewHolder>
     public void setQuery(Query query){
         stopListening();
         mSnapshots.clear();
+        mFilteredSnapshots.clear();
         notifyDataSetChanged();
 
         mQuery = query;

@@ -282,6 +282,18 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
         }
     }
 
+    public void reSelectLastOne(){
+        if(oldHighlighted != null){
+            oldHighlighted.findViewById(R.id.selected_flag).setBackground(getResources().getDrawable(R.color.colorAccent));
+        }
+        /*
+        recyclerView.post( () ->{
+            View v = recyclerView.getChildAt(0);
+            v.findViewById(R.id.selected_flag).setBackground(R.color.colorAccent);
+        });
+        */
+    }
+
     public void disableSwipe(){
         swipeHelper.attachToRecyclerView(null);
     }
@@ -329,6 +341,8 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
      */
     public TodoItem removeItem(int position){
         final TodoItem removedItem = adapter.getItem(position);
+        final View removedView = recyclerView.getChildAt(position);
+        removedView.findViewById(R.id.selected_flag).setBackground(null);
         adapter.removeItem(position);
 
         return removedItem;
