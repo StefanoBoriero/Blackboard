@@ -56,6 +56,7 @@ import dima.it.polimi.blackboard.model.DayResume;
 import dima.it.polimi.blackboard.model.User;
 import dima.it.polimi.blackboard.utils.DataGeneratorUtil;
 import dima.it.polimi.blackboard.utils.GlideApp;
+import dima.it.polimi.blackboard.utils.HouseDecoder;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -68,6 +69,7 @@ public class MainActivity extends AppCompatActivity
     private FirebaseFirestore db;
 
     @Override
+    @SuppressWarnings("unchecked")
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -102,22 +104,24 @@ public class MainActivity extends AppCompatActivity
 
 
 
-        db.collection("users").document(firebaseAuth.getCurrentUser().getUid()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if(task.isSuccessful())
-                {
-                    List<String> houses = (List<String>) task.getResult().getData().get("houses");
-                    if (houses != null && houses.size() > 0)
-                    {
-                        nav_balance.setEnabled(true);
-                        nav_group_list.setEnabled(true);
-                        nav_my_list.setEnabled(true);
-                        addHouseListener();
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if(user != null) {
+            db.collection("users").document(user.getUid()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    if (task.isSuccessful()) {
+                        List<String> houses = (List<String>) task.getResult().getData().get("houses");
+                        if (houses != null && houses.size() > 0) {
+                            nav_balance.setEnabled(true);
+                            nav_group_list.setEnabled(true);
+                            nav_my_list.setEnabled(true);
+                            addHouseListener();
+                        }
                     }
                 }
-            }
-        });
+
+            });
+        }
 
 
 
@@ -211,6 +215,8 @@ public class MainActivity extends AppCompatActivity
                 String completeName = name + " " + surname;
                 mailView.setText(mail);
                 nameView.setText(completeName);
+
+                HouseDecoder.getInstance().populateFromUser(User.getInstance());
                 //TODO get also the profile picture
                 initializeDays();
             });

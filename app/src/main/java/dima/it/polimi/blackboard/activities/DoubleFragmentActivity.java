@@ -43,6 +43,7 @@ import dima.it.polimi.blackboard.fragments.TodoItemDetailFragment;
 import dima.it.polimi.blackboard.fragments.TodoItemListFragment;
 import dima.it.polimi.blackboard.model.TodoItem;
 import dima.it.polimi.blackboard.model.User;
+import dima.it.polimi.blackboard.utils.HouseDecoder;
 import dima.it.polimi.blackboard.utils.UserDecoder;
 
 /**
@@ -84,6 +85,7 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
 
     protected int whichHouse = 0;
     protected CharSequence[] houses;
+    protected CharSequence[] housesDecoded;
     protected boolean houseDownloadComplete;
 
     protected FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -550,16 +552,18 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
         User user = User.getInstance();
         List<Object> houses = user.getHouses();
         this.houses = new CharSequence[houses.size()];
+        this.housesDecoded = new CharSequence[houses.size()];
         for(int i=0; i<houses.size(); i++){
             this.houses[i] = (String)houses.get(i);
             UserDecoder.getInstance().populateFromHouse((String)this.houses[i]);
+            this.housesDecoded[i] = HouseDecoder.getInstance().decodeId((String)this.houses[i]);
         }
         houseDownloadComplete = true;
     }
 
     public void onChooseHouse(MenuItem menuItem){
         HouseListActivity.ChooseHouseDialog.mListener = this;
-        DialogFragment houseListDialog = DoubleFragmentActivity.ChooseHouseDialog.newInstance(whichHouse, houses);
+        DialogFragment houseListDialog = DoubleFragmentActivity.ChooseHouseDialog.newInstance(whichHouse, housesDecoded);
         houseListDialog.show(getFragmentManager(), "dialog");
     }
 

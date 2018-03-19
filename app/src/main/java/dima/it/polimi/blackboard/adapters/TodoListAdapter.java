@@ -98,12 +98,11 @@ public class TodoListAdapter extends FirestoreAdapter<TodoListAdapter.ViewHolder
                         secondTime = true;
                     }
                 }
-                /*
                 else {
                     View toNotHighlight = holder.itemView;
                     toNotHighlight.findViewById(R.id.selected_flag).setBackground(null);
                 }
-                */
+
             }
         }
 
@@ -219,5 +218,12 @@ public class TodoListAdapter extends FirestoreAdapter<TodoListAdapter.ViewHolder
             timestampView = itemView.findViewById(R.id.timestamp);
             suggestionStar = itemView.findViewById(R.id.suggestion_star);
         }
+    }
+
+    @Override
+    public void setQuery(Query mQuery){
+        firstTime = true;
+        secondTime = false;
+        super.setQuery(mQuery);
     }
 }

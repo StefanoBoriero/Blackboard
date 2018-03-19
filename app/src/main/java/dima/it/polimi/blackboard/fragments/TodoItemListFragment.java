@@ -260,8 +260,18 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
             //We're changing the house
             oldHighlighted = null;
             toHighlightIndex = 0;
+            deselectAllCurrentShown();
         }
         this.adapter.setQuery(myQuery);
+    }
+
+    private void deselectAllCurrentShown(){
+        for(int i=0; i<getRemainingItems(); i++){
+            View v = recyclerView.getChildAt(i);
+            if(v!=null){
+                v.findViewById(R.id.selected_flag).setBackground(null);
+            }
+        }
     }
 
     public void setSelectedItem(int index){
