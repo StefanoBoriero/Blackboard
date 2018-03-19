@@ -8,7 +8,9 @@ package dima.it.polimi.blackboard.adapters;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -27,6 +29,7 @@ public class PaymentListAdapter extends RecyclerView.Adapter<PaymentListAdapter.
     private final List<PaymentItem> paymentItems;
     private Context mContext;
 
+
     public PaymentListAdapter(Context context, PaymentListAdapterListener listener){
 
 
@@ -40,6 +43,7 @@ public class PaymentListAdapter extends RecyclerView.Adapter<PaymentListAdapter.
     public PaymentViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.payment_item_row, parent, false);
+
         return new PaymentViewHolder(itemView);
     }
 
@@ -88,6 +92,15 @@ public class PaymentListAdapter extends RecyclerView.Adapter<PaymentListAdapter.
         notifyItemRemoved(position);
     }
 
+    public void removeItem(String id)
+    {
+        for(int i = 0; i < paymentItems.size(); i++)
+        {
+            if(paymentItems.get(i).getId().equals(id))
+                removeItem(i);
+        }
+    }
+
     public void insertItem(PaymentItem item, int position){
         paymentItems.add(position, item);
         notifyItemInserted(position);
@@ -99,7 +112,7 @@ public class PaymentListAdapter extends RecyclerView.Adapter<PaymentListAdapter.
 
     }
 
-    public class PaymentViewHolder extends RecyclerView.ViewHolder{
+    public class PaymentViewHolder extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener {
 
 
         private final TextView todoItemName;
@@ -118,6 +131,16 @@ public class PaymentListAdapter extends RecyclerView.Adapter<PaymentListAdapter.
             todoItemPrice = itemView.findViewById(R.id.amount_info);
             todoItemContainer = itemView.findViewById(R.id.payment_item_container);
             positiveNegativeIconContainer = itemView.findViewById(R.id.positive_negative_icon_container);
+            itemView.setOnCreateContextMenuListener(this);
         }
+
+        @Override
+        public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+
+            menu.add(this.getAdapterPosition(), R.id.firstOption, 0, "Delete");//groupId, itemId, order, title
+            menu.add(0, R.id.secondOption, 0, "Back");
+        }
+
+
     }
 }

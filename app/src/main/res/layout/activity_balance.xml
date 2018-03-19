@@ -29,7 +29,7 @@
                     app:contentScrim="?attr/colorPrimary"
                     app:expandedTitleGravity="center"
                     app:layout_scrollFlags="scroll|exitUntilCollapsed"
-                    app:title="6.66€"
+                    app:title="0.00"
                     app:toolbarId="@+id/toolbar">
 
 

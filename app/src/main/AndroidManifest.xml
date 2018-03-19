@@ -113,7 +113,7 @@
 
         <activity
             android:name=".activities.AddHouseDialogActivity"
-            android:theme="@android:style/Theme.Material.Light.DialogWhenLarge.NoActionBar"
+            android:theme="@android:style/Theme.Material.Light.DialogWhenLarge"
             android:screenOrientation="portrait"></activity>
     </application>
 

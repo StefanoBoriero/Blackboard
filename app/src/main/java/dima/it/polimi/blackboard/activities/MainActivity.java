@@ -29,13 +29,19 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.signature.ObjectKey;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -59,6 +65,7 @@ public class MainActivity extends AppCompatActivity
     private NavigationView navigationView;
     private View navHeaderView;
     private ImageView ivProfile;
+    private FirebaseFirestore db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +74,7 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         firebaseAuth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -82,6 +90,36 @@ public class MainActivity extends AppCompatActivity
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
         ivProfile = navHeaderView.findViewById(R.id.user_icon);
+
+        Menu menuNav= navigationView.getMenu();
+        MenuItem nav_balance = menuNav.findItem(R.id.nav_balance);
+        MenuItem nav_group_list = menuNav.findItem(R.id.nav_group_list);
+        MenuItem nav_my_list = menuNav.findItem(R.id.nav_my_list);
+
+        nav_balance.setEnabled(false);
+        nav_group_list.setEnabled(false);
+        nav_my_list.setEnabled(false);
+
+
+
+        db.collection("users").document(firebaseAuth.getCurrentUser().getUid()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if(task.isSuccessful())
+                {
+                    List<String> houses = (List<String>) task.getResult().getData().get("houses");
+                    if (houses != null && houses.size() > 0)
+                    {
+                        nav_balance.setEnabled(true);
+                        nav_group_list.setEnabled(true);
+                        nav_my_list.setEnabled(true);
+                        addHouseListener();
+                    }
+                }
+            }
+        });
+
+
 
         initializeUser();
         loadProfilePicture();
@@ -207,56 +245,90 @@ public class MainActivity extends AppCompatActivity
 
     private void loadProfilePicture()
     {
-        String lastEdit = readSharedPreferenceForCache();
-        FirebaseStorage storage = FirebaseStorage.getInstance();
-        StorageReference reference = storage.getReference().child(FirebaseAuth.getInstance().getCurrentUser().getUid().toString() + "/profile" + lastEdit);
-        GlideApp.with(getBaseContext())
-                .load(reference)
-                .listener(new RequestListener<Drawable>() {
-                    @Override
-                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-                        ivProfile.setVisibility(View.VISIBLE);
-                        return false;
-                    }
-
-                    @Override
-                    public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-                        ivProfile.setVisibility(View.VISIBLE);
-                        return false;
-                    }
-                })
-                .error(R.drawable.empty_profile_blue_circle)
-                .apply(RequestOptions.circleCropTransform())
-                .into(ivProfile);
+        readSharedPreferenceForCache();
     }
 
     //retrieve the last update to the photo profile, so we can get the URL
-    private String readSharedPreferenceForCache()
+    private void readSharedPreferenceForCache()
     {
         SharedPreferences sharedPref = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE);
 
-        String imageCaching =  sharedPref.getString("imageCaching","0");
-        //this means cache has been cleaned, we need to retrieve the value
-        if(imageCaching == "0")
-        {
-            DocumentReference userReference = FirebaseFirestore.getInstance().collection("users").document(FirebaseAuth.getInstance().getCurrentUser().getUid());
-            userReference.get().addOnCompleteListener((task) -> {
-                List<CharSequence> myHouses = new ArrayList<>();
-                if (task.isSuccessful()) {
-                    {
-                        DocumentSnapshot document = task.getResult();
-                        Map<String, Object> userParam = document.getData();
-                        String lastEdit = (String)userParam.get("lastEdit");
-                        SharedPreferences.Editor editor = sharedPref.edit();
-                        editor.putString("imageCaching", lastEdit);
-                        editor.commit();
-                    }
-
-                } else {
-                    Toast.makeText(this,"Failed in retrieving profile image",Toast.LENGTH_SHORT);
+        db.collection("users").whereEqualTo("auth_id",firebaseAuth.getCurrentUser().getUid()).addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot snapshots,
+                                @Nullable FirebaseFirestoreException e) {
+                if (e != null) {
+                    return;
                 }
-            });
-        }
-        return  sharedPref.getString("imageCaching","0");
+
+                for (DocumentChange dc : snapshots.getDocumentChanges()) {
+                    switch (dc.getType()) {
+                        case ADDED: {
+                            String imageCaching = (String) dc.getDocument().getData().get("lastEdit");
+                            if (imageCaching != null) {
+                                SharedPreferences.Editor editor = sharedPref.edit();
+                                editor.putString("imageCaching", imageCaching);
+                                editor.commit();
+
+                                FirebaseStorage storage = FirebaseStorage.getInstance();
+                                StorageReference reference = storage.getReference().child(FirebaseAuth.getInstance().getCurrentUser().getUid().toString() + "/profile" + imageCaching);
+                                GlideApp.with(getBaseContext())
+                                        .load(reference)
+                                        .listener(new RequestListener<Drawable>() {
+                                            @Override
+                                            public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                                                ivProfile.setVisibility(View.VISIBLE);
+                                                return false;
+                                            }
+
+                                            @Override
+                                            public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                                                ivProfile.setVisibility(View.VISIBLE);
+                                                return false;
+                                            }
+                                        })
+                                        .error(R.drawable.empty_profile_blue_circle)
+                                        .apply(RequestOptions.circleCropTransform())
+                                        .into(ivProfile);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+
+    private void addHouseListener()
+    {
+        db.collection("users").whereEqualTo("auth_id",firebaseAuth.getCurrentUser().getUid()).addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot snapshots,
+                                @Nullable FirebaseFirestoreException e) {
+                if (e != null) {
+                    return;
+                }
+
+                for (DocumentChange dc : snapshots.getDocumentChanges()) {
+                    switch (dc.getType()) {
+                        case MODIFIED: {
+                            List<String> houses = (List<String>) dc.getDocument().getData().get("houses");
+                            if (houses != null && houses.size() > 0) {
+                                Menu menuNav= navigationView.getMenu();
+                                MenuItem nav_balance = menuNav.findItem(R.id.nav_balance);
+                                MenuItem nav_group_list = menuNav.findItem(R.id.nav_group_list);
+                                MenuItem nav_my_list = menuNav.findItem(R.id.nav_my_list);
+
+                                nav_balance.setEnabled(true);
+                                nav_group_list.setEnabled(true);
+                                nav_my_list.setEnabled(true);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        });
     }
 }

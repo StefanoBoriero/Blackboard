@@ -37,6 +37,7 @@ public class AddHouseDialogActivity extends Activity {
     private FirebaseFirestore db;
     private FirebaseAuth auth;
     private String houseName;
+    private List<String> alreadySelectedEmail;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +57,7 @@ public class AddHouseDialogActivity extends Activity {
         Button createButton = findViewById(R.id.createButton);
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
+        alreadySelectedEmail = new ArrayList<>();
 
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -67,11 +69,12 @@ public class AddHouseDialogActivity extends Activity {
                                 @Override
                                 public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                                     if (task.isSuccessful()) {
-                                        if (!task.getResult().exists()) {
+                                        String newEmail =((EditText) emailLL.getChildAt(emailLL.getChildCount() - 1).findViewById(R.id.nameEditText)).getText().toString().toLowerCase();
+                                        if (!task.getResult().exists() || alreadySelectedEmail.contains(newEmail)) {
                                             ((EditText) emailLL.getChildAt(emailLL.getChildCount() - 1).findViewById(R.id.nameEditText)).setError("Please enter a valid e-mail address");
-
                                         } else {
                                             ((EditText) emailLL.getChildAt(emailLL.getChildCount() - 1).findViewById(R.id.nameEditText)).setInputType(InputType.TYPE_NULL);
+                                            alreadySelectedEmail.add(newEmail);
                                             emailLL = ((LinearLayout) inflater.inflate(R.layout.content_text_input, sv));
                                         }
                                     } else {
@@ -100,22 +103,28 @@ public class AddHouseDialogActivity extends Activity {
                 } else {
                     String lastEmail = ((EditText) emailLL.getChildAt(emailLL.getChildCount() - 1).findViewById(R.id.nameEditText)).getText().toString().toLowerCase();
                     if (!TextUtils.isEmpty(lastEmail)) {
-                        db.collection("e-mail").document(lastEmail).get()
-                                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                        if (task.isSuccessful()) {
-                                            if (!task.getResult().exists()) {
-                                                ((EditText) emailLL.getChildAt(emailLL.getChildCount() - 1).findViewById(R.id.nameEditText)).setError("Please enter a valid e-mail address");
+                        if(!TextUtils.equals(lastEmail, FirebaseAuth.getInstance().getCurrentUser().getEmail().toLowerCase()) && !alreadySelectedEmail.contains(lastEmail)) {
+                            db.collection("e-mail").document(lastEmail).get()
+                                    .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                            if (task.isSuccessful()) {
+                                                if (!task.getResult().exists()) {
+                                                    ((EditText) emailLL.getChildAt(emailLL.getChildCount() - 1).findViewById(R.id.nameEditText)).setError("Please enter a valid e-mail address");
+                                                } else {
+                                                    createHouse();
+                                                }
                                             } else {
-                                                createHouse();
+                                                //TODO add error message
                                             }
-                                        } else {
-                                            //TODO add error message
                                         }
-                                    }
-                                });
+                                    });
+                        }
+                        else
+                        {
+                            ((EditText) emailLL.getChildAt(emailLL.getChildCount() - 1).findViewById(R.id.nameEditText)).setError("Please enter a valid e-mail address");
 
+                        }
 
                     } else {
                         createHouse();
@@ -152,7 +161,14 @@ public class AddHouseDialogActivity extends Activity {
                                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                                         if (task.isSuccessful()) {
                                             Map<String, Object> userParams = task.getResult().getData();
-                                            List<String> houses = (ArrayList<String>) userParams.get("houses");
+                                            List<String> houses;
+                                            if(userParams.get("houses")!= null) {
+                                                houses = (ArrayList<String>) userParams.get("houses");
+                                            }
+                                            else
+                                            {
+                                                houses = new ArrayList<>();
+                                            }
                                             houses.add(houseId);
                                             userParams.put("houses", houses);
                                             db.collection("users").document(uid).set(userParams);
@@ -177,7 +193,14 @@ public class AddHouseDialogActivity extends Activity {
                 public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                     if (task.isSuccessful()) {
                         Map<String, Object> userParams = task.getResult().getData();
-                        List<String> houses = (ArrayList<String>) userParams.get("houses");
+                        List<String> houses;
+                        if(userParams.get("houses")!= null) {
+                            houses = (ArrayList<String>) userParams.get("houses");
+                        }
+                        else
+                        {
+                            houses = new ArrayList<>();
+                        }
                         houses.add(houseId);
                         userParams.put("houses", houses);
                         db.collection("users").document(auth.getCurrentUser().getUid()).set(userParams);
