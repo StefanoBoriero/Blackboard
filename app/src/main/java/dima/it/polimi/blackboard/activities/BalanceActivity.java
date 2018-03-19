@@ -177,7 +177,7 @@ public class BalanceActivity extends AppCompatActivity  implements PaymentListFr
             collapsingToolbar.setTitle(String.format("%.2f",newPayment) + "€");
         else
         {
-            double oldBalance = Double.parseDouble(collapsingToolbar.getTitle().toString().replace("€",""));
+            double oldBalance = Double.parseDouble(collapsingToolbar.getTitle().toString().replace("€","").replace(",","."));
             double newBalance = oldBalance + newPayment;
             collapsingToolbar.setTitle(String.format("%.2f",newBalance) + "€");
         }
