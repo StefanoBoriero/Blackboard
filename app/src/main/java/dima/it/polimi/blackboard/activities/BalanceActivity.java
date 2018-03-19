@@ -82,7 +82,9 @@ public class BalanceActivity extends AppCompatActivity  implements PaymentListFr
 
 
         collapsingToolbar = findViewById(R.id.balance_toolbar);
-
+        collapsingToolbar.setTitle("0.00€");
+        collapsingToolbar.setCollapsedTitleTextAppearance(R.style.CollapsedAppBarPositive);
+        collapsingToolbar.setExpandedTitleTextAppearance(R.style.ExpandedAppBarPositive);
 
 
 
@@ -281,7 +283,7 @@ public class BalanceActivity extends AppCompatActivity  implements PaymentListFr
         String currentHouse = (String)this.houses.get(selectedHouse).getId();
         ((PaymentListFragment)listFragmentPositive).changeHouse(currentHouse);
         ((PaymentListFragment)listFragmentNegative).changeHouse(currentHouse);
-        collapsingToolbar.setTitle("0.00");
+        collapsingToolbar.setTitle("0.00€");
         collapsingToolbar.setCollapsedTitleTextAppearance(R.style.CollapsedAppBarPositive);
         collapsingToolbar.setExpandedTitleTextAppearance(R.style.ExpandedAppBarPositive);
         dialog.dismiss();
