@@ -26,10 +26,13 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import org.w3c.dom.Text;
 
+import java.text.ParseException;
+
 import dima.it.polimi.blackboard.R;
 import dima.it.polimi.blackboard.model.PaymentItem;
 import dima.it.polimi.blackboard.utils.GUIUtils;
 import dima.it.polimi.blackboard.utils.OnRevealAnimationListener;
+import faranjit.currency.edittext.CurrencyEditText;
 
 public class NewPaymentActivity extends AppCompatActivity {
 
@@ -209,14 +212,12 @@ public class NewPaymentActivity extends AppCompatActivity {
         }
     }
 
-    public void createPayment(View v)
-    {
+    public void createPayment(View v) throws ParseException {
         EditText nameEditText = findViewById(R.id.nameEditText);
-        EditText currencyEditText = findViewById(R.id.costEditText);
+        CurrencyEditText currencyEditText = findViewById(R.id.costEditText);
 
         String name = nameEditText.getText().toString().trim();
-        String amountString = currencyEditText.getText().toString().replace(",",".");
-        Float amount = Float.parseFloat(amountString);
+        Double amount = currencyEditText.getCurrencyDouble();
         Button submitButton = findViewById(R.id.submit_button);
 
         if(TextUtils.isEmpty(name))

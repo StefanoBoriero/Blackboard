@@ -28,15 +28,17 @@ public class PaymentListAdapter extends RecyclerView.Adapter<PaymentListAdapter.
 
     private final List<PaymentItem> paymentItems;
     private Context mContext;
+    private String type;
 
 
-    public PaymentListAdapter(Context context, PaymentListAdapterListener listener){
+    public PaymentListAdapter(Context context, PaymentListAdapterListener listener ,String type){
 
 
 
         List<PaymentItem> filteredItems = new ArrayList<>();
         this.paymentItems = filteredItems;
         mContext =context;
+        this.type = type;
     }
 
     @Override
@@ -131,14 +133,16 @@ public class PaymentListAdapter extends RecyclerView.Adapter<PaymentListAdapter.
             todoItemPrice = itemView.findViewById(R.id.amount_info);
             todoItemContainer = itemView.findViewById(R.id.payment_item_container);
             positiveNegativeIconContainer = itemView.findViewById(R.id.positive_negative_icon_container);
-            itemView.setOnCreateContextMenuListener(this);
+            if(type.equals("positive"))
+                itemView.setOnCreateContextMenuListener(this);
         }
 
         @Override
         public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-
-            menu.add(this.getAdapterPosition(), R.id.firstOption, 0, "Delete");//groupId, itemId, order, title
-            menu.add(0, R.id.secondOption, 0, "Back");
+            if(type.equals("positive")) {
+                menu.add(this.getAdapterPosition(), R.id.firstOption, 0, "Delete");//groupId, itemId, order, title
+                menu.add(0, R.id.secondOption, 0, "Back");
+            }
         }
 
 

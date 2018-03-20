@@ -94,7 +94,7 @@ public class PaymentListFragment extends Fragment implements PaymentListAdapter.
                 this.house = savedInstanceState.getString("house");
         if(savedInstanceState != null && savedInstanceState.getString("type") != null)
             this.type = savedInstanceState.getString("type");
-            adapter = new PaymentListAdapter(this.getContext(),this);
+            adapter = new PaymentListAdapter(this.getContext(),this,type);
             db = FirebaseFirestore.getInstance();
             user = FirebaseAuth.getInstance().getCurrentUser();
             if(house != null) {
@@ -142,7 +142,9 @@ public class PaymentListFragment extends Fragment implements PaymentListAdapter.
     @Override
     public void onDetach() {
         super.onDetach();
+        disableRealTimeUpdate();
         mListener = null;
+
     }
 
 
@@ -171,7 +173,7 @@ public class PaymentListFragment extends Fragment implements PaymentListAdapter.
     public void changeHouse(String selectedHouse)
     {
         this.house = selectedHouse;
-        this.adapter = new PaymentListAdapter(this.getContext(),this);
+        this.adapter = new PaymentListAdapter(this.getContext(),this,type);
         this.recyclerView.setAdapter(adapter);
         prepareQuery();
         disableRealTimeUpdate();
@@ -231,10 +233,21 @@ public class PaymentListFragment extends Fragment implements PaymentListAdapter.
                                                 BalanceActivity.refreshBalanceColor(-payment);
                                             }
                                         }
-                                    if(dc.getType() == DocumentChange.Type.REMOVED){
-                                            PaymentItem oldItem = dc.getDocument().toObject(PaymentItem.class);
-                                            adapter.removeItem(oldItem.getId());
+
                                     }
+                                    else if(dc.getType() == DocumentChange.Type.REMOVED){
+                                        PaymentItem oldItem = dc.getDocument().toObject(PaymentItem.class);
+                                        double oldPrice = oldItem.getPrice();
+                                        if(oldItem.getPerformedBy().equals(user.getUid()) && type.equals("positive"))
+                                        {
+                                            double payment = oldPrice * ((numberOfRoommates - 1)/ (numberOfRoommates));
+                                            BalanceActivity.refreshBalanceColor(-payment);
+                                        }
+                                        else if(!oldItem.getPerformedBy().equals(user.getUid()) && type.equals("negative")){
+                                            double payment = oldPrice / (numberOfRoommates);
+                                            BalanceActivity.refreshBalanceColor(payment);
+                                        }
+                                        adapter.removeItem(oldItem.getId());
                                     }
                                 }
 
@@ -262,6 +275,7 @@ public class PaymentListFragment extends Fragment implements PaymentListAdapter.
     {
         savedInstanceState.putString("house",house);
         savedInstanceState.putString("type",type);
+
     }
 
 

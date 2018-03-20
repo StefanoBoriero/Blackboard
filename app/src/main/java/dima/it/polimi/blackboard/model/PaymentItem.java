@@ -14,7 +14,7 @@ import com.google.firebase.auth.FirebaseUser;
 public class PaymentItem implements Parcelable{
     private String id;
     private  String name;
-    private  float price;
+    private double price;
     private  String performedBy;
 
     public PaymentItem()
@@ -30,7 +30,7 @@ public class PaymentItem implements Parcelable{
         this.performedBy = in.readString();
     }
 
-    public PaymentItem( String id,String name, float price){
+    public PaymentItem(String id, String name, Double price){
         this.id = id;
         this.name = name;
         this.price = price;
@@ -62,7 +62,7 @@ public class PaymentItem implements Parcelable{
     }
 
 
-    public Float getPrice(){return this.price;}
+    public double getPrice(){return this.price;}
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {

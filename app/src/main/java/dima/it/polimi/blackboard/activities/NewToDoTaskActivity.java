@@ -31,6 +31,8 @@ import android.widget.TextView;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.text.ParseException;
+import java.util.Currency;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,6 +40,7 @@ import dima.it.polimi.blackboard.R;
 import dima.it.polimi.blackboard.model.TodoItem;
 import dima.it.polimi.blackboard.utils.GUIUtils;
 import dima.it.polimi.blackboard.utils.OnRevealAnimationListener;
+import faranjit.currency.edittext.CurrencyEditText;
 
 public class NewToDoTaskActivity extends AppCompatActivity {
     private final static String ARG_HOUSE = "house";
@@ -290,16 +293,14 @@ public class NewToDoTaskActivity extends AppCompatActivity {
         }
     }
 
-    public void createActivity(View v)
-    {
+    public void createActivity(View v) throws ParseException {
         EditText nameEditText = findViewById(R.id.nameEditText);
         Button typeButton = findViewById(R.id.typeButton);
-        EditText currencyEditText = findViewById(R.id.costEditText);
+        CurrencyEditText currencyEditText = findViewById(R.id.costEditText);
         Spinner spinner = findViewById(R.id.spinner2);
         EditText description = findViewById(R.id.descriptionEditText);
         Button submitButton = findViewById(R.id.submit_button);
-        String amountString = currencyEditText.getText().toString().replace(",",".");
-        Float amount = Float.parseFloat(amountString);
+        Double amount = currencyEditText.getCurrencyDouble();
         Map<String, Object> additionalInfo = new HashMap<>() ;
         additionalInfo.put("description", description.getText().toString());
         if(amount != 0.00)
