@@ -47,7 +47,7 @@ import dima.it.polimi.blackboard.receivers.BatteryStatusReceiver;
  * interface.
  */
 public class TodoItemListFragment extends Fragment implements TodoListAdapter.TodoListAdapterListener,
-        TodoItemTouchHelper.TodoItemTouchHelperListener, SwipeRefreshLayout.OnRefreshListener, FirestoreAdapter.OnCompleteListener{
+        TodoItemTouchHelper.TodoItemTouchHelperListener, SwipeRefreshLayout.OnRefreshListener/*, FirestoreAdapter.OnCompleteListener*/{
 
 
     private static final String ARG_COLUMN_COUNT = "column-count";
@@ -245,6 +245,7 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
     }
 
     public void setHouse(String house){
+        fillFragment();
         this.house = house;
         prepareQuery();
         if(adapter == null){
@@ -294,14 +295,10 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
 
     public void reSelectLastOne(){
         if(oldHighlighted != null){
+            deselectAllCurrentShown();
+            //setSelectedItem(toHighlightIndex);
             oldHighlighted.findViewById(R.id.selected_flag).setBackground(getResources().getDrawable(R.color.colorAccent));
         }
-        /*
-        recyclerView.post( () ->{
-            View v = recyclerView.getChildAt(0);
-            v.findViewById(R.id.selected_flag).setBackground(R.color.colorAccent);
-        });
-        */
     }
 
     public void disableSwipe(){
@@ -415,7 +412,7 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
         }
 
     }
-
+/*
     @Override
     public void onComplete(boolean empty){
         View rootView = getView();
@@ -429,7 +426,7 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
             }
        }
     }
-
+*/
     public void emptyFragment(){
         View rootView = getView();
         if(rootView != null) {

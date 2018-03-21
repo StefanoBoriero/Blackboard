@@ -132,8 +132,10 @@ public class TodoListAdapter extends FirestoreAdapter<TodoListAdapter.ViewHolder
         });
 
 
-        holder.itemView.setOnClickListener((v) ->
-                mListener.onTodoItemClicked(todoItem, v, holder.getAdapterPosition())
+        holder.itemView.setOnClickListener((v) -> {
+            v.setSelected(true);
+            mListener.onTodoItemClicked(todoItem, v, holder.getAdapterPosition());
+            }
         );
     }
 

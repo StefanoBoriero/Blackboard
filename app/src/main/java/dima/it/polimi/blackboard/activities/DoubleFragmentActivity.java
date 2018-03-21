@@ -259,6 +259,36 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
         }
     }
 
+    @Override
+    public void reselectCurrent(){
+        if(isDouble){
+            firstFragment.reSelectLastOne();
+        }
+    }
+
+    @Override
+    public void deleteByOther(int position){
+        if(isDouble){
+            if(checkSelected(position)){
+                TodoItem item = firstFragment.getItem(position);
+                if(firstFragment.getRemainingItems() == 0){
+                    firstFragment.emptyFragment();
+                    secondFragment.emptyFragment();
+                }
+                else if(item != null) {
+                    firstFragment.setSelectedItem(position);
+                    secondFragment.updateFragment(item, position, true);
+                }
+                else{
+                    //It was selected the last of the list
+                    TodoItem previousItem = firstFragment.getItem(position -1 );
+                    firstFragment.setSelectedItem(position -1);
+                    secondFragment.updateFragment(previousItem, position -1, true);
+                }
+            }
+        }
+    }
+
     private void showSecondFragment(){
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_detail_container, secondFragment)

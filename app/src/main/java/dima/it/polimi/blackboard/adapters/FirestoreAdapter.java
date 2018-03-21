@@ -45,14 +45,14 @@ public abstract class FirestoreAdapter<VH extends RecyclerView.ViewHolder>
     FirestoreAdapter(Query query, OnCompleteListener listener){
         mQuery = query;
         mSnapshots = new ArrayList<>();
-        mFilteredSnapshots = new ArrayList<>();
+        //mFilteredSnapshots = new ArrayList<>();
         mListener = listener;
     }
 
     FirestoreAdapter(Query query){
         mQuery = query;
         mSnapshots = new ArrayList<>();
-        mFilteredSnapshots = new ArrayList<>();
+        //mFilteredSnapshots = new ArrayList<>();
     }
 
     public void onEvent(QuerySnapshot documentSnapshots, FirebaseFirestoreException e){
@@ -76,7 +76,14 @@ public abstract class FirestoreAdapter<VH extends RecyclerView.ViewHolder>
 
             }
         }
-        getFilter().filter(filter, this);
+        if(mFilteredSnapshots == null){
+            mFilteredSnapshots = mSnapshots;
+        }
+        //TODO TRY TO REMOVE THIS FILTERING!!!!!
+        //getFilter().filter(filter, this);
+        if(mListener != null) {
+            mListener.onComplete(mFilteredSnapshots.isEmpty());
+        }
     }
 
     @Override
@@ -112,20 +119,21 @@ public abstract class FirestoreAdapter<VH extends RecyclerView.ViewHolder>
     }
 
     private void onDocumentRemoved(DocumentChange change){
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if(user!= null){
-            //String uid = user.getUid();
-            //Map<String, Object> doc = change.getDocument().getData();
-            //String takenBy = (String)doc.get("takenBy");
-            if(removedByMe){
-                removedByMe = false;
-                mSnapshots.remove(lastRemoved);
+        if(removedByMe){
+            removedByMe = false;
+            mSnapshots.remove(lastRemoved);
+        }
+        else{
+            int oldIndex = change.getOldIndex();
+            mSnapshots.remove(oldIndex);
+            notifyItemRemoved(oldIndex);
+            if(mListener != null){
+                mListener.deleteByOther(oldIndex);
             }
-            else{
-                int oldIndex = change.getOldIndex();
-                mSnapshots.remove(oldIndex);
-                notifyItemRemoved(oldIndex);
-            }
+        }
+
+        if(mListener != null){
+            mListener.reselectCurrent();
         }
     }
 
@@ -142,10 +150,12 @@ public abstract class FirestoreAdapter<VH extends RecyclerView.ViewHolder>
         }
     }
 
-    public void setQuery(Query query){
+    public void setQuery(Query query) {
         stopListening();
         mSnapshots.clear();
-        mFilteredSnapshots.clear();
+        if (mFilteredSnapshots != null){
+            mFilteredSnapshots.clear();
+        }
         notifyDataSetChanged();
 
         mQuery = query;
@@ -154,6 +164,9 @@ public abstract class FirestoreAdapter<VH extends RecyclerView.ViewHolder>
 
     @Override
     public int getItemCount() {
+        if(mFilteredSnapshots == null){
+            return 0;
+        }
         return mFilteredSnapshots.size();
     }
 
@@ -220,6 +233,7 @@ public abstract class FirestoreAdapter<VH extends RecyclerView.ViewHolder>
 
     public interface OnCompleteListener{
         void onComplete(boolean emptyResult);
-        //void onCompleteDouble(DocumentSnapshot item);
+        void reselectCurrent();
+        void deleteByOther(int position);
     }
 }
