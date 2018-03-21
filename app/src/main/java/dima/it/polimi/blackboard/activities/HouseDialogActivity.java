@@ -37,6 +37,7 @@ public class HouseDialogActivity extends Activity implements RoomMateListAdapter
         String name = getIntent().getStringExtra("house");
         String id = getIntent().getStringExtra("houseId");
         houseName.setText(name);
+        this.setTitle("House information");
 
         RecyclerView rv = findViewById(R.id.recycler_view_room_mates);
 

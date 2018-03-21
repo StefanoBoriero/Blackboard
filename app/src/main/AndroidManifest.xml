@@ -80,7 +80,7 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".activities.HouseDialogActivity"
-            android:theme="@android:style/Theme.Material.Light.DialogWhenLarge.NoActionBar" />
+            android:theme="@android:style/Theme.Material.Light.DialogWhenLarge" />
 
         <receiver android:name=".receivers.BatteryStatusReceiver">
             <intent-filter>
@@ -114,7 +114,7 @@
         <activity
             android:name=".activities.AddHouseDialogActivity"
             android:theme="@android:style/Theme.Material.Light.DialogWhenLarge"
-            android:screenOrientation="portrait"></activity>
+            ></activity>
     </application>
 
 </manifest>
