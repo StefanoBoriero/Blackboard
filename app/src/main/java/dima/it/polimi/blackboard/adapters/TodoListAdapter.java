@@ -6,6 +6,7 @@ import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.RecyclerView;
+import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -50,10 +51,14 @@ public class TodoListAdapter extends FirestoreAdapter<TodoListAdapter.ViewHolder
     private boolean firstTime = true;
     private boolean secondTime = false;
 
+    private SparseBooleanArray sSelectedItems;
+    private int sPosition;
+
     public TodoListAdapter(Query query, TodoListAdapterListener listener, OnCompleteListener completeListener){
         super(query, completeListener);
         this.mListener = listener;
         this.isDouble = false;
+        this.sSelectedItems = new SparseBooleanArray();
     }
 
     public TodoListAdapter(Query query, TodoListAdapterListener listener, OnCompleteListener completeListener, int initialHighlighted){
@@ -61,6 +66,8 @@ public class TodoListAdapter extends FirestoreAdapter<TodoListAdapter.ViewHolder
         this.mListener = listener;
         this.initialHighlighted = initialHighlighted;
         this.isDouble = true;
+        this.sSelectedItems = new SparseBooleanArray();
+        this.sSelectedItems.put(initialHighlighted, true);
         }
 
     @Override
@@ -85,6 +92,8 @@ public class TodoListAdapter extends FirestoreAdapter<TodoListAdapter.ViewHolder
         holder.todoItemType.setCompoundDrawablesWithIntrinsicBounds(resolveIcon(todoItem.getType()), null, null, null);
         checkSuggestion(todoItem, holder.suggestionStar);
 
+        holder.bind(todoItem);
+/*
         if(isDouble) {
             if(!secondTime) {
                 if (position == initialHighlighted) {
@@ -105,7 +114,7 @@ public class TodoListAdapter extends FirestoreAdapter<TodoListAdapter.ViewHolder
 
             }
         }
-
+*/
         // TODO: 11/03/2018 Refactor this code to get the correct image 
         FirebaseStorage storage = FirebaseStorage.getInstance();
         DocumentReference userReference = FirebaseFirestore.getInstance().collection("users").document(todoItem.getCreatedBy());
@@ -131,12 +140,15 @@ public class TodoListAdapter extends FirestoreAdapter<TodoListAdapter.ViewHolder
             }
         });
 
+        holder.itemView.setSelected(sSelectedItems.get(position, false));
 
+    /*
         holder.itemView.setOnClickListener((v) -> {
             v.setSelected(true);
             mListener.onTodoItemClicked(todoItem, v, holder.getAdapterPosition());
             }
         );
+    */
     }
 
     private void checkSuggestion(TodoItem item, ImageView suggestionStar){
@@ -201,7 +213,17 @@ public class TodoListAdapter extends FirestoreAdapter<TodoListAdapter.ViewHolder
         throw new AlreadyRemovedException(item);
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder{
+    public void setSelected(int position){
+        //Sets the position of the current item selected
+        sSelectedItems.put(sPosition, false);
+        sPosition = position;
+        sSelectedItems.put(sPosition, true);
+        //Forces the adapter to redraw its children
+        notifyDataSetChanged();
+    }
+
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        private TodoItem item;
         private TextView todoItemName;
         private TextView todoItemType;
         private ImageView userIcon;
@@ -219,6 +241,32 @@ public class TodoListAdapter extends FirestoreAdapter<TodoListAdapter.ViewHolder
             userIcon = itemView.findViewById(R.id.user_icon);
             timestampView = itemView.findViewById(R.id.timestamp);
             suggestionStar = itemView.findViewById(R.id.suggestion_star);
+            itemView.setOnClickListener(this);
+        }
+
+        private void bind(TodoItem item){
+            this.item = item;
+        }
+
+        @Override
+        public void onClick(View view) {
+            if(sSelectedItems.get(getAdapterPosition(), false)){
+                //TODO adjust this condition
+                //
+                //The key was in the SparseBooleanArray => this row was selected
+                //Remove the key from the array, becomes unselected
+                //sSelectedItems.delete(getAdapterPosition());
+                //itemView.setSelected(false);
+            }
+            else{
+                //The key was NOT in the SparseBooleanArray => this row was not selected
+                //Remove the currently selected one
+                sSelectedItems.put(sPosition, false);
+                //Set the currently clicked as selected
+                sSelectedItems.put(getAdapterPosition(), true);
+                itemView.setSelected(true);
+            }
+            mListener.onTodoItemClicked(item, itemView, getAdapterPosition());
         }
     }
 

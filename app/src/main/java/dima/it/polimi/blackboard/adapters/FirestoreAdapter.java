@@ -38,6 +38,8 @@ public abstract class FirestoreAdapter<VH extends RecyclerView.ViewHolder>
     private List<DocumentSnapshot> mFilteredSnapshots;
     private DocumentSnapshot lastRemoved;
     private boolean removedByMe;
+    private boolean insertedByMe;
+    private boolean firstTime;
 
     private OnCompleteListener mListener;
     private String filter="";
@@ -47,11 +49,13 @@ public abstract class FirestoreAdapter<VH extends RecyclerView.ViewHolder>
         mSnapshots = new ArrayList<>();
         //mFilteredSnapshots = new ArrayList<>();
         mListener = listener;
+        firstTime = true;
     }
 
     FirestoreAdapter(Query query){
         mQuery = query;
         mSnapshots = new ArrayList<>();
+        firstTime = true;
         //mFilteredSnapshots = new ArrayList<>();
     }
 
@@ -77,6 +81,7 @@ public abstract class FirestoreAdapter<VH extends RecyclerView.ViewHolder>
             }
         }
         if(mFilteredSnapshots == null){
+            firstTime = false;
             mFilteredSnapshots = mSnapshots;
         }
         //TODO TRY TO REMOVE THIS FILTERING!!!!!
@@ -98,6 +103,14 @@ public abstract class FirestoreAdapter<VH extends RecyclerView.ViewHolder>
     private void onDocumentAdded(DocumentChange change){
         mSnapshots.add(change.getNewIndex(), change.getDocument());
         notifyItemInserted(change.getNewIndex());
+        if(insertedByMe){
+            insertedByMe = false;
+        }
+        else{
+            if(mListener != null && !firstTime){
+                mListener.addedByOther(change.getNewIndex());
+            }
+        }
     }
 
     private void onDocumentModified(DocumentChange change){
@@ -131,10 +144,6 @@ public abstract class FirestoreAdapter<VH extends RecyclerView.ViewHolder>
                 mListener.deleteByOther(oldIndex);
             }
         }
-
-        if(mListener != null){
-            mListener.reselectCurrent();
-        }
     }
 
     public void startListening(){
@@ -153,6 +162,7 @@ public abstract class FirestoreAdapter<VH extends RecyclerView.ViewHolder>
     public void setQuery(Query query) {
         stopListening();
         mSnapshots.clear();
+        firstTime = true;
         if (mFilteredSnapshots != null){
             mFilteredSnapshots.clear();
         }
@@ -227,13 +237,14 @@ public abstract class FirestoreAdapter<VH extends RecyclerView.ViewHolder>
     }
 
     void insertItem(int position){
+
         mFilteredSnapshots.add(position, lastRemoved);
         notifyItemInserted(position);
     }
 
     public interface OnCompleteListener{
         void onComplete(boolean emptyResult);
-        void reselectCurrent();
         void deleteByOther(int position);
+        void addedByOther(int position);
     }
 }

@@ -5,13 +5,9 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
-import android.app.FragmentManager;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.graphics.drawable.Drawable;
-import android.os.PersistableBundle;
-import android.support.v4.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -28,13 +24,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Filter;
 
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import dima.it.polimi.blackboard.R;
 import dima.it.polimi.blackboard.adapters.FirestoreAdapter;
@@ -74,7 +66,6 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
     private int clickedPosition;
     private TodoItem clickedItem;
 
-    private List<TodoItem> itemList;
     private boolean isDouble;
     private boolean isActivityResult;
     private boolean isEmpty;
@@ -102,7 +93,6 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
             firstFragment = (TodoItemListFragment)getSupportFragmentManager().findFragmentById(R.id.fragment_list_container);
             firstFragment.setAuthId(User.getInstance().getAuth_id());
             searchQuery = savedInstanceState.getCharSequence(CURRENT_SEARCH_QUERY);
-            //firstFragment.setHouse((String)houses[whichHouse]);
 
             if(isDouble){
                 clickedItem = savedInstanceState.getParcelable(CURRENT_ITEM);
@@ -248,21 +238,12 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
                 return;
             }
             TodoItem firstItem = firstFragment.getItem(0);
-            //View rowToSelect = firstFragment.getViewHolder(0);
-            //doubleFragmentClickHandler(rowToSelect, firstItem, 0);
 
             firstFragment.setSelectedItem(0);
             secondFragment.updateFragment(firstItem, 0, false);
             //Cannot get the correct one due to filtering conflict
             //Will satisfy the condition in doubleFragmentClickHandler
             itemRowClicked = null;
-        }
-    }
-
-    @Override
-    public void reselectCurrent(){
-        if(isDouble){
-            firstFragment.reSelectLastOne();
         }
     }
 
@@ -276,16 +257,24 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
                     secondFragment.emptyFragment();
                 }
                 else if(item != null) {
-                    firstFragment.setSelectedItem(position);
+                    //Select the current item at the position where the deleted one was
+                    firstFragment.handleSelectionAfterRemoval(position);
                     secondFragment.updateFragment(item, position, true);
                 }
                 else{
                     //It was selected the last of the list
                     TodoItem previousItem = firstFragment.getItem(position -1 );
-                    firstFragment.setSelectedItem(position -1);
+                    firstFragment.handleSelectionAfterRemoval(position);
                     secondFragment.updateFragment(previousItem, position -1, true);
                 }
             }
+        }
+    }
+
+    @Override
+    public void addedByOther(int position) {
+        if(isDouble){
+            firstFragment.handleSelectionAfterInsertion(position);
         }
     }
 
@@ -387,21 +376,10 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
      * @param item the item selected
      */
     private void doubleFragmentClickHandler(View clickedView, TodoItem item, int position){
-        if(clickedView != itemRowClicked) {
-            //setFocusedItem(clickedView);
-            firstFragment.setSelectedItem(position);
-            secondFragment.updateFragment(item, position, false);
-        }
-        itemRowClicked = clickedView;
-    }
+        firstFragment.setSelectedItem(position);
+        secondFragment.updateFragment(item, position, false);
 
-    /**
-     * Sets a visual flag for the item currently selected in a large device
-     * @param view the view currently selected
-     */
-    private void setFocusedItem(View view){
-        Drawable selected = getDrawable(R.color.colorAccent);
-        view.findViewById(R.id.selected_flag).setBackground(selected);
+        itemRowClicked = clickedView;
     }
 
     /**
@@ -449,7 +427,9 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
 
     /**
      * Removes an item at a given position and sets the environment for showing next one
+     * @param shownItem the item which details where showm
      * @param position the position to remove
+     * @param action the action performed
      */
     void removeItem(TodoItem shownItem, int position, String action){
         View nextItemView = firstFragment.getViewHolder(position + 1);
@@ -465,15 +445,18 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
                 }
                 else {
                     isEmpty = false;
+                    //Try to get the next item (the one occupying now the position of the removed one)
                     TodoItem nextItem = firstFragment.getItem(position);
                     if (nextItem == null) {
-                        //It was the last of the list
+                        //It was the last of the list, but the list is not empty
+                        //Take the previous one
                         nextItem = firstFragment.getItem(position - 1);
                         secondFragment.updateFragment(nextItem, position - 1, false);
-                        firstFragment.setSelectedItem(position - 1);
+                        //firstFragment.setSelectedItem(position - 1);
                     } else {
+                        //It was not the last of the list
                         secondFragment.updateFragment(nextItem, position, false);
-                        firstFragment.setSelectedItem(position + 1);
+                        //firstFragment.setSelectedItem(position + 1);
                     }
                     itemRowClicked = nextItemView;
                 }
@@ -510,10 +493,10 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
                     //It was the last of the list
                     nextItem = firstFragment.getItem(position - 1);
                     secondFragment.updateFragment(nextItem, position - 1, false);
-                    firstFragment.setSelectedItem(position - 1);
+                    //firstFragment.setSelectedItem(position - 1);
                 } else {
                     secondFragment.updateFragment(nextItem, position, false);
-                    firstFragment.setSelectedItem(position + 1);
+                    //firstFragment.setSelectedItem(position + 1);
                 }
                 itemRowClicked = nextItemView;
             }
@@ -542,10 +525,7 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
                 //I'm inserting in empty list
                 //Could be during search
                 secondFragment.updateFragment(item, position, true);
-                firstFragment.reSelectLastOne();
             }
-            //secondFragment.updateFragment(item, position);
-            //firstFragment.setSelectedItem(position);
         }
     }
 
@@ -573,6 +553,8 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
         this.whichHouse = which;
         String currentHouse = (String)this.houses[whichHouse];
         firstFragment.setHouse(currentHouse);
+        //Select the first element in the list
+        firstFragment.setSelectedItem(0);
         dialog.dismiss();
 
     }

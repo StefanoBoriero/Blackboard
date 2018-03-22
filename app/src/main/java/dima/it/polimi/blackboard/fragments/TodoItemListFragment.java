@@ -1,7 +1,6 @@
 package dima.it.polimi.blackboard.fragments;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
 import android.support.annotation.NonNull;
@@ -66,7 +65,6 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
     private TodoListAdapter adapter;
 
     private View rootView;
-    private View oldHighlighted;
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private String authId;
@@ -195,10 +193,6 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
         m.setText(message);
         i.setImageResource(iconId);
 
-        if(isDouble) {
-            setSelectedItem(toHighlightIndex);
-        }
-
         setHouse(house);
         return view;
     }
@@ -251,7 +245,8 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
         if(adapter == null){
             //We're initialing the fragment the first time or after rotation
             if(isDouble) {
-                adapter = new TodoListAdapter(myQuery, this, mOnCompleteListener, toHighlightIndex);
+                adapter = new TodoListAdapter(myQuery, this, mOnCompleteListener/*, toHighlightIndex10*/);
+                setSelectedItem(toHighlightIndex);
             }
             else{
                 adapter = new TodoListAdapter(myQuery, this, mOnCompleteListener);
@@ -259,46 +254,20 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
             recyclerView.setAdapter(adapter);
         }else{
             //We're changing the house
-            oldHighlighted = null;
             toHighlightIndex = 0;
-            deselectAllCurrentShown();
         }
         this.adapter.setQuery(myQuery);
     }
 
-    private void deselectAllCurrentShown(){
-        for(int i=0; i<getRemainingItems(); i++){
-            View v = recyclerView.getChildAt(i);
-            if(v!=null){
-                v.findViewById(R.id.selected_flag).setBackground(null);
-            }
-        }
-    }
-
     public void setSelectedItem(int index){
-
-        if(oldHighlighted != null){
-            oldHighlighted.findViewById(R.id.selected_flag).setBackground(null);
-        }else{
-            oldHighlighted = recyclerView.getChildAt(toHighlightIndex);
-            if(oldHighlighted != null){
-                oldHighlighted.findViewById(R.id.selected_flag).setBackground(null);
-            }
-        }
-        toHighlightIndex = index;
-        View toHighlight = recyclerView.getChildAt(toHighlightIndex);
-        if(toHighlight != null) {
-            oldHighlighted = toHighlight;
-            highlight(toHighlight);
+        if(adapter != null){
+            toHighlightIndex = index;
+            adapter.setSelected(index);
         }
     }
 
-    public void reSelectLastOne(){
-        if(oldHighlighted != null){
-            deselectAllCurrentShown();
-            //setSelectedItem(toHighlightIndex);
-            oldHighlighted.findViewById(R.id.selected_flag).setBackground(getResources().getDrawable(R.color.colorAccent));
-        }
+    public void highlightCurrentOne(){
+        this.setSelectedItem(toHighlightIndex);
     }
 
     public void disableSwipe(){
@@ -348,10 +317,8 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
      */
     public TodoItem removeItem(int position){
         final TodoItem removedItem = adapter.getItem(position);
-        final View removedView = recyclerView.getChildAt(position);
-        removedView.findViewById(R.id.selected_flag).setBackground(null);
         adapter.removeItem(position);
-
+        handleSelectionAfterRemoval(position);
         return removedItem;
     }
 
@@ -367,6 +334,35 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
         adapter.insertItem(todoItem, position);
         if(position == 0 || position == itemCount){
             recyclerView.scrollToPosition(position);
+        }
+        handleSelectionAfterInsertion(position);
+    }
+
+    /**
+     * Whenever I insert an item in the list, I have to make sure the index of the currently selected one is consistent
+     * @param insertingPosition the position where I'm inserting the item
+     */
+    public void handleSelectionAfterInsertion(int insertingPosition){
+        if(isDouble) {
+            if (insertingPosition <= toHighlightIndex) {
+                //I'm inserting it before the currently selected
+                toHighlightIndex++;
+                setSelectedItem(toHighlightIndex);
+            }
+        }
+    }
+
+    public void handleSelectionAfterRemoval(int removedPosition){
+        if(isDouble){
+            if(removedPosition < toHighlightIndex){
+                //I'm removing something before the currently selected one
+                toHighlightIndex--;
+            }
+            else if(removedPosition == getRemainingItems()){
+                //I removed the last of the list
+                toHighlightIndex--;
+            }
+            setSelectedItem(toHighlightIndex);
         }
     }
 
@@ -389,12 +385,6 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
         //TODO implement refreshing through Firebase. Add setter for network source
     }
 
-    public void changeHouse(String newHouse){
-        this.house = newHouse;
-        prepareQuery();
-        this.adapter.setQuery(myQuery);
-    }
-
     public void setAuthId(String authId){
         this.authId = authId;
     }
@@ -412,21 +402,7 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
         }
 
     }
-/*
-    @Override
-    public void onComplete(boolean empty){
-        View rootView = getView();
-        if(rootView != null) {
-            View emptyMessage = rootView.findViewById(R.id.empty_message);
-            if(empty){
-                emptyMessage.setVisibility(View.VISIBLE);
-            }
-            else{
-                emptyMessage.setVisibility(View.INVISIBLE);
-            }
-       }
-    }
-*/
+
     public void emptyFragment(){
         View rootView = getView();
         if(rootView != null) {
@@ -451,10 +427,6 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
         return adapter.getItemCount();
     }
 
-    private void highlight(View view){
-        Drawable selected = getResources().getDrawable(R.color.colorAccent);
-        view.findViewById(R.id.selected_flag).setBackground(selected);
-    }
 
     public void stopListening(){
         adapter.stopListening();

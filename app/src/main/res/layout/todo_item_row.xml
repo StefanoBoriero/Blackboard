@@ -37,7 +37,7 @@
         android:id="@+id/foreground_row"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/background_list_row"
+        android:background="@drawable/selector_item_row"
         android:clickable="false"
         android:clipChildren="false"
         android:clipToPadding="false"
@@ -49,6 +49,7 @@
             android:id="@+id/selected_flag"
             android:layout_width="8dp"
             android:layout_height="match_parent"
+
             app:layout_constraintStart_toStartOf="parent"
             android:contentDescription="@string/content_description_selected"/>
 
