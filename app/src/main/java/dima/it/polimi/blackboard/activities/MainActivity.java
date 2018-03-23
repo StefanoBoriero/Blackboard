@@ -3,7 +3,9 @@ package dima.it.polimi.blackboard.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -29,6 +31,16 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.signature.ObjectKey;
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.AxisBase;
+import com.github.mikephil.charting.components.Description;
+import com.github.mikephil.charting.components.Legend;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.formatter.IAxisValueFormatter;
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -45,8 +57,11 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import dima.it.polimi.blackboard.R;
@@ -59,7 +74,7 @@ import dima.it.polimi.blackboard.utils.GlideApp;
 import dima.it.polimi.blackboard.utils.HouseDecoder;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, FirestoreAdapter.OnCompleteListener {
 
     private FirebaseAuth firebaseAuth;
     private RecyclerView recyclerView;
@@ -67,6 +82,10 @@ public class MainActivity extends AppCompatActivity
     private View navHeaderView;
     private ImageView ivProfile;
     private FirebaseFirestore db;
+    private DayResumeAdapter adapter;
+    private boolean graphInstantiated;
+    private String[] datesCreated;
+    private String[] datesCompleted;
 
     @Override
     @SuppressWarnings("unchecked")
@@ -241,12 +260,212 @@ public class MainActivity extends AppCompatActivity
         if(user != null){
             String id = user.getUid();
             CollectionReference days = db.collection("users").document(id).collection("days");
-            Query query = days.orderBy("day", Query.Direction.DESCENDING);
+            Query query = days.orderBy("day", Query.Direction.DESCENDING).limit(7);
 
-            FirestoreAdapter adapter = new DayResumeAdapter(query);
+            adapter = new DayResumeAdapter(query, this);
             recyclerView.setAdapter(adapter);
             adapter.startListening();
         }
+    }
+
+    @Override
+    public void onComplete(boolean emptyResult) {
+        if(!emptyResult){
+            recyclerView.setVisibility(View.VISIBLE);
+            if(!graphInstantiated) {
+                graphInstantiated = true;
+                LineChart completeChart = findViewById(R.id.chart_completed);
+                LineChart createdChart = findViewById(R.id.chart_created);
+                if (createdChart == null) {
+                    //Small device
+                    populateCompletedChart(completeChart);
+                } else {
+                    if (recyclerView != null) {
+                        recyclerView.scrollToPosition(0);
+                    }
+                    populateCompletedChart(completeChart);
+                    populateCreatedChart(createdChart);
+                }
+            }
+            else{
+                LineChart completeChart = findViewById(R.id.chart_completed);
+                LineChart createdChart = findViewById(R.id.chart_created);
+                if (createdChart == null) {
+                    //Small device
+                    //populateCompletedChart(completeChart);
+                    completeChart.setVisibility(View.INVISIBLE);
+                    LineDataSet dataSet = generateCompletedDataSet();
+                    styleDataSet(dataSet, getDrawable(R.drawable.fade_green), getResources().getColor(R.color.greenAccept));
+                    LineData lineData = new LineData(dataSet);
+                    setXLabels(completeChart, datesCompleted);
+                    completeChart.setData(lineData);
+                    completeChart.notifyDataSetChanged();
+                    completeChart.invalidate();
+                    completeChart.setVisibility(View.VISIBLE);
+                } else {
+                    if (recyclerView != null) {
+                        recyclerView.scrollToPosition(0);
+                    }
+                    //populateCompletedChart(completeChart);
+                    completeChart.setVisibility(View.INVISIBLE);
+                    completeChart.getXAxis().setDrawLabels(false);
+                    LineDataSet dataSet = generateCompletedDataSet();
+                    styleDataSet(dataSet, getDrawable(R.drawable.fade_green), getResources().getColor(R.color.greenAccept));
+                    LineData lineData = new LineData(dataSet);
+                    setXLabels(completeChart, datesCompleted);
+                    completeChart.setData(lineData);
+                    completeChart.notifyDataSetChanged();
+                    completeChart.invalidate();
+                    completeChart.getXAxis().setDrawLabels(true);
+                    completeChart.setVisibility(View.VISIBLE);
+
+
+                    //populateCreatedChart(createdChart);
+                    createdChart.setVisibility(View.INVISIBLE);
+                    createdChart.getXAxis().setDrawLabels(false);
+                    LineDataSet dataSetCr = generateCreatedDataSet();
+                    styleDataSet(dataSetCr, getDrawable(R.drawable.fade_accent), getResources().getColor(R.color.colorAccent));
+                    LineData lineDataCr = new LineData(dataSetCr);
+                    setXLabels(createdChart, datesCreated);
+                    createdChart.setData(lineDataCr);
+                    createdChart.notifyDataSetChanged();
+                    createdChart.invalidate();
+                    createdChart.getXAxis().setDrawLabels(true);
+                    createdChart.setVisibility(View.VISIBLE);
+                }
+            }
+        }
+    }
+
+    private List<Entry> createNewEntries(){
+        DayResume[] mData = adapter.getDayResumeArray();
+        List<Entry> entries = new ArrayList<>();
+        int i = mData.length;
+        int j;
+        datesCompleted = new String[i];
+        for(i--, j=0;i>=0; i--, j++){
+            DayResume day = mData[i];
+            DateFormat df = new SimpleDateFormat("MMM dd", Locale.US);
+            String date = df.format(day.getDay());
+            datesCompleted[j] = date;
+            entries.add(new Entry(j, day.getCompletedItems()));
+        }
+        return entries;
+    }
+
+    private LineDataSet generateCompletedDataSet(){
+        DayResume[] mData = adapter.getDayResumeArray();
+        List<Entry> entries = new ArrayList<>();
+        int i = mData.length;
+        int j;
+        datesCompleted = new String[i];
+        for(i--, j=0;i>=0; i--, j++){
+            DayResume day = mData[i];
+            DateFormat df = new SimpleDateFormat("MMM dd", Locale.US);
+            String date = df.format(day.getDay());
+            datesCompleted[j] = date;
+            entries.add(new Entry(j, day.getCompletedItems()));
+        }
+        return new LineDataSet(entries, "Completed Items");
+    }
+
+    private LineDataSet generateCreatedDataSet(){
+        DayResume[] mData = adapter.getDayResumeArray();
+
+        List<Entry> entries = new ArrayList<>();
+        datesCreated = new String[mData.length];
+        int i = mData.length;
+        int j;
+        for(i--, j=0;i>=0; i--, j++){
+            DayResume day = mData[i];
+            DateFormat df = new SimpleDateFormat("MMM dd", Locale.US);
+            String date = df.format(day.getDay());
+            datesCreated[j] = date;
+            entries.add(new Entry(j, day.getCreatedItems()));
+        }
+        return new LineDataSet(entries, "Completed Items");
+    }
+
+    private void styleChart(LineChart chart){
+        chart.getXAxis().setDrawGridLines(false);
+        chart.getAxisLeft().setDrawGridLines(false);
+        chart.getLegend().setHorizontalAlignment(Legend.LegendHorizontalAlignment.RIGHT);
+        chart.getLegend().setVerticalAlignment(Legend.LegendVerticalAlignment.TOP);
+        chart.setDrawGridBackground(false);
+
+        Description mDesc = new Description();
+        mDesc.setText("");
+        chart.setDescription(mDesc);    // Hide the description
+        chart.getAxisLeft().setDrawLabels(false);
+        chart.getAxisRight().setDrawLabels(false);
+        chart.getXAxis().setDrawLabels(true);
+        chart.getXAxis().setLabelRotationAngle(-75);
+        chart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
+
+        chart.getLegend().setEnabled(false);
+    }
+
+    private void setXLabels(LineChart chart, String[] dates){
+        chart.getXAxis().setValueFormatter( (f,a) ->
+            dates[(int)f]
+        );
+    }
+
+    private void styleDataSet(LineDataSet dataSet, Drawable background, int lineColor){
+        //dataSet = new LineDataSet(entries, "Completed Items");
+        dataSet.setColor(lineColor);
+        dataSet.setDrawFilled(true);
+        //Drawable background = getDrawable(R.drawable.fade_green);
+        dataSet.setFillDrawable(background);
+        dataSet.setDrawHighlightIndicators(false);
+        dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
+        dataSet.setCubicIntensity(0.2f);
+    }
+
+    private void populateCompletedChart(LineChart chart){
+        /*
+        DayResume[] mData = adapter.getDayResumeArray();
+
+        List<Entry> entries = new ArrayList<>();
+        int i = mData.length;
+        int j;
+        String[] dates = new String[i];
+        for(i--, j=0;i>=0; i--, j++){
+            DayResume day = mData[i];
+            DateFormat df = new SimpleDateFormat("MMM dd", Locale.US);
+            String date = df.format(day.getDay());
+            dates[j] = date;
+            entries.add(new Entry(j, day.getCompletedItems()));
+        }*/
+        LineDataSet dataSet = generateCompletedDataSet();
+        //LineDataSet dataSet = new LineDataSet(entries, "Completed Items");
+        styleDataSet(dataSet, getDrawable(R.drawable.fade_green), getResources().getColor(R.color.greenAccept));
+        LineData lineData = new LineData(dataSet);
+        styleChart(chart);
+        setXLabels(chart, datesCompleted);
+        chart.setData(lineData);
+        chart.invalidate();
+    }
+
+
+    private void populateCreatedChart(LineChart chart){
+        LineDataSet dataSet = generateCreatedDataSet();
+        styleDataSet(dataSet, getDrawable(R.drawable.fade_accent), getResources().getColor(R.color.colorAccent));
+        LineData lineData = new LineData(dataSet);
+        styleChart(chart);
+        setXLabels(chart, datesCreated);
+        chart.setData(lineData);
+        chart.invalidate();
+    }
+
+    @Override
+    public void deleteByOther(int position) {
+
+    }
+
+    @Override
+    public void addedByOther(int position) {
+
     }
 
     private void loadProfilePicture()
@@ -337,4 +556,5 @@ public class MainActivity extends AppCompatActivity
             }
         });
     }
+
 }

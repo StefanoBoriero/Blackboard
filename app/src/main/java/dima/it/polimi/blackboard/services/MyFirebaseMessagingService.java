@@ -15,6 +15,7 @@ import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
 import dima.it.polimi.blackboard.R;
+import dima.it.polimi.blackboard.activities.HouseListActivity;
 import dima.it.polimi.blackboard.activities.MainActivity;
 
 /**
@@ -36,6 +37,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
         if (remoteMessage.getNotification() != null) {
             String messageBody = remoteMessage.getNotification().getBody();
+            sendNotification(messageBody);
             Log.d(TAG, "Message Notification Body: " + messageBody);
         }
 
@@ -48,7 +50,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
      * @param messageBody FCM message body received.
      */
     private void sendNotification(String messageBody) {
-        Intent intent = new Intent(this, MainActivity.class);
+        Intent intent = new Intent(this, HouseListActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
                 PendingIntent.FLAG_ONE_SHOT);

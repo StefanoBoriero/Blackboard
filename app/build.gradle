@@ -54,6 +54,9 @@ dependencies {
 
     //Google play authentication dependencies
     implementation 'com.google.android.gms:play-services-auth:11.8.0'
+
+    //Graph library
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.0.3'
 }
 
 apply plugin: 'com.google.gms.google-services'
