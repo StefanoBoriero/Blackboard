@@ -29,6 +29,8 @@ import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -210,44 +212,49 @@ public class PaymentListFragment extends Fragment implements PaymentListAdapter.
                         {
                             Map<String,Object> roommates = (Map<String, Object>) task.getResult().getData().get("roommates");
                             List<String> roommatesList = (List<String>) roommates.get("roommates");
-                            double numberOfRoommates = roommatesList.size();
-
+                            Map<String,Object> joinedAtRoomates = (Map<String, Object>) roommates.get("joinedTime");
                             myListener = myPaymentsQuery.addSnapshotListener( (querySnapshot, error) ->
                             {
                                 if (error != null) {
                                     return;
                                 }
-
+                                Date joinedAt = Calendar.getInstance().getTime();
+                                if(joinedAtRoomates != null)
+                                    joinedAt = (Date) joinedAtRoomates.get(FirebaseAuth.getInstance().getCurrentUser().getUid().toString());
                                 for(DocumentChange dc: querySnapshot.getDocumentChanges()){
-                                    if(dc.getType() == DocumentChange.Type.ADDED){
-                                        PaymentItem newItem = dc.getDocument().toObject(PaymentItem.class);
-                                        if((type.equals("positive") && newItem.getPerformedBy().equals(user.getUid()) || (type.equals("negative") && !newItem.getPerformedBy().equals(user.getUid())))) {
-                                            insertPayment(newItem);
-                                            if(newItem.getPerformedBy().equals(user.getUid()))
-                                            {
-                                                double payment = newItem.getPrice() * ((numberOfRoommates - 1)/ (numberOfRoommates));
+                                    PaymentItem newItem = dc.getDocument().toObject(PaymentItem.class);
+                                    Date paymentDate = newItem.getPerformedOn();
+                                    if( paymentDate != null && paymentDate.after(joinedAt)) {
+                                        //calculate the number of persons that were in the group when the payment has been issued
+                                        double numberOfPersonsAtPaymentTime = 0;
+                                        for (Map.Entry<String, Object> entry : joinedAtRoomates.entrySet())
+                                        {
+                                            if(((Date)entry.getValue()).before(paymentDate))
+                                                numberOfPersonsAtPaymentTime++;
+                                        }
+                                        if (dc.getType() == DocumentChange.Type.ADDED) {
+                                            if ((type.equals("positive") && newItem.getPerformedBy().equals(user.getUid()) || (type.equals("negative") && !newItem.getPerformedBy().equals(user.getUid())))) {
+                                                insertPayment(newItem);
+                                                if (newItem.getPerformedBy().equals(user.getUid())) {
+                                                    double payment = newItem.getPrice() * ((numberOfPersonsAtPaymentTime - 1) / (numberOfPersonsAtPaymentTime));
+                                                    BalanceActivity.refreshBalanceColor(payment);
+                                                } else {
+                                                    double payment = newItem.getPrice() / (numberOfPersonsAtPaymentTime);
+                                                    BalanceActivity.refreshBalanceColor(-payment);
+                                                }
+                                            }
+
+                                        } else if (dc.getType() == DocumentChange.Type.REMOVED) {
+                                            double oldPrice = newItem.getPrice();
+                                            if (newItem.getPerformedBy().equals(user.getUid()) && type.equals("positive")) {
+                                                double payment = oldPrice * ((numberOfPersonsAtPaymentTime - 1) / (numberOfPersonsAtPaymentTime));
+                                                BalanceActivity.refreshBalanceColor(-payment);
+                                            } else if (!newItem.getPerformedBy().equals(user.getUid()) && type.equals("negative")) {
+                                                double payment = oldPrice / (numberOfPersonsAtPaymentTime);
                                                 BalanceActivity.refreshBalanceColor(payment);
                                             }
-                                            else {
-                                                double payment = newItem.getPrice() / (numberOfRoommates);
-                                                BalanceActivity.refreshBalanceColor(-payment);
-                                            }
+                                            adapter.removeItem(newItem.getId());
                                         }
-
-                                    }
-                                    else if(dc.getType() == DocumentChange.Type.REMOVED){
-                                        PaymentItem oldItem = dc.getDocument().toObject(PaymentItem.class);
-                                        double oldPrice = oldItem.getPrice();
-                                        if(oldItem.getPerformedBy().equals(user.getUid()) && type.equals("positive"))
-                                        {
-                                            double payment = oldPrice * ((numberOfRoommates - 1)/ (numberOfRoommates));
-                                            BalanceActivity.refreshBalanceColor(-payment);
-                                        }
-                                        else if(!oldItem.getPerformedBy().equals(user.getUid()) && type.equals("negative")){
-                                            double payment = oldPrice / (numberOfRoommates);
-                                            BalanceActivity.refreshBalanceColor(payment);
-                                        }
-                                        adapter.removeItem(oldItem.getId());
                                     }
                                 }
 

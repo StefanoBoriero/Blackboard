@@ -11,8 +11,7 @@
     <TextView
         android:id="@+id/house_name"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_height="40dp"
         android:gravity="center_horizontal"
         android:text="@string/house_name"
         android:textSize="30sp"
@@ -25,6 +24,13 @@
         android:layout_weight="8"
         app:layoutManager="LinearLayoutManager"
         tools:listitem="@layout/room_mate" />
+
+
+    <include
+        android:id="@+id/add_member_view"
+        layout="@layout/content_add_member"
+        android:layout_width="match_parent"
+        android:layout_height="70dp" />
 
     <include
         android:id="@+id/leave_view"

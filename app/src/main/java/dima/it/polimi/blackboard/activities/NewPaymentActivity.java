@@ -27,6 +27,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import org.w3c.dom.Text;
 
 import java.text.ParseException;
+import java.util.Calendar;
 
 import dima.it.polimi.blackboard.R;
 import dima.it.polimi.blackboard.model.PaymentItem;
@@ -237,7 +238,7 @@ public class NewPaymentActivity extends AppCompatActivity {
         }
 
         String id = name + System.currentTimeMillis();
-        PaymentItem paymentItem = new PaymentItem(id,name,amount);
+        PaymentItem paymentItem = new PaymentItem(id,name,amount, Calendar.getInstance().getTime());
         db.collection("houses").document(selectedHouse).collection("payments").document(id).set(paymentItem);
         submitButton.setClickable(false);
         onBackPressed();

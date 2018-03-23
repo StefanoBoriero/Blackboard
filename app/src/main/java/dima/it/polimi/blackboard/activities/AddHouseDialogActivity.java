@@ -2,11 +2,8 @@ package dima.it.polimi.blackboard.activities;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.RecyclerView;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -16,7 +13,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -25,6 +21,8 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -142,9 +140,12 @@ public class AddHouseDialogActivity extends Activity {
         } else {
             Map<String, Object> house = new HashMap<>();
             Map<String, Object> roommates = new HashMap<>();
+            Map<String,Object> joinedTime = new HashMap<>();
+            Date date = Calendar.getInstance().getTime();
             roommates.put("creator", auth.getCurrentUser().getUid());
             List<String> persons = new ArrayList<>();
             persons.add(auth.getCurrentUser().getUid());
+            joinedTime.put(auth.getCurrentUser().getUid(),date);
             String houseId = houseName + System.currentTimeMillis();
             house.put("name", houseName);
             for ( int i = 0; i < emailLL.getChildCount(); i++) {
@@ -156,6 +157,7 @@ public class AddHouseDialogActivity extends Activity {
                             if (task.isSuccessful()) {
                                 String uid = (String) task.getResult().getData().get("uid");
                                 persons.add(uid);
+                                joinedTime.put(uid,date);
                                 db.collection("users").document(uid).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                                     @Override
                                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -176,6 +178,7 @@ public class AddHouseDialogActivity extends Activity {
                                     }
                                 });
                                 roommates.put("roommates", persons);
+                                roommates.put("joinedTime",joinedTime);
                                 house.put("roommates", roommates);
                                 db.collection("houses").document(houseId).set(house);
                             }

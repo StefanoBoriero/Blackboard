@@ -6,6 +6,8 @@ import android.os.Parcelable;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.util.Date;
+
 /**
  * This class represents a payment item issued by an user
  * Created by simone on 21/12/2017.
@@ -16,6 +18,7 @@ public class PaymentItem implements Parcelable{
     private  String name;
     private double price;
     private  String performedBy;
+    private Date performedOn;
 
     public PaymentItem()
     {
@@ -28,9 +31,10 @@ public class PaymentItem implements Parcelable{
         this.name = in.readString();
         this.price = in.readFloat();
         this.performedBy = in.readString();
+        this.performedOn = null;
     }
 
-    public PaymentItem(String id, String name, Double price){
+    public PaymentItem(String id, String name, Double price,Date performedOn){
         this.id = id;
         this.name = name;
         this.price = price;
@@ -39,6 +43,15 @@ public class PaymentItem implements Parcelable{
         if(user != null) {
             this.performedBy = user.getUid();
         }
+        this.performedOn = performedOn;
+    }
+
+    public PaymentItem(String id, String name, Double price,Date performedOn, String performedBy){
+        this.id = id;
+        this.name = name;
+        this.price = price;
+        this.performedBy = performedBy;
+        this.performedOn = performedOn;
     }
 
     public String getPerformedBy(){ return  this.performedBy;}
@@ -60,6 +73,7 @@ public class PaymentItem implements Parcelable{
     public String getName(){
         return this.name;
     }
+    public Date getPerformedOn(){return this.performedOn;}
 
 
     public double getPrice(){return this.price;}

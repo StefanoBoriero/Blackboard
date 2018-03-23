@@ -113,8 +113,10 @@
 
         <activity
             android:name=".activities.AddHouseDialogActivity"
-            android:theme="@android:style/Theme.Material.Light.DialogWhenLarge"
-            ></activity>
+            android:theme="@android:style/Theme.Material.Light.DialogWhenLarge" />
+        <activity
+            android:name=".activities.AddMemberDialogActivity"
+            android:theme="@android:style/Theme.Material.Light.Dialog.Alert"/>
     </application>
 
 </manifest>

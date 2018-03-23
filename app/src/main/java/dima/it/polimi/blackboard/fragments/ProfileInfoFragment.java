@@ -114,7 +114,7 @@ public class ProfileInfoFragment extends Fragment implements HouseListAdapter.Ho
         db = FirebaseFirestore.getInstance();
 
         rv = view.findViewById(R.id.recycler_view_house);
-        newGetHoues();
+        newGetHouses();
 
 
         TextView nameView = view.findViewById(R.id.username);
@@ -266,7 +266,7 @@ public class ProfileInfoFragment extends Fragment implements HouseListAdapter.Ho
 
 
 
-    private void newGetHoues()
+    private void newGetHouses()
     {
        CollectionReference user = db.collection("houses");
        houses = new ArrayList<>();
@@ -278,11 +278,13 @@ public class ProfileInfoFragment extends Fragment implements HouseListAdapter.Ho
             }
 
             for(DocumentChange dc: querySnapshot.getDocumentChanges()){
+                String name = (String)dc.getDocument().getData().get("name");
+                String id = dc.getDocument().getId();
                 if(dc.getType() == DocumentChange.Type.ADDED){
-                    String name = (String)dc.getDocument().getData().get("name");
-                    String id = dc.getDocument().getId();
                     Map<String,Object> houseData = dc.getDocument().getData();
                     Map<String,Object> roommates = (Map<String, Object>) houseData.get("roommates");
+                    if(roommates != null)
+                    {
                     ArrayList<String> roomMatesList = (ArrayList<String>) roommates.get("roommates");
                     if(roomMatesList.contains(FirebaseAuth.getInstance().getCurrentUser().getUid().toString())) {
                         House newHouse = new House(name, id);
@@ -291,6 +293,30 @@ public class ProfileInfoFragment extends Fragment implements HouseListAdapter.Ho
                         RecyclerView.Adapter adapter = new HouseListAdapter(houses, ProfileInfoFragment.this);
                         rv.setLayoutManager(new GridLayoutManager(getContext(), 3));
                         rv.setAdapter(adapter);
+                    }
+                    }
+                }
+                else if(dc.getType() == DocumentChange.Type.MODIFIED)
+                {
+                    Map<String,Object> houseData = dc.getDocument().getData();
+                    Map<String,Object> roommates = (Map<String, Object>) houseData.get("roommates");
+                    if(roommates != null)
+                    {
+                        ArrayList<String> roomMatesList = (ArrayList<String>) roommates.get("roommates");
+                        if(!roomMatesList.contains(FirebaseAuth.getInstance().getCurrentUser().getUid().toString())) {
+                            boolean found = false;
+                            int i = 0;
+                            for(; i< houses.size() && found == false;i++)
+                            {
+                                if(houses.get(i).getId().equals(id))
+                                    found = true;
+                            }
+                            if(found)
+                                houses.remove(i-1);
+                            RecyclerView.Adapter adapter = new HouseListAdapter(houses, ProfileInfoFragment.this);
+                            rv.setLayoutManager(new GridLayoutManager(getContext(), 3));
+                            rv.setAdapter(adapter);
+                        }
                     }
                 }
             }
