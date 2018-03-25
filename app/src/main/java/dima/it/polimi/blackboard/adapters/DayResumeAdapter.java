@@ -129,6 +129,20 @@ public class DayResumeAdapter extends FirestoreAdapter<DayResumeAdapter.ViewHold
         }
     }
 
+    public void goBackOneWeek(){
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if(user != null) {
+            hideRecyclerViewWhileLoading();
+            weekNumber--;
+            String id = user.getUid();
+            CollectionReference days = db.collection("users").document(id).collection("days");
+            Query query = days.orderBy("day", Query.Direction.DESCENDING).limit(7)
+                    .startAt(startingPivots.get(weekNumber));
+            super.setQuery(query);
+        }
+    }
+
     @Override
     public int getItemCount() {
         //We return 2 items more, one for the header and one for the footer

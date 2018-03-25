@@ -307,7 +307,7 @@ public class MainActivity extends AppCompatActivity
                         recyclerView.scrollToPosition(0);
                     }
                     //populateCompletedChart(completeChart);
-                    completeChart.setVisibility(View.INVISIBLE);
+                    findViewById(R.id.charts).setVisibility(View.INVISIBLE);
                     completeChart.getXAxis().setDrawLabels(false);
                     LineDataSet dataSet = generateCompletedDataSet();
                     styleDataSet(dataSet, getDrawable(R.drawable.fade_green), getResources().getColor(R.color.greenAccept));
@@ -317,11 +317,9 @@ public class MainActivity extends AppCompatActivity
                     completeChart.notifyDataSetChanged();
                     completeChart.invalidate();
                     completeChart.getXAxis().setDrawLabels(true);
-                    completeChart.setVisibility(View.VISIBLE);
 
 
                     //populateCreatedChart(createdChart);
-                    createdChart.setVisibility(View.INVISIBLE);
                     createdChart.getXAxis().setDrawLabels(false);
                     LineDataSet dataSetCr = generateCreatedDataSet();
                     styleDataSet(dataSetCr, getDrawable(R.drawable.fade_accent), getResources().getColor(R.color.colorAccent));
@@ -331,9 +329,14 @@ public class MainActivity extends AppCompatActivity
                     createdChart.notifyDataSetChanged();
                     createdChart.invalidate();
                     createdChart.getXAxis().setDrawLabels(true);
-                    createdChart.setVisibility(View.VISIBLE);
+                    findViewById(R.id.charts).setVisibility(View.VISIBLE);
                 }
             }
+        }
+        else{
+            adapter.goBackOneWeek();
+            Toast.makeText(this, "There's no more data to load!", Toast.LENGTH_SHORT)
+                    .show();
         }
     }
 
