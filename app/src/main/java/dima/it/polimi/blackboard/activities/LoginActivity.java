@@ -47,6 +47,8 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.FirebaseInstanceIdService;
 
 import dima.it.polimi.blackboard.R;
 
@@ -56,6 +58,7 @@ import dima.it.polimi.blackboard.R;
  */
 
 public class LoginActivity extends AppCompatActivity {
+    private final static String TAG = "login-activity";
     private final static int ANIMATION_DELAY = 800;
     private ConstraintSet mConstraintSet2 = new ConstraintSet(); // create a Constraint Set
     private ConstraintLayout mConstraintLayout;
@@ -228,8 +231,26 @@ public class LoginActivity extends AppCompatActivity {
                     }
 
                 }
+                else{
+                    sendToken();
+                }
+
             }
         });
+    }
+
+    private void sendToken(){
+        FirebaseInstanceId instanceId = FirebaseInstanceId.getInstance();
+        String currentToken = instanceId.getToken();
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if(user != null){
+            String uid = user.getUid();
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+            db.collection("users").document(uid).update("token", currentToken).addOnFailureListener(e ->
+                    Log.w(TAG, "Error updating document", e)
+            );
+        }
     }
 
     //this method is used to set up the google login
@@ -269,6 +290,7 @@ public class LoginActivity extends AppCompatActivity {
                 // Google Sign In was successful, authenticate with Firebase
                 GoogleSignInAccount account = task.getResult(ApiException.class);
                 firebaseAuthWithGoogle(account);
+                sendToken();
             } catch (ApiException e) {
                 // Google Sign In failed, update UI appropriately
 
