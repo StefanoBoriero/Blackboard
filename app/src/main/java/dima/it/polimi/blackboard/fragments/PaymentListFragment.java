@@ -1,7 +1,9 @@
 package dima.it.polimi.blackboard.fragments;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.Fragment;
@@ -64,6 +66,9 @@ public class PaymentListFragment extends Fragment implements PaymentListAdapter.
     private String house;
     private RecyclerView recyclerView;
     private String type;
+    private SwipeRefreshLayout mSwipe;
+    private String syncConnPref;
+
 
 
     /**
@@ -99,9 +104,16 @@ public class PaymentListFragment extends Fragment implements PaymentListAdapter.
             adapter = new PaymentListAdapter(this.getContext(),this,type);
             db = FirebaseFirestore.getInstance();
             user = FirebaseAuth.getInstance().getCurrentUser();
-            if(house != null) {
+            user = FirebaseAuth.getInstance().getCurrentUser();
+            SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this.getActivity());
+            syncConnPref = sharedPref.getString(getString(R.string.key_sync_frequency), "");
+            if(house != null && !BalanceActivity.isChangingHouse) {
                 prepareQuery();
                 enableRealTimeUpdate();
+                if(syncConnPref.equals("1"))
+                {
+                    disableRealTimeUpdate();
+                }
             }
 
     }
@@ -125,6 +137,8 @@ public class PaymentListFragment extends Fragment implements PaymentListAdapter.
         // Setting up the refresh layout
         SwipeRefreshLayout swipeRefreshLayout = view.findViewById(R.id.swipe_refresh_layout);
         swipeRefreshLayout.setOnRefreshListener(this);
+        mSwipe = view.findViewById(R.id.swipe_refresh_layout);
+
 
         return view;
     }
@@ -144,7 +158,8 @@ public class PaymentListFragment extends Fragment implements PaymentListAdapter.
     @Override
     public void onDetach() {
         super.onDetach();
-        disableRealTimeUpdate();
+        if(syncConnPref.equals("0"))
+            disableRealTimeUpdate();
         mListener = null;
 
     }
@@ -154,8 +169,17 @@ public class PaymentListFragment extends Fragment implements PaymentListAdapter.
 
     @Override
     public void onRefresh() {
-        //TODO implement refreshing through Firebase. Add setter for network source
         mListener.onRefresh();
+    }
+
+    public void updateData()
+    {
+
+        if(syncConnPref.equals("1")) {
+            if(house != null)
+                changeHouse(this.house);
+        }
+        mSwipe.setRefreshing(false);
     }
 
     /**
@@ -178,8 +202,12 @@ public class PaymentListFragment extends Fragment implements PaymentListAdapter.
         this.adapter = new PaymentListAdapter(this.getContext(),this,type);
         this.recyclerView.setAdapter(adapter);
         prepareQuery();
-        disableRealTimeUpdate();
+        if(syncConnPref.equals("0"))
+            disableRealTimeUpdate();
         enableRealTimeUpdate();
+        if(syncConnPref.equals("1"))
+            disableRealTimeUpdate();
+
     }
 
     private void insertPayment(PaymentItem item)

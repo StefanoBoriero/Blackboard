@@ -290,7 +290,7 @@ public class LoginActivity extends AppCompatActivity {
                 // Google Sign In was successful, authenticate with Firebase
                 GoogleSignInAccount account = task.getResult(ApiException.class);
                 firebaseAuthWithGoogle(account);
-                sendToken();
+
             } catch (ApiException e) {
                 // Google Sign In failed, update UI appropriately
 
@@ -309,6 +309,7 @@ public class LoginActivity extends AppCompatActivity {
                             // Sign in success, update UI with the signed-in user's information
 
                             FirebaseUser user = mAuth.getCurrentUser();
+                            sendToken();
 
                         } else {
                             // If sign in fails, display a message to the user.

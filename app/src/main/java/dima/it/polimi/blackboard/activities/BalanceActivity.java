@@ -11,6 +11,7 @@ import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -59,19 +60,19 @@ public class BalanceActivity extends AppCompatActivity  implements PaymentListFr
     private FloatingActionButton mFab;
     private ArrayList<House> houses;
     private FirebaseFirestore db;
-    private int selectedHouse = 0;
     private PaymentListFragment listFragmentPositive;
     private PaymentListFragment listFragmentNegative;
     private ViewPager mViewPager;
     private PaymentViewPagerAdapter mViewPagerAdapter;
     private ListenerRegistration myListener;
+    public static int selectedHouse = 0;
+    public static boolean isChangingHouse;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_balance);
-
 
         mFab = findViewById(R.id.add_fab);
         mFab.setTransitionName("revealCircular");
@@ -82,9 +83,8 @@ public class BalanceActivity extends AppCompatActivity  implements PaymentListFr
 
 
         collapsingToolbar = findViewById(R.id.balance_toolbar);
-        collapsingToolbar.setTitle("0.00€");
-        collapsingToolbar.setCollapsedTitleTextAppearance(R.style.CollapsedAppBarPositive);
-        collapsingToolbar.setExpandedTitleTextAppearance(R.style.ExpandedAppBarPositive);
+        refreshBalanceColor();
+        isChangingHouse = false;
 
 
 
@@ -169,7 +169,9 @@ public class BalanceActivity extends AppCompatActivity  implements PaymentListFr
 
     public void onRefresh()
     {
-
+        refreshBalanceColor();
+        listFragmentPositive.updateData();
+        listFragmentNegative.updateData();
     }
 
     public static void refreshBalanceColor(double newPayment)
@@ -197,6 +199,13 @@ public class BalanceActivity extends AppCompatActivity  implements PaymentListFr
             collapsingToolbar.setExpandedTitleTextAppearance(R.style.ExpandedAppBarNegative);
         }
     }
+
+    public static void refreshBalanceColor() {
+        collapsingToolbar.setTitle("0.00€");
+        collapsingToolbar.setCollapsedTitleTextAppearance(R.style.CollapsedAppBarPositive);
+        collapsingToolbar.setExpandedTitleTextAppearance(R.style.ExpandedAppBarPositive);
+    }
+
 
     public void fabListener(View v){
         Intent intent = new Intent(this, NewPaymentActivity.class);
@@ -279,6 +288,7 @@ public class BalanceActivity extends AppCompatActivity  implements PaymentListFr
 
     @Override
     public void onClick(DialogInterface dialog, int selected) {
+        this.isChangingHouse = false;
         this.selectedHouse = selected;
         String currentHouse = (String)this.houses.get(selectedHouse).getId();
         ((PaymentListFragment)listFragmentPositive).changeHouse(currentHouse);
@@ -309,7 +319,6 @@ public class BalanceActivity extends AppCompatActivity  implements PaymentListFr
 
         public static BalanceActivity.ChooseHouseDialog newInstance(int selectedHouse, ArrayList<House> houses) {
             Bundle args = new Bundle();
-            args.putInt("chosen_house", selectedHouse);
             CharSequence[] houseChars = new CharSequence[houses.size()];
             for(int i = 0; i < houses.size(); i++)
             {
@@ -318,20 +327,30 @@ public class BalanceActivity extends AppCompatActivity  implements PaymentListFr
             args.putCharSequenceArray("houses", houseChars);
             BalanceActivity.ChooseHouseDialog fragment = new BalanceActivity.ChooseHouseDialog();
             fragment.setArguments(args);
+
             return fragment;
         }
 
         @Override
         public Dialog onCreateDialog(final Bundle savedInstanceState) {
 
-            int selectedHouse = getArguments().getInt("chosen_house");
+            int selectedHouse = BalanceActivity.selectedHouse;
             CharSequence[] houses = getArguments().getCharSequenceArray("houses");
             final AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
             dialog.setTitle(R.string.action_choose_house);
+            isChangingHouse = true;
 
 
             dialog.setSingleChoiceItems(houses, selectedHouse, mListener);
             return dialog.create();
         }
+
+        @Override
+        public void onCancel(final DialogInterface arg0)
+        {
+            isChangingHouse = false;
+        }
+
+
     }
 }
