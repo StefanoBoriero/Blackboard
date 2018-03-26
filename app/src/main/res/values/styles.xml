@@ -66,6 +66,18 @@
         <item name="android:textStyle">normal</item>
     </style>
 
+    <style name="ExpandedAppBarEmpty" parent="@android:style/TextAppearance.Medium">
+        <item name="android:textSize">70sp</item>
+        <item name="android:textColor">@color/colorPrimary</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="CollapsedAppBarEmpty" parent="@android:style/TextAppearance.Medium">
+        <item name="android:textSize">25sp</item>
+        <item name="android:textColor">@color/colorPrimary</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+
     <style name="ExpandedAppBarNegative" parent="@android:style/TextAppearance.Medium">
         <item name="android:textSize">70sp</item>
         <item name="android:textColor">#D32F2F</item>

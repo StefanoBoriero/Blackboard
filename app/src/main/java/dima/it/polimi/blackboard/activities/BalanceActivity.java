@@ -83,7 +83,9 @@ public class BalanceActivity extends AppCompatActivity  implements PaymentListFr
 
 
         collapsingToolbar = findViewById(R.id.balance_toolbar);
-        refreshBalanceColor();
+        collapsingToolbar.setTitle("0.00€");
+        collapsingToolbar.setCollapsedTitleTextAppearance(R.style.CollapsedAppBarPositive);
+        collapsingToolbar.setExpandedTitleTextAppearance(R.style.ExpandedAppBarPositive);
         isChangingHouse = false;
 
 
@@ -202,8 +204,8 @@ public class BalanceActivity extends AppCompatActivity  implements PaymentListFr
 
     public static void refreshBalanceColor() {
         collapsingToolbar.setTitle("0.00€");
-        collapsingToolbar.setCollapsedTitleTextAppearance(R.style.CollapsedAppBarPositive);
-        collapsingToolbar.setExpandedTitleTextAppearance(R.style.ExpandedAppBarPositive);
+        collapsingToolbar.setCollapsedTitleTextAppearance(R.style.CollapsedAppBarEmpty);
+        collapsingToolbar.setExpandedTitleTextAppearance(R.style.ExpandedAppBarEmpty);
     }
 
 
