@@ -84,8 +84,6 @@ public abstract class FirestoreAdapter<VH extends RecyclerView.ViewHolder>
             firstTime = false;
             mFilteredSnapshots = mSnapshots;
         }
-        //TODO TRY TO REMOVE THIS FILTERING!!!!!
-        //getFilter().filter(filter, this);
         if(mListener != null) {
             mListener.onComplete(mFilteredSnapshots.isEmpty());
         }
@@ -148,7 +146,24 @@ public abstract class FirestoreAdapter<VH extends RecyclerView.ViewHolder>
 
     public void startListening(){
         if (mQuery != null && mRegistration == null) {
+            mSnapshots.clear();
+            if (mFilteredSnapshots != null){
+                mFilteredSnapshots.clear();
+            }
+            notifyDataSetChanged();
             mRegistration = mQuery.addSnapshotListener(this);
+        }
+    }
+
+    public void startListeningOnBatteryOk(){
+        if (mQuery != null && mRegistration == null) {
+            mSnapshots.clear();
+            if (mFilteredSnapshots != null){
+                mFilteredSnapshots.clear();
+            }
+            notifyDataSetChanged();
+            mRegistration = mQuery.addSnapshotListener(this);
+            mListener.resetOnFirst();
         }
     }
 
@@ -236,6 +251,45 @@ public abstract class FirestoreAdapter<VH extends RecyclerView.ViewHolder>
 
     }
 
+    public boolean isListening(){
+        return mRegistration != null;
+    }
+
+    public void forceRefresh(){
+        mSnapshots.clear();
+        firstTime = true;
+        notifyDataSetChanged();
+        if (mFilteredSnapshots != null){
+            mFilteredSnapshots.clear();
+        }
+
+        mQuery.get().addOnCompleteListener( querySnapshotTask -> {
+            if(querySnapshotTask.isSuccessful()){
+                QuerySnapshot snap = querySnapshotTask.getResult();
+                for(DocumentChange change: snap.getDocumentChanges()){
+                    switch (change.getType()){
+                        case ADDED:
+                            onDocumentAdded(change);
+                            break;
+                        case MODIFIED:
+                            onDocumentModified(change);
+                            break;
+                        case REMOVED:
+                            onDocumentRemoved(change);
+                            break;
+                    }
+                }
+                if(mFilteredSnapshots == null){
+                    firstTime = false;
+                    mFilteredSnapshots = mSnapshots;
+                }
+                if(mListener != null) {
+                    mListener.onComplete(mFilteredSnapshots.isEmpty());
+                }
+            }
+        });
+    }
+
     void insertItem(int position){
 
         mFilteredSnapshots.add(position, lastRemoved);
@@ -246,5 +300,6 @@ public abstract class FirestoreAdapter<VH extends RecyclerView.ViewHolder>
         void onComplete(boolean emptyResult);
         void deleteByOther(int position);
         void addedByOther(int position);
+        void resetOnFirst();
     }
 }

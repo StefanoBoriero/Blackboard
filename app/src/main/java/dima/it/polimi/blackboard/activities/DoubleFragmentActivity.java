@@ -70,6 +70,8 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
     private boolean isActivityResult;
     private boolean isEmpty;
     private boolean wasEmpty;
+    private boolean onBatteryOk;
+    private boolean onRotation;
 
     private CharSequence searchQuery;
     private SearchView searchView;
@@ -88,6 +90,7 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
         isDouble = isDouble();
         getHouses();
         if(savedInstanceState != null){
+            onRotation = true;
             whichHouse = savedInstanceState.getInt(CURRENT_HOUSE_INDEX);
             clickedPosition = savedInstanceState.getInt(CURRENT_ITEM_INDEX);
             firstFragment = (TodoItemListFragment)getSupportFragmentManager().findFragmentById(R.id.fragment_list_container);
@@ -140,7 +143,7 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
 
         firstFragment.setSearchView(searchView);
 
-        if(searchQuery != null && !TextUtils.isEmpty(searchQuery)/*!searchQuery.equals("")*/) {
+        if(searchQuery != null && !TextUtils.isEmpty(searchQuery)) {
             searchView.setQuery(searchQuery, true);
             searchView.setIconified(false);
         }
@@ -202,7 +205,16 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
                 // show it
                 showSecondFragment();
             }
+            else if(onBatteryOk){
+                onBatteryOk = false;
+                clickedPosition = 0;
+                TodoItem firstItem = firstFragment.getItem(0);
+                clickedItem = firstItem;
+                secondFragment.updateFragment(firstItem, 0, false);
+                firstFragment.setSelectedItem(0);
+            }
         }
+        firstFragment.stopRefreshing();
         if(isEmpty){
             // If the list of items is empty, show a message
             Log.d(TAG, "Showing empty message");
@@ -227,6 +239,14 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
                 }
             }
         }
+
+        if(onRotation){
+            onRotation = false;
+            if(searchQuery != null && !TextUtils.isEmpty(searchQuery)) {
+                searchView.setQuery(searchQuery, true);
+                searchView.setIconified(false);
+            }
+        }
     }
 
     @Override
@@ -238,12 +258,16 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
                 return;
             }
             TodoItem firstItem = firstFragment.getItem(0);
-
+            clickedItem = firstItem;
             firstFragment.setSelectedItem(0);
-            secondFragment.updateFragment(firstItem, 0, false);
+            secondFragment.updateFragment(firstItem, 0, true);
             //Cannot get the correct one due to filtering conflict
             //Will satisfy the condition in doubleFragmentClickHandler
             itemRowClicked = null;
+        }
+        if(firstFragment.getRemainingItems() == 0){
+            // The search didn't match any item
+            firstFragment.fillFragment();
         }
     }
 
@@ -276,6 +300,11 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
         if(isDouble){
             firstFragment.handleSelectionAfterInsertion(position);
         }
+    }
+
+    @Override
+    public void resetOnFirst(){
+        onBatteryOk = true;
     }
 
     private void showSecondFragment(){

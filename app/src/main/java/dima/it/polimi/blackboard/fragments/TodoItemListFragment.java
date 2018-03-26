@@ -1,6 +1,9 @@
 package dima.it.polimi.blackboard.fragments;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 
 import android.support.annotation.NonNull;
@@ -60,6 +63,7 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
     private int mColumnCount = 1;
     private OnListFragmentInteractionListener mListener;
     private FirestoreAdapter.OnCompleteListener mOnCompleteListener;
+    private SwipeRefreshLayout swipeRefreshLayout;
     private RecyclerView recyclerView;
     private ItemTouchHelper swipeHelper;
     private TodoListAdapter adapter;
@@ -173,7 +177,7 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
         swipeHelper.attachToRecyclerView(recyclerView);
 
         // Setting up the refresh layout
-        SwipeRefreshLayout swipeRefreshLayout = view.findViewById(R.id.swipe_refresh_layout);
+        swipeRefreshLayout = view.findViewById(R.id.swipe_refresh_layout);
         swipeRefreshLayout.setOnRefreshListener(this);
 
         String message;
@@ -209,7 +213,14 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
     @Override
     public void onStart() {
         super.onStart();
-        new BatteryStatusReceiver(adapter);
+        BroadcastReceiver br = new BatteryStatusReceiver(adapter);
+        IntentFilter ifilter = new IntentFilter();
+        ifilter.addAction(Intent.ACTION_BATTERY_LOW);
+        ifilter.addAction(Intent.ACTION_BATTERY_OKAY);
+        Context ctx = getContext();
+        if(ctx != null) {
+            ctx.getApplicationContext().registerReceiver(br, ifilter);
+        }
     }
 
     @Override
@@ -261,6 +272,7 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
 
     public void setSelectedItem(int index){
         if(adapter != null){
+            fillFragment();
             toHighlightIndex = index;
             adapter.setSelected(index);
         }
@@ -382,7 +394,20 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
 
     @Override
     public void onRefresh() {
+        if(!adapter.isListening()) {
+            ((DoubleFragmentActivity)mListener).resetOnFirst();
+            adapter.forceRefresh();
+        }
+        else{
+            stopRefreshing();
+        }
         //TODO implement refreshing through Firebase. Add setter for network source
+    }
+
+    public void stopRefreshing(){
+        if(swipeRefreshLayout.isRefreshing()){
+            swipeRefreshLayout.setRefreshing(false);
+        }
     }
 
     public void setAuthId(String authId){

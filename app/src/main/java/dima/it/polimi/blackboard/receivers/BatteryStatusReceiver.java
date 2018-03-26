@@ -20,15 +20,17 @@ public class BatteryStatusReceiver extends BroadcastReceiver {
     }
 
     public BatteryStatusReceiver(FirestoreAdapter adapter){
+        super();
         this.mAdapter = adapter;
     }
     @Override
     public void onReceive(Context context, Intent intent) {
-        if ((Intent.ACTION_BATTERY_LOW).equals(intent.getAction())){
-            mAdapter.stopListening();
-        }
-        else if(Intent.ACTION_BATTERY_OKAY.equals(intent.getAction())){
-            mAdapter.startListening();
+        if(mAdapter != null) {
+            if ((Intent.ACTION_BATTERY_LOW).equals(intent.getAction())) {
+                mAdapter.stopListening();
+            } else if (Intent.ACTION_BATTERY_OKAY.equals(intent.getAction())) {
+                mAdapter.startListeningOnBatteryOk();
+            }
         }
     }
 }

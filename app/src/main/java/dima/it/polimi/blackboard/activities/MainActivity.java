@@ -471,6 +471,11 @@ public class MainActivity extends AppCompatActivity
 
     }
 
+    @Override
+    public void resetOnFirst(){
+
+    }
+
     private void loadProfilePicture()
     {
         readSharedPreferenceForCache();

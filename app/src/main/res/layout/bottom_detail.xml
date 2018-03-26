@@ -26,7 +26,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="4dp"
         android:background="@drawable/background_modify_button"
-        android:foreground="@drawable/ic_my_list_white"
+        android:foreground="@drawable/ic_my_list_green"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/modify"
         app:layout_constraintStart_toEndOf="@id/delete"
