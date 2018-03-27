@@ -89,6 +89,16 @@ public class PaymentListAdapter extends RecyclerView.Adapter<PaymentListAdapter.
     public PaymentItem getItem(int position){
         return paymentItems.get(position);
     }
+
+    public PaymentItem getItem(String id)
+    {
+        for(int i = 0; i < paymentItems.size(); i++)
+        {
+            if(paymentItems.get(i).getId().equals(id))
+                return paymentItems.get(i);
+        }
+        return null;
+    }
     public void removeItem(int position){
         paymentItems.remove(position);
         notifyItemRemoved(position);

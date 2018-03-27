@@ -29,6 +29,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -104,16 +105,11 @@ public class PaymentListFragment extends Fragment implements PaymentListAdapter.
             adapter = new PaymentListAdapter(this.getContext(),this,type);
             db = FirebaseFirestore.getInstance();
             user = FirebaseAuth.getInstance().getCurrentUser();
-            user = FirebaseAuth.getInstance().getCurrentUser();
             SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this.getActivity());
             syncConnPref = sharedPref.getString(getString(R.string.key_sync_frequency), "");
-            if(house != null && !BalanceActivity.isChangingHouse) {
+            if(house != null ) {
                 prepareQuery();
                 enableRealTimeUpdate();
-                if(syncConnPref.equals("1"))
-                {
-                    disableRealTimeUpdate();
-                }
             }
 
     }
@@ -158,8 +154,7 @@ public class PaymentListFragment extends Fragment implements PaymentListAdapter.
     @Override
     public void onDetach() {
         super.onDetach();
-        if(syncConnPref.equals("0"))
-            disableRealTimeUpdate();
+        disableRealTimeUpdate();
         mListener = null;
 
     }
@@ -182,6 +177,11 @@ public class PaymentListFragment extends Fragment implements PaymentListAdapter.
         mSwipe.setRefreshing(false);
     }
 
+    public void updateDataSync()
+    {
+        changeHouse(this.house);
+    }
+
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
@@ -200,13 +200,12 @@ public class PaymentListFragment extends Fragment implements PaymentListAdapter.
     {
         this.house = selectedHouse;
         this.adapter = new PaymentListAdapter(this.getContext(),this,type);
-        this.recyclerView.setAdapter(adapter);
+        this.recyclerView.setAdapter(this.adapter);
         prepareQuery();
-        if(syncConnPref.equals("0"))
-            disableRealTimeUpdate();
+        disableRealTimeUpdate();
         enableRealTimeUpdate();
-        if(syncConnPref.equals("1"))
-            disableRealTimeUpdate();
+
+
 
     }
 
@@ -236,61 +235,18 @@ public class PaymentListFragment extends Fragment implements PaymentListAdapter.
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if(task.isSuccessful())
-                        {
-                            Map<String,Object> roommates = (Map<String, Object>) task.getResult().getData().get("roommates");
+                        if (task.isSuccessful()) {
+                            Map<String, Object> roommates = (Map<String, Object>) task.getResult().getData().get("roommates");
                             List<String> roommatesList = (List<String>) roommates.get("roommates");
-                            Map<String,Object> joinedAtRoomates = (Map<String, Object>) roommates.get("joinedTime");
-                            myListener = myPaymentsQuery.addSnapshotListener( (querySnapshot, error) ->
-                            {
-                                if (error != null) {
-                                    return;
-                                }
-                                Date joinedAt = Calendar.getInstance().getTime();
-                                if(joinedAtRoomates != null)
-                                    joinedAt = (Date) joinedAtRoomates.get(FirebaseAuth.getInstance().getCurrentUser().getUid().toString());
-                                for(DocumentChange dc: querySnapshot.getDocumentChanges()){
-                                    PaymentItem newItem = dc.getDocument().toObject(PaymentItem.class);
-                                    Date paymentDate = newItem.getPerformedOn();
-                                    if( paymentDate != null && paymentDate.after(joinedAt)) {
-                                        //calculate the number of persons that were in the group when the payment has been issued
-                                        double numberOfPersonsAtPaymentTime = 0;
-                                        for (Map.Entry<String, Object> entry : joinedAtRoomates.entrySet())
-                                        {
-                                            if(((Date)entry.getValue()).before(paymentDate))
-                                                numberOfPersonsAtPaymentTime++;
-                                        }
-                                        if (dc.getType() == DocumentChange.Type.ADDED) {
-                                            if ((type.equals("positive") && newItem.getPerformedBy().equals(user.getUid()) || (type.equals("negative") && !newItem.getPerformedBy().equals(user.getUid())))) {
-                                                insertPayment(newItem);
-                                                if (newItem.getPerformedBy().equals(user.getUid())) {
-                                                    double payment = newItem.getPrice() * ((numberOfPersonsAtPaymentTime - 1) / (numberOfPersonsAtPaymentTime));
-                                                    BalanceActivity.refreshBalanceColor(payment);
-                                                } else {
-                                                    double payment = newItem.getPrice() / (numberOfPersonsAtPaymentTime);
-                                                    BalanceActivity.refreshBalanceColor(-payment);
-                                                }
-                                            }
-
-                                        } else if (dc.getType() == DocumentChange.Type.REMOVED) {
-                                            double oldPrice = newItem.getPrice();
-                                            if (newItem.getPerformedBy().equals(user.getUid()) && type.equals("positive")) {
-                                                double payment = oldPrice * ((numberOfPersonsAtPaymentTime - 1) / (numberOfPersonsAtPaymentTime));
-                                                BalanceActivity.refreshBalanceColor(-payment);
-                                            } else if (!newItem.getPerformedBy().equals(user.getUid()) && type.equals("negative")) {
-                                                double payment = oldPrice / (numberOfPersonsAtPaymentTime);
-                                                BalanceActivity.refreshBalanceColor(payment);
-                                            }
-                                            adapter.removeItem(newItem.getId());
-                                        }
-                                    }
-                                }
-
-                            });
+                            Map<String, Object> joinedAtRoomates = (Map<String, Object>) roommates.get("joinedTime");
+                            if (syncConnPref.equals("0")) {
+                                realTimeUpdate(joinedAtRoomates);
+                            } else {
+                                onceUpdate(joinedAtRoomates);
+                            }
                         }
                     }
                 });
-
     }
 
     public void disableRealTimeUpdate(){
@@ -314,8 +270,6 @@ public class PaymentListFragment extends Fragment implements PaymentListAdapter.
     }
 
 
-
-
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         if (getUserVisibleHint()) {
@@ -323,7 +277,16 @@ public class PaymentListFragment extends Fragment implements PaymentListAdapter.
                 case R.id.firstOption:
                         String id = adapter.getItem(item.getGroupId()).getId();
                         db.collection("houses").document(house).collection("payments").document(id).delete();
+                        if(syncConnPref.equals("1")) {
+                            if(type.equals("positive")) {
+                                 double numberOfPersonsAtPaymentTime = adapter.getItem(item.getGroupId()).getNumberOfRoommates();
+                                double oldPrice = adapter.getItem(item.getGroupId()).getPrice();
+                                double payment = oldPrice * ((numberOfPersonsAtPaymentTime - 1) / (numberOfPersonsAtPaymentTime));
+                                BalanceActivity.refreshBalanceColor(-payment);
+                        }
+                    }
                         adapter.removeItem(item.getGroupId());
+
                     break;
                 case R.id.secondOption:
                     // do nothing
@@ -332,6 +295,97 @@ public class PaymentListFragment extends Fragment implements PaymentListAdapter.
             return true;
         }
         return false;
+    }
+
+    //used to update when live sync is off
+    private void realTimeUpdate(Map<String, Object> joinedAtRoomates)
+    {
+        myListener = myPaymentsQuery.addSnapshotListener((querySnapshot, error) ->
+        {
+            if (error != null) {
+                return;
+            }
+            Date joinedAt = Calendar.getInstance().getTime();
+            if (joinedAtRoomates != null)
+                joinedAt = (Date) joinedAtRoomates.get(FirebaseAuth.getInstance().getCurrentUser().getUid().toString());
+            for (DocumentChange dc : querySnapshot.getDocumentChanges()) {
+                PaymentItem newItem = dc.getDocument().toObject(PaymentItem.class);
+                Date paymentDate = newItem.getPerformedOn();
+                if (paymentDate != null && paymentDate.after(joinedAt)) {
+                    //calculate the number of persons that were in the group when the payment has been issued
+                    double numberOfPersonsAtPaymentTime = newItem.getNumberOfRoommates();
+                    if (dc.getType() == DocumentChange.Type.ADDED) {
+                        if ((type.equals("positive") && newItem.getPerformedBy().equals(user.getUid()) || (type.equals("negative") && !newItem.getPerformedBy().equals(user.getUid())))) {
+                            insertPayment(newItem);
+                            if (newItem.getPerformedBy().equals(user.getUid())) {
+                                double payment = newItem.getPrice() * ((numberOfPersonsAtPaymentTime - 1) / (numberOfPersonsAtPaymentTime));
+                                BalanceActivity.refreshBalanceColor(payment);
+                            } else {
+                                double payment = newItem.getPrice() / (numberOfPersonsAtPaymentTime);
+                                BalanceActivity.refreshBalanceColor(-payment);
+                            }
+                        }
+
+                    } else if (dc.getType() == DocumentChange.Type.REMOVED) {
+                        double oldPrice = newItem.getPrice();
+                        if (newItem.getPerformedBy().equals(user.getUid()) && type.equals("positive")) {
+                            double payment = oldPrice * ((numberOfPersonsAtPaymentTime - 1) / (numberOfPersonsAtPaymentTime));
+                            BalanceActivity.refreshBalanceColor(-payment);
+                        } else if (!newItem.getPerformedBy().equals(user.getUid()) && type.equals("negative")) {
+                            double payment = oldPrice / (numberOfPersonsAtPaymentTime);
+                            BalanceActivity.refreshBalanceColor(payment);
+                        }
+                        adapter.removeItem(newItem.getId());
+                    }
+                }
+            }
+        });
+    }
+
+    //used to update when live sync is off
+    private void onceUpdate(Map<String, Object> joinedAtRoomates)
+    {
+        myPaymentsQuery.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    Date joinedAt = Calendar.getInstance().getTime();
+                    if (joinedAtRoomates != null)
+                        joinedAt = (Date) joinedAtRoomates.get(FirebaseAuth.getInstance().getCurrentUser().getUid().toString());
+                    for (DocumentChange dc : task.getResult().getDocumentChanges()) {
+                        PaymentItem newItem = dc.getDocument().toObject(PaymentItem.class);
+                        Date paymentDate = newItem.getPerformedOn();
+                        if (paymentDate != null && paymentDate.after(joinedAt)) {
+                            //calculate the number of persons that were in the group when the payment has been issued
+                            double numberOfPersonsAtPaymentTime = newItem.getNumberOfRoommates();
+                            if (dc.getType() == DocumentChange.Type.ADDED) {
+                                if ((type.equals("positive") && newItem.getPerformedBy().equals(user.getUid()) || (type.equals("negative") && !newItem.getPerformedBy().equals(user.getUid())))) {
+                                    insertPayment(newItem);
+                                    if (newItem.getPerformedBy().equals(user.getUid())) {
+                                        double payment = newItem.getPrice() * ((numberOfPersonsAtPaymentTime - 1) / (numberOfPersonsAtPaymentTime));
+                                        BalanceActivity.refreshBalanceColor(payment);
+                                    } else {
+                                        double payment = newItem.getPrice() / (numberOfPersonsAtPaymentTime);
+                                        BalanceActivity.refreshBalanceColor(-payment);
+                                    }
+                                }
+
+                            } else if (dc.getType() == DocumentChange.Type.REMOVED) {
+                                double oldPrice = newItem.getPrice();
+                                if (newItem.getPerformedBy().equals(user.getUid()) && type.equals("positive")) {
+                                    double payment = oldPrice * ((numberOfPersonsAtPaymentTime - 1) / (numberOfPersonsAtPaymentTime));
+                                    BalanceActivity.refreshBalanceColor(-payment);
+                                } else if (!newItem.getPerformedBy().equals(user.getUid()) && type.equals("negative")) {
+                                    double payment = oldPrice / (numberOfPersonsAtPaymentTime);
+                                    BalanceActivity.refreshBalanceColor(payment);
+                                }
+                                adapter.removeItem(newItem.getId());
+                            }
+                        }
+                    }
+                }
+            }
+        });
     }
 
 }

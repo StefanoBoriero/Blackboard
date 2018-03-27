@@ -125,14 +125,8 @@ public class HouseDialogActivity extends Activity implements RoomMateListAdapter
                                             Date joinedAt = Calendar.getInstance().getTime();
                                             if(joinedAtRoomates != null)
                                                 joinedAt = (Date) joinedAtRoomates.get(FirebaseAuth.getInstance().getCurrentUser().getUid().toString());
-                                            List<String> roommates = (List<String>) roomMatesMap.get("roommates");
                                             if( paymentDate != null && paymentDate.after(joinedAt)) {
-                                                double numberOfPersonsAtPaymentTime = 0;
-                                                for (Map.Entry<String, Object> entry : joinedAtRoomates.entrySet())
-                                                {
-                                                    if(((Date)entry.getValue()).before(paymentDate))
-                                                        numberOfPersonsAtPaymentTime++;
-                                                }
+                                                double numberOfPersonsAtPaymentTime = newItem.getNumberOfRoommates();
                                                 if (newItem.getPerformedBy().equals(FirebaseAuth.getInstance().getCurrentUser().getUid().toString())) {
                                                     double payment = newItem.getPrice() * ((numberOfPersonsAtPaymentTime - 1) / (numberOfPersonsAtPaymentTime));
                                                     exitBalance = exitBalance + payment;
@@ -147,7 +141,7 @@ public class HouseDialogActivity extends Activity implements RoomMateListAdapter
                                         Date date = Calendar.getInstance().getTime();
                                         if(exitBalance != 0)
                                             {
-                                                PaymentItem finalPayment = new PaymentItem(finalId,finalName,-exitBalance,date);
+                                                PaymentItem finalPayment = new PaymentItem(finalId,finalName,-exitBalance,date,roommates.size());
                                                 db.collection("houses").document(id).collection("payments").document(finalId).set(finalPayment);
                                             }
 

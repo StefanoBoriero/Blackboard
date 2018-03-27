@@ -6,6 +6,8 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -67,6 +69,7 @@ public class BalanceActivity extends AppCompatActivity  implements PaymentListFr
     private ListenerRegistration myListener;
     public static int selectedHouse = 0;
     public static boolean isChangingHouse;
+    private String syncConnPref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,12 +84,14 @@ public class BalanceActivity extends AppCompatActivity  implements PaymentListFr
         newGetHouses();
 
 
-
         collapsingToolbar = findViewById(R.id.balance_toolbar);
         collapsingToolbar.setTitle("0.00€");
         collapsingToolbar.setCollapsedTitleTextAppearance(R.style.CollapsedAppBarPositive);
         collapsingToolbar.setExpandedTitleTextAppearance(R.style.ExpandedAppBarPositive);
         isChangingHouse = false;
+
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        syncConnPref = sharedPref.getString(getString(R.string.key_sync_frequency), "");
 
 
 
@@ -171,7 +176,10 @@ public class BalanceActivity extends AppCompatActivity  implements PaymentListFr
 
     public void onRefresh()
     {
-        refreshBalanceColor();
+        if(syncConnPref.equals("1"))
+        {
+            refreshBalanceColor();
+        }
         listFragmentPositive.updateData();
         listFragmentNegative.updateData();
     }
@@ -204,8 +212,8 @@ public class BalanceActivity extends AppCompatActivity  implements PaymentListFr
 
     public static void refreshBalanceColor() {
         collapsingToolbar.setTitle("0.00€");
-        collapsingToolbar.setCollapsedTitleTextAppearance(R.style.CollapsedAppBarEmpty);
-        collapsingToolbar.setExpandedTitleTextAppearance(R.style.ExpandedAppBarEmpty);
+        collapsingToolbar.setCollapsedTitleTextAppearance(R.style.CollapsedAppBarPositive);
+        collapsingToolbar.setExpandedTitleTextAppearance(R.style.ExpandedAppBarPositive);
     }
 
 
@@ -314,6 +322,17 @@ public class BalanceActivity extends AppCompatActivity  implements PaymentListFr
         this.selectedHouse = savedInstanceState.getInt("house");
     }
 
+    @Override
+    public void onResume() {
+
+        super.onResume();
+        if(listFragmentNegative != null && listFragmentPositive!=null) {
+            refreshBalanceColor();
+            listFragmentPositive.updateDataSync();
+            listFragmentNegative.updateDataSync();
+        }
+    }
+
 
 
     public static class ChooseHouseDialog extends DialogFragment{
@@ -351,6 +370,13 @@ public class BalanceActivity extends AppCompatActivity  implements PaymentListFr
         public void onCancel(final DialogInterface arg0)
         {
             isChangingHouse = false;
+        }
+
+        @Override
+        public void onPause() {
+            super.onPause();
+
+            this.dismiss();
         }
 
 

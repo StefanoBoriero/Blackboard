@@ -19,6 +19,7 @@ public class PaymentItem implements Parcelable{
     private double price;
     private  String performedBy;
     private Date performedOn;
+    private int numberOfRoommates;
 
     public PaymentItem()
     {
@@ -32,9 +33,10 @@ public class PaymentItem implements Parcelable{
         this.price = in.readFloat();
         this.performedBy = in.readString();
         this.performedOn = null;
+        this.numberOfRoommates = in.readInt();
     }
 
-    public PaymentItem(String id, String name, Double price,Date performedOn){
+    public PaymentItem(String id, String name, Double price,Date performedOn,int numberOfRoommates){
         this.id = id;
         this.name = name;
         this.price = price;
@@ -44,14 +46,16 @@ public class PaymentItem implements Parcelable{
             this.performedBy = user.getUid();
         }
         this.performedOn = performedOn;
+        this.numberOfRoommates = numberOfRoommates;
     }
 
-    public PaymentItem(String id, String name, Double price,Date performedOn, String performedBy){
+    public PaymentItem(String id, String name, Double price,Date performedOn, String performedBy,int numberOfRoommates){
         this.id = id;
         this.name = name;
         this.price = price;
         this.performedBy = performedBy;
         this.performedOn = performedOn;
+        this.numberOfRoommates = numberOfRoommates;
     }
 
     public String getPerformedBy(){ return  this.performedBy;}
@@ -69,6 +73,8 @@ public class PaymentItem implements Parcelable{
         return this.id;
     }
 
+    public int getNumberOfRoommates() {return this.numberOfRoommates;}
+
 
     public String getName(){
         return this.name;
@@ -84,6 +90,7 @@ public class PaymentItem implements Parcelable{
         dest.writeString(this.name);
         dest.writeDouble(this.price);
         dest.writeString(this.performedBy);
+        dest.writeInt(this.numberOfRoommates);
     }
 
     @Override

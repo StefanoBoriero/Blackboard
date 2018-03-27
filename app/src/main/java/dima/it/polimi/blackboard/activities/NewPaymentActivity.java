@@ -4,10 +4,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.transition.Transition;
 import android.transition.TransitionInflater;
@@ -22,15 +25,23 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import org.w3c.dom.Text;
 
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
+import java.util.Map;
 
 import dima.it.polimi.blackboard.R;
+import dima.it.polimi.blackboard.adapters.RoomMateListAdapter;
 import dima.it.polimi.blackboard.model.PaymentItem;
+import dima.it.polimi.blackboard.model.RoomMate;
 import dima.it.polimi.blackboard.utils.GUIUtils;
 import dima.it.polimi.blackboard.utils.OnRevealAnimationListener;
 import faranjit.currency.edittext.CurrencyEditText;
@@ -44,6 +55,7 @@ public class NewPaymentActivity extends AppCompatActivity {
     private EditText editText;
     private FirebaseFirestore db;
     private String selectedHouse;
+    private int numberOfRoommates;
 
 
 
@@ -237,11 +249,26 @@ public class NewPaymentActivity extends AppCompatActivity {
             return;
         }
 
-        String id = name + System.currentTimeMillis();
-        PaymentItem paymentItem = new PaymentItem(id,name,amount, Calendar.getInstance().getTime());
-        db.collection("houses").document(selectedHouse).collection("payments").document(id).set(paymentItem);
-        submitButton.setClickable(false);
-        onBackPressed();
+        db.collection("houses").document(selectedHouse).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if(task.isSuccessful())
+                {
+                    DocumentSnapshot document = task.getResult();
+                    Map<String, Object> house = document.getData();
+                    Map<String, Object> mapRoomates = (Map<String, Object>) house.get("roommates");
+                    ArrayList<String> roomMates = (ArrayList<String>) mapRoomates.get("roommates");
+                    numberOfRoommates = roomMates.size();
+
+                    String id = name + System.currentTimeMillis();
+                    PaymentItem paymentItem = new PaymentItem(id,name,amount, Calendar.getInstance().getTime(),numberOfRoommates);
+                    db.collection("houses").document(selectedHouse).collection("payments").document(id).set(paymentItem);
+                    submitButton.setClickable(false);
+                    onBackPressed();
+                }
+            }
+        });
+
     }
 
     @Override
