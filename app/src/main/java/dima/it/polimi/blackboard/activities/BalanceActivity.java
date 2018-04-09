@@ -326,7 +326,8 @@ public class BalanceActivity extends AppCompatActivity  implements PaymentListFr
     public void onResume() {
 
         super.onResume();
-        if(listFragmentNegative != null && listFragmentPositive!=null) {
+
+        if(listFragmentNegative != null && listFragmentPositive!=null && syncConnPref.equals("1")) {
             refreshBalanceColor();
             listFragmentPositive.updateDataSync();
             listFragmentNegative.updateDataSync();
