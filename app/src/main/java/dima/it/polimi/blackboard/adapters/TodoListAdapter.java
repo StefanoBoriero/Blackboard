@@ -1,5 +1,6 @@
 package dima.it.polimi.blackboard.adapters;
 
+import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
@@ -12,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 import com.bumptech.glide.request.RequestOptions;
@@ -23,6 +25,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+
+import org.w3c.dom.Text;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -91,30 +95,10 @@ public class TodoListAdapter extends FirestoreAdapter<TodoListAdapter.ViewHolder
         holder.timestampView.setText(df.format(todoItem.getCreatedOn()));
         holder.todoItemType.setCompoundDrawablesWithIntrinsicBounds(resolveIcon(todoItem.getType()), null, null, null);
         checkSuggestion(todoItem, holder.suggestionStar);
+        checkPriority(todoItem, holder.todoItemName);
 
         holder.bind(todoItem);
-/*
-        if(isDouble) {
-            if(!secondTime) {
-                if (position == initialHighlighted) {
-                    View toHighlight = holder.itemView;
-                    Drawable selected = new ColorDrawable(0xFF448AFF);
-                    toHighlight.findViewById(R.id.selected_flag).setBackground(selected);
-                    if(firstTime) {
-                        firstTime = false;
-                    }
-                    else{
-                        secondTime = true;
-                    }
-                }
-                else {
-                    View toNotHighlight = holder.itemView;
-                    toNotHighlight.findViewById(R.id.selected_flag).setBackground(null);
-                }
 
-            }
-        }
-*/
         // TODO: 11/03/2018 Refactor this code to get the correct image 
         FirebaseStorage storage = FirebaseStorage.getInstance();
         DocumentReference userReference = FirebaseFirestore.getInstance().collection("users").document(todoItem.getCreatedBy());
@@ -136,7 +120,7 @@ public class TodoListAdapter extends FirestoreAdapter<TodoListAdapter.ViewHolder
                 }
 
             } else {
-                //TODO display error message
+                Toast.makeText((Context)mListener, "Error in loading user image", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -162,6 +146,13 @@ public class TodoListAdapter extends FirestoreAdapter<TodoListAdapter.ViewHolder
             else{
                 suggestionStar.setImageResource(R.drawable.ic_star_border_black_24dp);
             }
+        }
+    }
+
+    private void checkPriority(TodoItem item, TextView name){
+        String priority = item.getPriority();
+        if(priority.equals("Very important")){
+            name.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_priority_high_red_24dp, 0, 0, 0);
         }
     }
 

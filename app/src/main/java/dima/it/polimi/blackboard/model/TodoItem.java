@@ -48,6 +48,7 @@ public class TodoItem implements Parcelable {
         createdOnString = in.readString();
         additionalInfo = new HashMap<>();
         in.readMap(additionalInfo, HashMap.class.getClassLoader());
+        priority = in.readString();
     }
 
     public TodoItem(String name, String type, String priority, Map<String, Object> additionalInfo){
@@ -72,6 +73,7 @@ public class TodoItem implements Parcelable {
             details.add(det);
         }
         details.add(new Detail("suggestedTo", this.suggestedTo));
+        details.add(new Detail("priority", this.priority));
         return details;
     }
 
@@ -190,6 +192,7 @@ public class TodoItem implements Parcelable {
         dest.writeString(this.createdBy);
         dest.writeString(this.createdOnString);
         dest.writeMap(this.additionalInfo);
+        dest.writeString(this.priority);
     }
 
     @Override

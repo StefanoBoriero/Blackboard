@@ -219,8 +219,8 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
             // If the list of items is empty, show a message
             Log.d(TAG, "Showing empty message");
             firstFragment.emptyFragment();
+            wasEmpty = true;
             if(isDouble){
-                wasEmpty = true;
                 secondFragment.emptyFragment();
             }
         }
@@ -230,13 +230,11 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
                 // Show the correct content
                 firstFragment.fillFragment();
                 if (isDouble) {
-                    if (wasEmpty) {
-                        wasEmpty = false;
-                        // If it's the first item in the list
-                        secondFragment.updateFragment(firstFragment.getItem(0), 0, false);
-                    }
+                    // If it's the first item in the list
+                    secondFragment.updateFragment(firstFragment.getItem(0), 0, false);
                     secondFragment.fillFragment();
                 }
+                wasEmpty = false;
             }
         }
 
@@ -507,27 +505,28 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
     public void removeItem(int position, String action){
         TodoItem removedItem = firstFragment.removeItem(position);
         showUndoMessage(removedItem, position, action);
-        if(firstFragment.getRemainingItems() == 0){
-            //We're removing the last item
-            secondFragment.emptyFragment();
-            isEmpty = true;
-        }
-        else {
-            //We have to determine which will be the next item shown
-            isEmpty = false;
-            View nextItemView = firstFragment.getViewHolder(position + 1);
-            if (isDouble && checkSelected(position)) {
-                TodoItem nextItem = firstFragment.getItem(position);
-                if (nextItem == null) {
-                    //It was the last of the list
-                    nextItem = firstFragment.getItem(position - 1);
-                    secondFragment.updateFragment(nextItem, position - 1, false);
-                    //firstFragment.setSelectedItem(position - 1);
-                } else {
-                    secondFragment.updateFragment(nextItem, position, false);
-                    //firstFragment.setSelectedItem(position + 1);
+        if(isDouble) {
+            if (firstFragment.getRemainingItems() == 0) {
+                //We're removing the last item
+                secondFragment.emptyFragment();
+                isEmpty = true;
+            } else {
+                //We have to determine which will be the next item shown
+                isEmpty = false;
+                View nextItemView = firstFragment.getViewHolder(position + 1);
+                if (isDouble && checkSelected(position)) {
+                    TodoItem nextItem = firstFragment.getItem(position);
+                    if (nextItem == null) {
+                        //It was the last of the list
+                        nextItem = firstFragment.getItem(position - 1);
+                        secondFragment.updateFragment(nextItem, position - 1, false);
+                        //firstFragment.setSelectedItem(position - 1);
+                    } else {
+                        secondFragment.updateFragment(nextItem, position, false);
+                        //firstFragment.setSelectedItem(position + 1);
+                    }
+                    itemRowClicked = nextItemView;
                 }
-                itemRowClicked = nextItemView;
             }
         }
     }

@@ -59,16 +59,18 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ellipsize="end"
-            android:lines="1"
+            android:ems="15"
+            android:maxLines="1"
             android:layout_marginStart="@dimen/margin_text"
             android:textAppearance="@style/TextAppearance.AppCompat.Body1"
             android:textSize="@dimen/msg_text_primary"
             android:textStyle="bold"
+            tools:drawableStart="@drawable/ic_priority_high_red_24dp"
             app:layout_constraintBottom_toTopOf="@+id/item_type"
             app:layout_constraintStart_toEndOf="@id/user_icon"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_chainStyle="packed"
-            tools:text="Pay Netflix" />
+            tools:text="Very long string to see the effect of lemax lenght" />
 
         <TextView
             android:id="@+id/item_type"

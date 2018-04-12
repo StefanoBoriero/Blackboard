@@ -24,10 +24,12 @@ public class Detail implements Parcelable{
         switch (title){
             case ("description"):
                 iconResId = R.drawable.ic_description_black_24dp;
+                this.title = "Description";
                 this.content = (String)content;
                 break;
             case("amount"):
                 iconResId = R.drawable.ic_menu_balance_24dp;
+                this.title = "Bill Amount";
                 this.content = String.valueOf(content);
                 break;
             case("expiration"):
@@ -35,6 +37,12 @@ public class Detail implements Parcelable{
                 break;
             case("suggestedTo"):
                 iconResId = R.drawable.ic_person_black_24dp;
+                this.title = "Suggested to";
+                this.content = (String)content;
+                break;
+            case("priority"):
+                iconResId = R.drawable.ic_priority_high_black_24dp;
+                this.title = "Priority";
                 this.content = (String)content;
                 break;
             default:

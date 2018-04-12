@@ -38,7 +38,7 @@ public class DetailAdapter extends RecyclerView.Adapter<DetailAdapter.ViewHolder
         Detail detail = details.get(position);
 
         String title = detail.getTitle();
-        if(title.equals("suggestedTo")){
+        if(title.equals("Suggested to")){
             String userSuggested = UserDecoder.getInstance().getNameFromId(detail.getContent());
             holder.title.setText(detail.getTitle());
             holder.tView.setText(userSuggested);

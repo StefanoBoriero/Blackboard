@@ -1,5 +1,7 @@
 package dima.it.polimi.blackboard.utils;
 
+import android.text.TextUtils;
+
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -24,10 +26,12 @@ public class UserDecoder {
 
     public String getNameFromId(String uid){
         String name = mMap.get(uid);
+
         if(name == null){
             //Todo go get it from Firestore
-            return "Serento";
+            return uid;
         }
+
 
         return name;
     }

@@ -1,17 +1,21 @@
 package dima.it.polimi.blackboard.activities;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
@@ -69,12 +73,14 @@ import dima.it.polimi.blackboard.adapters.DayResumeAdapter;
 import dima.it.polimi.blackboard.adapters.FirestoreAdapter;
 import dima.it.polimi.blackboard.model.DayResume;
 import dima.it.polimi.blackboard.model.User;
+import dima.it.polimi.blackboard.receivers.BatteryStatusReceiver;
 import dima.it.polimi.blackboard.utils.DataGeneratorUtil;
 import dima.it.polimi.blackboard.utils.GlideApp;
 import dima.it.polimi.blackboard.utils.HouseDecoder;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, FirestoreAdapter.OnCompleteListener {
+        implements NavigationView.OnNavigationItemSelectedListener, FirestoreAdapter.OnCompleteListener,
+        SwipeRefreshLayout.OnRefreshListener {
 
     private FirebaseAuth firebaseAuth;
     private RecyclerView recyclerView;
@@ -86,6 +92,7 @@ public class MainActivity extends AppCompatActivity
     private boolean graphInstantiated;
     private String[] datesCreated;
     private String[] datesCompleted;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     @Override
     @SuppressWarnings("unchecked")
@@ -111,6 +118,9 @@ public class MainActivity extends AppCompatActivity
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
         ivProfile = navHeaderView.findViewById(R.id.user_icon);
+
+        swipeRefreshLayout = findViewById(R.id.refresh);
+        swipeRefreshLayout.setOnRefreshListener(this);
 
         Menu menuNav= navigationView.getMenu();
         MenuItem nav_balance = menuNav.findItem(R.id.nav_balance);
@@ -146,6 +156,23 @@ public class MainActivity extends AppCompatActivity
 
         initializeUser();
         loadProfilePicture();
+    }
+
+    @Override
+    public void onRefresh() {
+        if(!adapter.isListening()) {
+            adapter.forceRefresh();
+        }
+        else{
+            stopRefreshing();
+        }
+    }
+
+
+    private void stopRefreshing(){
+        if(swipeRefreshLayout.isRefreshing()){
+            swipeRefreshLayout.setRefreshing(false);
+        }
     }
 
     @Override
@@ -263,14 +290,34 @@ public class MainActivity extends AppCompatActivity
             Query query = days.orderBy("day", Query.Direction.DESCENDING).limit(7);
 
             adapter = new DayResumeAdapter(query, this);
+
+            SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+            String syncConnPref = sharedPref.getString(getString(R.string.key_sync_frequency), "");
+            boolean liveUpdate;
+            if(syncConnPref.equals("0")){
+                liveUpdate = true;
+            }
+            else{
+                liveUpdate = false;
+            }
+            adapter.setLiveUpdate(liveUpdate);
             recyclerView.setAdapter(adapter);
-            adapter.startListening();
+            adapter.setQuery(query);
+
+            BroadcastReceiver br = new BatteryStatusReceiver(adapter);
+            IntentFilter ifilter = new IntentFilter();
+            ifilter.addAction(Intent.ACTION_BATTERY_LOW);
+            ifilter.addAction(Intent.ACTION_BATTERY_OKAY);
+
+            this.getApplicationContext().registerReceiver(br, ifilter);
         }
     }
 
     @Override
     public void onComplete(boolean emptyResult) {
+        stopRefreshing();
         if(!emptyResult){
+            recyclerView.scrollToPosition(0);
             recyclerView.setVisibility(View.VISIBLE);
             if(!graphInstantiated) {
                 graphInstantiated = true;
@@ -278,7 +325,7 @@ public class MainActivity extends AppCompatActivity
                 LineChart createdChart = findViewById(R.id.chart_created);
                 if (createdChart == null) {
                     //Small device
-                    populateCompletedChart(completeChart);
+                    //populateCompletedChart(completeChart);
                 } else {
                     if (recyclerView != null) {
                         recyclerView.scrollToPosition(0);
@@ -291,6 +338,7 @@ public class MainActivity extends AppCompatActivity
                 LineChart completeChart = findViewById(R.id.chart_completed);
                 LineChart createdChart = findViewById(R.id.chart_created);
                 if (createdChart == null) {
+                    /*
                     //Small device
                     //populateCompletedChart(completeChart);
                     completeChart.setVisibility(View.INVISIBLE);
@@ -302,6 +350,7 @@ public class MainActivity extends AppCompatActivity
                     completeChart.notifyDataSetChanged();
                     completeChart.invalidate();
                     completeChart.setVisibility(View.VISIBLE);
+                    */
                 } else {
                     if (recyclerView != null) {
                         recyclerView.scrollToPosition(0);

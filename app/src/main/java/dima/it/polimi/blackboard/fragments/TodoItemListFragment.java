@@ -4,8 +4,10 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -267,6 +269,17 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
             //We're changing the house
             toHighlightIndex = 0;
         }
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this.getActivity());
+        String syncConnPref = sharedPref.getString(getString(R.string.key_sync_frequency), "");
+        boolean liveUpdate;
+        if(syncConnPref.equals("0")){
+            liveUpdate = true;
+        }
+        else{
+            liveUpdate = false;
+        }
+
+        adapter.setLiveUpdate(liveUpdate);
         this.adapter.setQuery(myQuery);
     }
 

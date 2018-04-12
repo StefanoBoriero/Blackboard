@@ -40,6 +40,7 @@ public abstract class FirestoreAdapter<VH extends RecyclerView.ViewHolder>
     private boolean removedByMe;
     private boolean insertedByMe;
     private boolean firstTime;
+    private boolean liveUpdate;
 
     private OnCompleteListener mListener;
     private String filter="";
@@ -163,7 +164,9 @@ public abstract class FirestoreAdapter<VH extends RecyclerView.ViewHolder>
             }
             notifyDataSetChanged();
             mRegistration = mQuery.addSnapshotListener(this);
-            mListener.resetOnFirst();
+            if(mListener != null) {
+                mListener.resetOnFirst();
+            }
         }
     }
 
@@ -172,6 +175,10 @@ public abstract class FirestoreAdapter<VH extends RecyclerView.ViewHolder>
             mRegistration.remove();
             mRegistration = null;
         }
+    }
+
+    public void setLiveUpdate(boolean live) {
+        this.liveUpdate = live;
     }
 
     public void setQuery(Query query) {
@@ -184,7 +191,12 @@ public abstract class FirestoreAdapter<VH extends RecyclerView.ViewHolder>
         notifyDataSetChanged();
 
         mQuery = query;
-        startListening();
+        if(liveUpdate) {
+            startListening();
+        }
+        else{
+            forceRefresh();
+        }
     }
 
     @Override
