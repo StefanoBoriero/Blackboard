@@ -95,6 +95,7 @@
 
     <string name="type_selection">Select activity type</string>
     <string name="name_selection">Insert activity name</string>
+    <string name="payment_name_selection">Insert payment name</string>
     <string name="name">Name</string>
     <string name="type">Type</string>
     <string name="description">Description</string>
