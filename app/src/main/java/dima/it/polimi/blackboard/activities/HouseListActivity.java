@@ -1,5 +1,6 @@
 package dima.it.polimi.blackboard.activities;
 
+import android.annotation.SuppressLint;
 import android.app.ActivityOptions;
 import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
@@ -31,6 +32,7 @@ import dima.it.polimi.blackboard.utils.DataGeneratorUtil;
 public class HouseListActivity extends DoubleFragmentActivity{
     private final static String TAG = "HOUSE_LIST";
     private final static String ARG_HOUSE = "house";
+    private final static int CREATE_NEW_ITEM = 2;
 
     private FloatingActionButton mFab;
 
@@ -109,19 +111,6 @@ public class HouseListActivity extends DoubleFragmentActivity{
                     "taken", true,
                     "takenBy", userId
             );
-            /*
-            item.get().addOnCompleteListener( task -> {
-                if(task.isSuccessful()){
-                    if( (boolean)task.getResult().getData().get("taken")){
-                        Toast.makeText(this, "Uh-oh, someone already took this one!", Toast.LENGTH_SHORT)
-                            .show();
-                    }
-                    else {
-
-                    }
-                }
-            });
-            */
         }
     }
 
@@ -155,6 +144,7 @@ public class HouseListActivity extends DoubleFragmentActivity{
     /*
         FAB listener set in XML layout
          */
+    @SuppressLint("restrictedApi")
     public void fabListener(View v){
         if(houseDownloadComplete) {
             Intent intent = new Intent(this, NewToDoTaskActivity.class);
@@ -162,12 +152,24 @@ public class HouseListActivity extends DoubleFragmentActivity{
 
             ActivityOptions options = ActivityOptions.
                     makeSceneTransitionAnimation(this, mFab, mFab.getTransitionName());
-            startActivity(intent, options.toBundle());
+            startActivityForResult(intent, CREATE_NEW_ITEM, options.toBundle());
+
         }
         else{
             Toast.makeText(this, "Error connecting to network, try again", Toast.LENGTH_SHORT)
                     .show();
         }
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode == CREATE_NEW_ITEM){
+            if(resultCode == RESULT_OK){
+                firstFragment.refresh();
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override

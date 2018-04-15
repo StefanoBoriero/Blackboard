@@ -418,7 +418,7 @@ public abstract class DoubleFragmentActivity extends AppCompatActivity
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        /*TODO pass also the item, try to remove it from the list and catch the exception at line 359
+        /*
         // if there was an exception, it had been taken by someone in the meantime
         */
         // Check which request we're responding to

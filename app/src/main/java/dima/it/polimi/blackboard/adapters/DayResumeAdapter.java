@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.github.mikephil.charting.components.Legend;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
@@ -33,6 +34,7 @@ public class DayResumeAdapter extends FirestoreAdapter<DayResumeAdapter.ViewHold
     private static final int ITEM_VIEW_TYPE_FOOTER = 2;
     private static final int ITEM_VIEW_TYPE_HEADER = 1;
     private static final int ITEM_VIEW_TYPE_DAY= 0;
+    private static final int ITEM_VIEW_TYPE_MESSAGE = 3;
     private static final int ITEM_VIEW_NULL = -1;
     private List<DocumentSnapshot> startingPivots = new ArrayList<>();
     private RecyclerView recyclerView;
@@ -60,6 +62,10 @@ public class DayResumeAdapter extends FirestoreAdapter<DayResumeAdapter.ViewHold
                 itemView = LayoutInflater.from(parent.getContext())
                         .inflate(R.layout.load_more_footer, parent, false);
                 break;
+            case ITEM_VIEW_TYPE_MESSAGE:
+                itemView = LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.message_first_week_layout, parent, false);
+                break;
             default:
                 //TODO adjust header
                 itemView = LayoutInflater.from(parent.getContext())
@@ -84,7 +90,7 @@ public class DayResumeAdapter extends FirestoreAdapter<DayResumeAdapter.ViewHold
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         int delta;
         if(weekNumber==0){
-            delta = 0;
+            delta = 1;
         }
         else{
             delta = 1;
@@ -95,7 +101,7 @@ public class DayResumeAdapter extends FirestoreAdapter<DayResumeAdapter.ViewHold
             holder.bind(day);
         }
         else if(itemViewType == ITEM_VIEW_TYPE_FOOTER){
-            ((TextView)holder.itemView.findViewById(R.id.load_message)).setText("LOAD PREVIOUS WEEK");
+            ((TextView)holder.itemView.findViewById(R.id.load_message)).setText(R.string.prev_week);
             holder.itemView.setOnClickListener((v)->{
                 startingPivots.add(weekNumber,getSnapshot(0));
                 FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -112,7 +118,7 @@ public class DayResumeAdapter extends FirestoreAdapter<DayResumeAdapter.ViewHold
             });
         }
         else if(itemViewType == ITEM_VIEW_TYPE_HEADER){
-            ((TextView)holder.itemView.findViewById(R.id.load_message)).setText("LOAD NEXT WEEK");
+            ((TextView)holder.itemView.findViewById(R.id.load_message)).setText(R.string.subsequent_week);
             holder.itemView.setOnClickListener((v)->{
                 FirebaseFirestore db = FirebaseFirestore.getInstance();
                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -126,6 +132,12 @@ public class DayResumeAdapter extends FirestoreAdapter<DayResumeAdapter.ViewHold
                     super.setQuery(query);
                 }
             });
+        }
+
+        else if(itemViewType == ITEM_VIEW_TYPE_MESSAGE){
+            TextView message = holder.itemView.findViewById(R.id.message);
+            String msg = "Welcome back! \n it has been a while since you were here..";
+                message.setText(msg);
         }
     }
 
@@ -153,7 +165,7 @@ public class DayResumeAdapter extends FirestoreAdapter<DayResumeAdapter.ViewHold
     public int getItemViewType(int position) {
         int delta;
         if(weekNumber == 0){
-            delta = 2;
+            delta = 1;
         }
         else{
             delta = 1;
@@ -171,6 +183,9 @@ public class DayResumeAdapter extends FirestoreAdapter<DayResumeAdapter.ViewHold
         }
         else if(position == 0 && weekNumber > 0){
             return ITEM_VIEW_TYPE_HEADER;
+        }
+        else if(position == 0 && weekNumber == 0){
+            return ITEM_VIEW_TYPE_MESSAGE;
         }
         else{
             return ITEM_VIEW_TYPE_DAY;

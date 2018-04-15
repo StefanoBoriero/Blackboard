@@ -201,4 +201,7 @@
 
     <string name="empty_detail">There\'s nothing to show</string>
 
+    <string name="prev_week">LOAD PREVIOUS WEEK</string>
+    <string name="subsequent_week">LOAD SUBSEQUENT WEEK</string>
+
 </resources>

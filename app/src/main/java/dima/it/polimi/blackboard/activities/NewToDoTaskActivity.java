@@ -334,6 +334,7 @@ public class NewToDoTaskActivity extends AppCompatActivity {
         todoItem.setId(itemId);
         newDoc.set(todoItem);
 
+        setResult(RESULT_OK);
         onBackPressed();
     }
 }

@@ -417,6 +417,12 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
         //TODO implement refreshing through Firebase. Add setter for network source
     }
 
+    public void refresh(){
+        if(!adapter.isListening()){
+            adapter.forceRefresh();
+        }
+    }
+
     public void stopRefreshing(){
         if(swipeRefreshLayout.isRefreshing()){
             swipeRefreshLayout.setRefreshing(false);
