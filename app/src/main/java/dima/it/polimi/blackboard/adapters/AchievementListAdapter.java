@@ -1,12 +1,13 @@
 package dima.it.polimi.blackboard.adapters;
 
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import java.util.List;
+import com.google.firebase.firestore.Query;
 
 import dima.it.polimi.blackboard.R;
 import dima.it.polimi.blackboard.model.Achievement;
@@ -16,22 +17,26 @@ import dima.it.polimi.blackboard.model.Achievement;
  * Created by Stefano on 30/12/2017.
  */
 
-public class AchievementListAdapter extends RecyclerView.Adapter<AchievementListAdapter.ViewHolder> {
-    private List<Achievement> achievements;
+public class AchievementListAdapter extends FirestoreAdapter<AchievementListAdapter.ViewHolder> {
 
-    public AchievementListAdapter(List<Achievement> list){
+    /*public AchievementListAdapter(List<Achievement> list){
         achievements = list;
     }
+    */
+    public AchievementListAdapter(Query query){
+        super(query);
+    }
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    @NonNull
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.achievement, parent, false);
         return new ViewHolder(itemView);
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
-        Achievement achievement = achievements.get(position);
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        Achievement achievement = getSnapshot(position).toObject(Achievement.class);
 
         holder.title.setText(achievement.getTitle());
         holder.description.setText(achievement.getDescription());
@@ -39,7 +44,7 @@ public class AchievementListAdapter extends RecyclerView.Adapter<AchievementList
 
     @Override
     public int getItemCount() {
-        return achievements.size();
+        return super.getItemCount();
     }
 
     protected class ViewHolder extends RecyclerView.ViewHolder{

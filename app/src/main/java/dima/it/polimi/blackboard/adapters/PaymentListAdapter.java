@@ -8,7 +8,9 @@ package dima.it.polimi.blackboard.adapters;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -23,27 +25,27 @@ import dima.it.polimi.blackboard.model.PaymentItem;
 
 
 public class PaymentListAdapter extends RecyclerView.Adapter<PaymentListAdapter.PaymentViewHolder> {
-    private final Context mContext;
+
     private final List<PaymentItem> paymentItems;
+    private Context mContext;
+    private String type;
 
-    public PaymentListAdapter(Context context, List<PaymentItem> paymentItems, PaymentListAdapterListener listener){
+
+    public PaymentListAdapter(Context context, PaymentListAdapterListener listener ,String type){
 
 
-        this.mContext = context;
+
         List<PaymentItem> filteredItems = new ArrayList<>();
-        for (PaymentItem item : paymentItems) {
-            if(item.getPrice() != 0)
-            {
-                filteredItems.add(item);
-            }
-        }
         this.paymentItems = filteredItems;
+        mContext =context;
+        this.type = type;
     }
 
     @Override
     public PaymentViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.payment_item_row, parent, false);
+
         return new PaymentViewHolder(itemView);
     }
 
@@ -54,8 +56,11 @@ public class PaymentListAdapter extends RecyclerView.Adapter<PaymentListAdapter.
         final PaymentItem paymentItem = paymentItems.get(position);
 
 
-       // holder.todoItemName.setText(paymentItem.getName());
+        holder.todoItemName.setText(paymentItem.getName());
+        holder.positiveNegativeIconContainer.setBackground(mContext.getResources().getDrawable(R.drawable.grey_euro));
+
         //TODO change all this
+        /*
         if(paymentItem.getEmitter().equals("Stefy & Simo") ) {
             holder.todoItemName.setText("To: " + paymentItem.getReceiver());
             holder.positiveNegativeIconContainer.setBackground(mContext.getResources().getDrawable(R.drawable.grey_euro));
@@ -64,6 +69,7 @@ public class PaymentListAdapter extends RecyclerView.Adapter<PaymentListAdapter.
             holder.todoItemName.setText("From: " + paymentItem.getEmitter());
             holder.positiveNegativeIconContainer.setBackground(mContext.getResources().getDrawable(R.drawable.grey_euro));
         }
+        */
 
         holder.todoItemPrice.setText("Amount: " + String.format("%.2f", paymentItem.getPrice()) +" €");
 
@@ -73,6 +79,8 @@ public class PaymentListAdapter extends RecyclerView.Adapter<PaymentListAdapter.
         });
     }
 
+
+
     @Override
     public int getItemCount() {
         return paymentItems.size();
@@ -81,9 +89,28 @@ public class PaymentListAdapter extends RecyclerView.Adapter<PaymentListAdapter.
     public PaymentItem getItem(int position){
         return paymentItems.get(position);
     }
+
+    public PaymentItem getItem(String id)
+    {
+        for(int i = 0; i < paymentItems.size(); i++)
+        {
+            if(paymentItems.get(i).getId().equals(id))
+                return paymentItems.get(i);
+        }
+        return null;
+    }
     public void removeItem(int position){
         paymentItems.remove(position);
         notifyItemRemoved(position);
+    }
+
+    public void removeItem(String id)
+    {
+        for(int i = 0; i < paymentItems.size(); i++)
+        {
+            if(paymentItems.get(i).getId().equals(id))
+                removeItem(i);
+        }
     }
 
     public void insertItem(PaymentItem item, int position){
@@ -97,7 +124,7 @@ public class PaymentListAdapter extends RecyclerView.Adapter<PaymentListAdapter.
 
     }
 
-    public class PaymentViewHolder extends RecyclerView.ViewHolder{
+    public class PaymentViewHolder extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener {
 
 
         private final TextView todoItemName;
@@ -116,6 +143,18 @@ public class PaymentListAdapter extends RecyclerView.Adapter<PaymentListAdapter.
             todoItemPrice = itemView.findViewById(R.id.amount_info);
             todoItemContainer = itemView.findViewById(R.id.payment_item_container);
             positiveNegativeIconContainer = itemView.findViewById(R.id.positive_negative_icon_container);
+            if(type.equals("positive"))
+                itemView.setOnCreateContextMenuListener(this);
         }
+
+        @Override
+        public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+            if(type.equals("positive")) {
+                menu.add(this.getAdapterPosition(), R.id.firstOption, 0, "Delete");//groupId, itemId, order, title
+                menu.add(0, R.id.secondOption, 0, "Back");
+            }
+        }
+
+
     }
 }

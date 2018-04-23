@@ -41,7 +41,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             // ringtone preference change listener
             bindPreferenceSummaryToValue(findPreference(getString(R.string.key_sync_frequency)));
 
-
         }
     }
 

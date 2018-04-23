@@ -1,6 +1,9 @@
 package dima.it.polimi.blackboard.model;
 
+import com.google.firebase.firestore.Exclude;
+
 import java.text.DecimalFormat;
+import java.util.Date;
 
 /**
  * Object representing what has been done in one day
@@ -9,36 +12,42 @@ import java.text.DecimalFormat;
 
 public class DayResume {
     public static final String COMPLETED_MESSAGE = "Number of tasks completed: ";
-    public static final String BALANCE_MESSAGE = "Total balance movement: ";
     public static final String ADDED_MESSAGE = "Number of tasks added: ";
 
-    private String day;
-    private int taskCompleted;
-    private String balanceDiff;
-    private int addedTasks;
+    private Date day;
+    private int completedItems;
+    private int createdItems;
 
-    public DayResume(int taskCompleted, double balanceDiff, int addedTasks){
-        DecimalFormat numberFormat = new DecimalFormat("#.00");
-
-        this.day = "August 19 2017";
-        this.taskCompleted = taskCompleted;
-        this.balanceDiff = numberFormat.format(balanceDiff);
-        this.addedTasks = addedTasks;
+    public DayResume(){
+        //Empty constructor for Firestore serialization
     }
 
-    public int getTaskCompleted(){
-        return taskCompleted;
+    public DayResume(int completedItems, int addedTasks){
+        this.completedItems = completedItems;
+        this.createdItems = addedTasks;
     }
 
-    public String getBalanceDiff(){
-        return balanceDiff;
+    public int getCompletedItems(){
+        return completedItems;
     }
 
-    public int getAddedTasks(){
-        return addedTasks;
+    public void setCompletedItems(int completedItems){
+        this.completedItems = completedItems;
     }
 
-    public String getDay(){
+    public int getCreatedItems(){
+        return createdItems;
+    }
+
+    public void setCreatedItems(int t){
+        this.createdItems = t;
+    }
+
+    public Date getDay(){
         return day;
+    }
+
+    public void setDay(Date d){
+        this.day = d;
     }
 }

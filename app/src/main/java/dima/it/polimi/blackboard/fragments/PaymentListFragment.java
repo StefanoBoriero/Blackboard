@@ -1,7 +1,10 @@
 package dima.it.polimi.blackboard.fragments;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -9,15 +12,35 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentChange;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import dima.it.polimi.blackboard.R;
+import dima.it.polimi.blackboard.activities.BalanceActivity;
 import dima.it.polimi.blackboard.adapters.PaymentListAdapter;
+import dima.it.polimi.blackboard.adapters.TodoListAdapter;
 import dima.it.polimi.blackboard.model.PaymentItem;
 
 
@@ -32,11 +55,21 @@ public class PaymentListFragment extends Fragment implements PaymentListAdapter.
 
 
     private static final String ARG_COLUMN_COUNT = "column-count";
-    private static final String ARG_TODO_ITEMS = "todo-items";
+    private static final String ARG_TYPE = "type";
 
     private int mColumnCount = 1;
     private OnListFragmentInteractionListener mListener;
     private PaymentListAdapter adapter;
+    private FirebaseFirestore db;
+    private Query myPaymentsQuery;
+    private FirebaseUser user;
+    private ListenerRegistration myListener;
+    private String house;
+    private RecyclerView recyclerView;
+    private String type;
+    private SwipeRefreshLayout mSwipe;
+    private String syncConnPref;
+
 
 
     /**
@@ -46,15 +79,14 @@ public class PaymentListFragment extends Fragment implements PaymentListAdapter.
     public PaymentListFragment() {
     }
 
-    public static PaymentListFragment newInstance(int columnCount, List<PaymentItem> paymentItems) {
+    public static PaymentListFragment newInstance(int columnCount, String type, String house) {
         PaymentListFragment fragment = new PaymentListFragment();
         Bundle args = new Bundle();
+        args.putString("house",house);
         args.putInt(ARG_COLUMN_COUNT, columnCount);
-
-
-        //TODO change this with network fetching
-        args.putParcelableArrayList(ARG_TODO_ITEMS, (ArrayList)paymentItems);
+        args.putString(ARG_TYPE, type);
         fragment.setArguments(args);
+
         return fragment;
     }
 
@@ -64,11 +96,22 @@ public class PaymentListFragment extends Fragment implements PaymentListAdapter.
 
         super.onCreate(savedInstanceState);
 
-        if (getArguments() != null) {
-            mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
-            paymentItems = getArguments().getParcelableArrayList(ARG_TODO_ITEMS);
-            adapter = new PaymentListAdapter(getContext(),paymentItems, this);
-        }
+
+            //type = getArguments().getString(ARG_TYPE);
+            if(savedInstanceState != null && savedInstanceState.getString("house") != null)
+                this.house = savedInstanceState.getString("house");
+        if(savedInstanceState != null && savedInstanceState.getString("type") != null)
+            this.type = savedInstanceState.getString("type");
+            adapter = new PaymentListAdapter(this.getContext(),this,type);
+            db = FirebaseFirestore.getInstance();
+            user = FirebaseAuth.getInstance().getCurrentUser();
+            SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this.getActivity());
+            syncConnPref = sharedPref.getString(getString(R.string.key_sync_frequency), "");
+            if(house != null ) {
+                prepareQuery();
+                enableRealTimeUpdate();
+            }
+
     }
 
     @Override
@@ -78,7 +121,7 @@ public class PaymentListFragment extends Fragment implements PaymentListAdapter.
         View view = inflater.inflate(R.layout.fragment_payment_list, container, false);
 
         // Setting up the RecyclerView adapter and helpers
-        RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
+        recyclerView = view.findViewById(R.id.recycler_view);
         Context context = view.getContext();
         if (mColumnCount <= 1) {
             recyclerView.setLayoutManager(new LinearLayoutManager(context));
@@ -90,6 +133,8 @@ public class PaymentListFragment extends Fragment implements PaymentListAdapter.
         // Setting up the refresh layout
         SwipeRefreshLayout swipeRefreshLayout = view.findViewById(R.id.swipe_refresh_layout);
         swipeRefreshLayout.setOnRefreshListener(this);
+        mSwipe = view.findViewById(R.id.swipe_refresh_layout);
+
 
         return view;
     }
@@ -109,7 +154,9 @@ public class PaymentListFragment extends Fragment implements PaymentListAdapter.
     @Override
     public void onDetach() {
         super.onDetach();
+        disableRealTimeUpdate();
         mListener = null;
+
     }
 
 
@@ -117,8 +164,22 @@ public class PaymentListFragment extends Fragment implements PaymentListAdapter.
 
     @Override
     public void onRefresh() {
-        //TODO implement refreshing through Firebase. Add setter for network source
         mListener.onRefresh();
+    }
+
+    public void updateData()
+    {
+
+        if(syncConnPref.equals("1")) {
+            if(house != null)
+                changeHouse(this.house);
+        }
+        mSwipe.setRefreshing(false);
+    }
+
+    public void updateDataSync()
+    {
+        changeHouse(this.house);
     }
 
     /**
@@ -134,4 +195,197 @@ public class PaymentListFragment extends Fragment implements PaymentListAdapter.
     public interface OnListFragmentInteractionListener {
         void onRefresh();
     }
+
+    public void changeHouse(String selectedHouse)
+    {
+        this.house = selectedHouse;
+        this.adapter = new PaymentListAdapter(this.getContext(),this,type);
+        this.recyclerView.setAdapter(this.adapter);
+        prepareQuery();
+        disableRealTimeUpdate();
+        enableRealTimeUpdate();
+
+
+
+    }
+
+    private void insertPayment(PaymentItem item)
+    {
+        adapter.insertItem(item, 0);
+    }
+
+    private void prepareQuery(){
+
+
+        CollectionReference housePayments = db.collection("houses")
+                .document(house)
+                .collection("payments");
+
+
+            myPaymentsQuery = housePayments;
+
+
+
+    }
+
+    public void enableRealTimeUpdate(){
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("houses").document(house).get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            Map<String, Object> roommates = (Map<String, Object>) task.getResult().getData().get("roommates");
+                            List<String> roommatesList = (List<String>) roommates.get("roommates");
+                            Map<String, Object> joinedAtRoomates = (Map<String, Object>) roommates.get("joinedTime");
+                            if (syncConnPref.equals("0")) {
+                                realTimeUpdate(joinedAtRoomates);
+                            } else {
+                                onceUpdate(joinedAtRoomates);
+                            }
+                        }
+                    }
+                });
+    }
+
+    public void disableRealTimeUpdate(){
+        if(myListener != null)
+            myListener.remove();
+    }
+
+    public void setHouse(String house){
+        this.house = house;
+    }
+    public void setType(String type){
+        this.type = type;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState)
+    {
+        savedInstanceState.putString("house",house);
+        savedInstanceState.putString("type",type);
+
+    }
+
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        if (getUserVisibleHint()) {
+            switch (item.getItemId()) {
+                case R.id.firstOption:
+                        String id = adapter.getItem(item.getGroupId()).getId();
+                        db.collection("houses").document(house).collection("payments").document(id).delete();
+                        if(syncConnPref.equals("1")) {
+                            if(type.equals("positive")) {
+                                 double numberOfPersonsAtPaymentTime = adapter.getItem(item.getGroupId()).getNumberOfRoommates();
+                                double oldPrice = adapter.getItem(item.getGroupId()).getPrice();
+                                double payment = oldPrice * ((numberOfPersonsAtPaymentTime - 1) / (numberOfPersonsAtPaymentTime));
+                                BalanceActivity.refreshBalanceColor(-payment);
+                        }
+                    }
+                        adapter.removeItem(item.getGroupId());
+
+                    break;
+                case R.id.secondOption:
+                    // do nothing
+                    break;
+            }
+            return true;
+        }
+        return false;
+    }
+
+    //used to update when live sync is off
+    private void realTimeUpdate(Map<String, Object> joinedAtRoomates)
+    {
+        myListener = myPaymentsQuery.addSnapshotListener((querySnapshot, error) ->
+        {
+            if (error != null) {
+                return;
+            }
+            Date joinedAt = Calendar.getInstance().getTime();
+            if (joinedAtRoomates != null)
+                joinedAt = (Date) joinedAtRoomates.get(FirebaseAuth.getInstance().getCurrentUser().getUid().toString());
+            for (DocumentChange dc : querySnapshot.getDocumentChanges()) {
+                PaymentItem newItem = dc.getDocument().toObject(PaymentItem.class);
+                Date paymentDate = newItem.getPerformedOn();
+                if (paymentDate != null && paymentDate.after(joinedAt)) {
+                    //calculate the number of persons that were in the group when the payment has been issued
+                    double numberOfPersonsAtPaymentTime = newItem.getNumberOfRoommates();
+                    if (dc.getType() == DocumentChange.Type.ADDED) {
+                        if ((type.equals("positive") && newItem.getPerformedBy().equals(user.getUid()) || (type.equals("negative") && !newItem.getPerformedBy().equals(user.getUid())))) {
+                            insertPayment(newItem);
+                            if (newItem.getPerformedBy().equals(user.getUid())) {
+                                double payment = newItem.getPrice() * ((numberOfPersonsAtPaymentTime - 1) / (numberOfPersonsAtPaymentTime));
+                                BalanceActivity.refreshBalanceColor(payment);
+                            } else {
+                                double payment = newItem.getPrice() / (numberOfPersonsAtPaymentTime);
+                                BalanceActivity.refreshBalanceColor(-payment);
+                            }
+                        }
+
+                    } else if (dc.getType() == DocumentChange.Type.REMOVED) {
+                        double oldPrice = newItem.getPrice();
+                        if (newItem.getPerformedBy().equals(user.getUid()) && type.equals("positive")) {
+                            double payment = oldPrice * ((numberOfPersonsAtPaymentTime - 1) / (numberOfPersonsAtPaymentTime));
+                            BalanceActivity.refreshBalanceColor(-payment);
+                        } else if (!newItem.getPerformedBy().equals(user.getUid()) && type.equals("negative")) {
+                            double payment = oldPrice / (numberOfPersonsAtPaymentTime);
+                            BalanceActivity.refreshBalanceColor(payment);
+                        }
+                        adapter.removeItem(newItem.getId());
+                    }
+                }
+            }
+        });
+    }
+
+    //used to update when live sync is off
+    private void onceUpdate(Map<String, Object> joinedAtRoomates)
+    {
+        myPaymentsQuery.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    Date joinedAt = Calendar.getInstance().getTime();
+                    if (joinedAtRoomates != null)
+                        joinedAt = (Date) joinedAtRoomates.get(FirebaseAuth.getInstance().getCurrentUser().getUid().toString());
+                    for (DocumentChange dc : task.getResult().getDocumentChanges()) {
+                        PaymentItem newItem = dc.getDocument().toObject(PaymentItem.class);
+                        Date paymentDate = newItem.getPerformedOn();
+                        if (paymentDate != null && paymentDate.after(joinedAt)) {
+                            //calculate the number of persons that were in the group when the payment has been issued
+                            double numberOfPersonsAtPaymentTime = newItem.getNumberOfRoommates();
+                            if (dc.getType() == DocumentChange.Type.ADDED) {
+                                if ((type.equals("positive") && newItem.getPerformedBy().equals(user.getUid()) || (type.equals("negative") && !newItem.getPerformedBy().equals(user.getUid())))) {
+                                    insertPayment(newItem);
+                                    if (newItem.getPerformedBy().equals(user.getUid())) {
+                                        double payment = newItem.getPrice() * ((numberOfPersonsAtPaymentTime - 1) / (numberOfPersonsAtPaymentTime));
+                                        BalanceActivity.refreshBalanceColor(payment);
+                                    } else {
+                                        double payment = newItem.getPrice() / (numberOfPersonsAtPaymentTime);
+                                        BalanceActivity.refreshBalanceColor(-payment);
+                                    }
+                                }
+
+                            } else if (dc.getType() == DocumentChange.Type.REMOVED) {
+                                double oldPrice = newItem.getPrice();
+                                if (newItem.getPerformedBy().equals(user.getUid()) && type.equals("positive")) {
+                                    double payment = oldPrice * ((numberOfPersonsAtPaymentTime - 1) / (numberOfPersonsAtPaymentTime));
+                                    BalanceActivity.refreshBalanceColor(-payment);
+                                } else if (!newItem.getPerformedBy().equals(user.getUid()) && type.equals("negative")) {
+                                    double payment = oldPrice / (numberOfPersonsAtPaymentTime);
+                                    BalanceActivity.refreshBalanceColor(payment);
+                                }
+                                adapter.removeItem(newItem.getId());
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
 }

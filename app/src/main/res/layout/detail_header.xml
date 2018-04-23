@@ -17,11 +17,12 @@
         android:id="@+id/user_icon"
         android:layout_width="56dp"
         android:layout_height="56dp"
-        android:background="@drawable/background_user_circle"
-        android:paddingTop="@dimen/nav_header_vertical_spacing"
+        android:layout_margin="@dimen/margin_icon"
+        tools:src="@drawable/empty_profile_blue_circle"
+        android:contentDescription="@string/content_description_user_icon"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:contentDescription="@string/content_description_user_icon"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/item_name"
@@ -45,7 +46,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@id/user_icon"
         app:layout_constraintTop_toBottomOf="@+id/item_name"
-        android:text="Added by Maharez"
+        tools:text="Added by Maharez"
         android:textSize="@dimen/msg_text_secondary"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"/>
 

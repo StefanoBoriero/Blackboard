@@ -1,8 +1,14 @@
 package dima.it.polimi.blackboard.fragments;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
+import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -13,17 +19,30 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 
-import java.util.ArrayList;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+
 import java.util.List;
 
 import dima.it.polimi.blackboard.R;
+import dima.it.polimi.blackboard.activities.DoubleFragmentActivity;
 import dima.it.polimi.blackboard.activities.HouseListActivity;
+import dima.it.polimi.blackboard.adapters.FirestoreAdapter;
 import dima.it.polimi.blackboard.adapters.TodoListAdapter;
+import dima.it.polimi.blackboard.exceptions.AlreadyRemovedException;
 import dima.it.polimi.blackboard.helper.TodoItemTouchHelper;
 import dima.it.polimi.blackboard.model.TodoItem;
+import dima.it.polimi.blackboard.receivers.BatteryStatusReceiver;
 
 /**
  * A fragment representing a list of Items.
@@ -32,20 +51,35 @@ import dima.it.polimi.blackboard.model.TodoItem;
  * interface.
  */
 public class TodoItemListFragment extends Fragment implements TodoListAdapter.TodoListAdapterListener,
-        TodoItemTouchHelper.TodoItemTouchHelperListener, SwipeRefreshLayout.OnRefreshListener{
+        TodoItemTouchHelper.TodoItemTouchHelperListener, SwipeRefreshLayout.OnRefreshListener/*, FirestoreAdapter.OnCompleteListener*/{
 
 
     private static final String ARG_COLUMN_COUNT = "column-count";
-    private static final String ARG_TODO_ITEMS = "todo-items";
+    private static final String USER_ID = "user-id";
+    private static final String ARG_DEFAULT_HOUSE = "house-list";
+    private static final String TAG = "ITEM_LIST";
+    private static final String CURRENT_SELECTED_INDEX = "current-index";
+    private static final String CURRENT_HOUSE = "current-house";
+    private static final String IS_DOUBLE = "is-double";
 
     private int mColumnCount = 1;
     private OnListFragmentInteractionListener mListener;
+    private FirestoreAdapter.OnCompleteListener mOnCompleteListener;
+    private SwipeRefreshLayout swipeRefreshLayout;
     private RecyclerView recyclerView;
     private ItemTouchHelper swipeHelper;
     private TodoListAdapter adapter;
 
-
     private View rootView;
+
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private String authId;
+    private String house;
+    private boolean myList;
+    private Query myQuery;
+
+    private int toHighlightIndex = 0;
+    private boolean isDouble;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -54,15 +88,35 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
     public TodoItemListFragment() {
     }
 
-    public static TodoItemListFragment newInstance(int columnCount, List<TodoItem> todoItems) {
+    public static TodoItemListFragment newInstance(int columnCount, List<TodoItem> todoItems, String defaultHouse) {
         TodoItemListFragment fragment = new TodoItemListFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
+        args.putString(ARG_DEFAULT_HOUSE, defaultHouse);
 
 
 
         //TODO change this with network fetching
-        args.putParcelableArrayList(ARG_TODO_ITEMS, new ArrayList<>(todoItems));
+        //args.putParcelableArrayList(ARG_TODO_ITEMS, new ArrayList<>(todoItems));
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    public static TodoItemListFragment newInstance(int columnCount, boolean isDouble, String defaultHouse){
+        TodoItemListFragment fragment = new TodoItemListFragment();
+        Bundle args = new Bundle();
+        args.putInt(ARG_COLUMN_COUNT, columnCount);
+        args.putBoolean(IS_DOUBLE, isDouble);
+        args.putString(ARG_DEFAULT_HOUSE, defaultHouse);
+
+        String authId;
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if(user != null) {
+            authId = user.getUid();
+            args.putString(USER_ID, authId);
+        }
+
+
         fragment.setArguments(args);
         return fragment;
     }
@@ -70,23 +124,35 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
-            List<TodoItem> todoItems = getArguments().getParcelableArrayList(ARG_TODO_ITEMS);
-            adapter = new TodoListAdapter(todoItems, this);
+            isDouble = getArguments().getBoolean(IS_DOUBLE);
+            house = getArguments().getString(ARG_DEFAULT_HOUSE);
         }
+
+        if(savedInstanceState!=null){
+            toHighlightIndex = savedInstanceState.getInt(CURRENT_SELECTED_INDEX);
+            house = savedInstanceState.getString(CURRENT_HOUSE);
+            isDouble = savedInstanceState.getBoolean(IS_DOUBLE);
+        }
+
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_list, container, false);
 
 
         AppCompatActivity parentActivity = ((AppCompatActivity)getActivity());
-        rootView = parentActivity.findViewById(R.id.root_view);
-
+        if(parentActivity != null) {
+            rootView = parentActivity.findViewById(R.id.root_view);
+        }
         // Setting up the RecyclerView adapter and helpers
         recyclerView = view.findViewById(R.id.recycler_view);
         Context context = view.getContext();
@@ -100,28 +166,73 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
         String swipeMessage;
         if(parentActivity instanceof HouseListActivity){
             swipeMessage = getResources().getString(R.string.house_list_swipe_msg);
+            myList = false;
         }
         else{
             swipeMessage = getResources().getString(R.string.my_list_swipe_msg);
+            myList = true;
         }
         ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new TodoItemTouchHelper(0,
-                ItemTouchHelper.LEFT, this, swipeMessage);
+                ItemTouchHelper.LEFT , this, swipeMessage);
+
         swipeHelper = new ItemTouchHelper(itemTouchHelperCallback);
         swipeHelper.attachToRecyclerView(recyclerView);
 
         // Setting up the refresh layout
-        SwipeRefreshLayout swipeRefreshLayout = view.findViewById(R.id.swipe_refresh_layout);
+        swipeRefreshLayout = view.findViewById(R.id.swipe_refresh_layout);
         swipeRefreshLayout.setOnRefreshListener(this);
 
+        String message;
+        int iconId;
+        if(myList){
+            message = "Good job, you've done everything!\nLook for new things in your house list";
+            iconId = R.drawable.ic_done_all_black_24dp;
+        }
+        else{
+            message = "Great, everything has been taken care of!\nAdd something to do";
+            iconId = R.drawable.ic_add_box_black_24dp;
+        }
+        View emptyMessage = view.findViewById(R.id.empty_message);
+        TextView m = emptyMessage.findViewById(R.id.message);
+        ImageView i = emptyMessage.findViewById(R.id.imageView6);
+
+        m.setText(message);
+        i.setImageResource(iconId);
+
+        setHouse(house);
         return view;
     }
 
+    //Remembering the current selected item
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        outState.putInt(CURRENT_SELECTED_INDEX, toHighlightIndex);
+        outState.putString(CURRENT_HOUSE, house);
+        outState.putBoolean(IS_DOUBLE, isDouble);
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        BroadcastReceiver br = new BatteryStatusReceiver(adapter);
+        IntentFilter ifilter = new IntentFilter();
+        ifilter.addAction(Intent.ACTION_BATTERY_LOW);
+        ifilter.addAction(Intent.ACTION_BATTERY_OKAY);
+        Context ctx = getContext();
+        if(ctx != null) {
+            ctx.getApplicationContext().registerReceiver(br, ifilter);
+        }
+    }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         if (context instanceof OnListFragmentInteractionListener) {
             mListener = (OnListFragmentInteractionListener) context;
+            if(context instanceof FirestoreAdapter.OnCompleteListener){
+                mOnCompleteListener = (FirestoreAdapter.OnCompleteListener) context;
+            }
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement OnListFragmentInteractionListener");
@@ -132,13 +243,56 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
     public void onDetach() {
         super.onDetach();
         mListener = null;
-
     }
 
 
     @Override
     public void onTodoItemClicked(TodoItem todoItem, View view, int clickedPosition) {
         mListener.onItemClick(todoItem, view, clickedPosition);
+    }
+
+    public void setHouse(String house){
+        fillFragment();
+        this.house = house;
+        prepareQuery();
+        if(adapter == null){
+            //We're initialing the fragment the first time or after rotation
+            if(isDouble) {
+                adapter = new TodoListAdapter(myQuery, this, mOnCompleteListener/*, toHighlightIndex10*/);
+                setSelectedItem(toHighlightIndex);
+            }
+            else{
+                adapter = new TodoListAdapter(myQuery, this, mOnCompleteListener);
+            }
+            recyclerView.setAdapter(adapter);
+        }else{
+            //We're changing the house
+            toHighlightIndex = 0;
+        }
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this.getActivity());
+        String syncConnPref = sharedPref.getString(getString(R.string.key_sync_frequency), "");
+        boolean liveUpdate;
+        if(syncConnPref.equals("0")){
+            liveUpdate = true;
+        }
+        else{
+            liveUpdate = false;
+        }
+
+        adapter.setLiveUpdate(liveUpdate);
+        this.adapter.setQuery(myQuery);
+    }
+
+    public void setSelectedItem(int index){
+        if(adapter != null){
+            fillFragment();
+            toHighlightIndex = index;
+            adapter.setSelected(index);
+        }
+    }
+
+    public void highlightCurrentOne(){
+        this.setSelectedItem(toHighlightIndex);
     }
 
     public void disableSwipe(){
@@ -150,19 +304,22 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
     }
 
     public void setSearchView(SearchView searchView){
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                adapter.getFilter().filter(query);
-                return false;
-            }
+        DoubleFragmentActivity parent = (DoubleFragmentActivity)getActivity();
+        if(parent != null) {
+            searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextSubmit(String query) {
+                    adapter.getFilter().filter(query, parent);
+                    return false;
+                }
 
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                adapter.getFilter().filter(newText);
-                return false;
-            }
-        });
+                @Override
+                public boolean onQueryTextChange(String newText) {
+                    adapter.getFilter().filter(newText, parent);
+                    return false;
+                }
+            });
+        }
     }
 
     /**
@@ -175,7 +332,7 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
      */
     @Override
     public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction, int position) {
-        mListener.onItemSwipe(position);
+        mListener.onItemSwipe(position, direction);
     }
 
     /**
@@ -186,6 +343,7 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
     public TodoItem removeItem(int position){
         final TodoItem removedItem = adapter.getItem(position);
         adapter.removeItem(position);
+        handleSelectionAfterRemoval(position);
         return removedItem;
     }
 
@@ -201,6 +359,35 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
         adapter.insertItem(todoItem, position);
         if(position == 0 || position == itemCount){
             recyclerView.scrollToPosition(position);
+        }
+        handleSelectionAfterInsertion(position);
+    }
+
+    /**
+     * Whenever I insert an item in the list, I have to make sure the index of the currently selected one is consistent
+     * @param insertingPosition the position where I'm inserting the item
+     */
+    public void handleSelectionAfterInsertion(int insertingPosition){
+        if(isDouble) {
+            if (insertingPosition <= toHighlightIndex) {
+                //I'm inserting it before the currently selected
+                toHighlightIndex++;
+                setSelectedItem(toHighlightIndex);
+            }
+        }
+    }
+
+    public void handleSelectionAfterRemoval(int removedPosition){
+        if(isDouble){
+            if(removedPosition < toHighlightIndex){
+                //I'm removing something before the currently selected one
+                toHighlightIndex--;
+            }
+            else if(removedPosition == getRemainingItems()){
+                //I removed the last of the list
+                toHighlightIndex--;
+            }
+            setSelectedItem(toHighlightIndex);
         }
     }
 
@@ -220,7 +407,73 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
 
     @Override
     public void onRefresh() {
+        if(!adapter.isListening()) {
+            ((DoubleFragmentActivity)mListener).resetOnFirst();
+            adapter.forceRefresh();
+        }
+        else{
+            stopRefreshing();
+        }
         //TODO implement refreshing through Firebase. Add setter for network source
+    }
+
+    public void refresh(){
+        if(!adapter.isListening()){
+            adapter.forceRefresh();
+        }
+    }
+
+    public void stopRefreshing(){
+        if(swipeRefreshLayout.isRefreshing()){
+            swipeRefreshLayout.setRefreshing(false);
+        }
+    }
+
+    public void setAuthId(String authId){
+        this.authId = authId;
+    }
+
+    private void prepareQuery(){
+        CollectionReference houseItems = db.collection("houses")
+                .document(house)
+                .collection("items");
+        if(getActivity() instanceof HouseListActivity) {
+            myQuery = houseItems.whereEqualTo("taken", false);
+        }
+        else{
+            myQuery = houseItems.whereEqualTo("taken", true).whereEqualTo("takenBy", authId)
+                .whereEqualTo("completed", false);
+        }
+
+    }
+
+    public void emptyFragment(){
+        View rootView = getView();
+        if(rootView != null) {
+            View emptyMessage = rootView.findViewById(R.id.empty_message);
+            emptyMessage.setVisibility(View.VISIBLE);
+        }
+    }
+
+    public void fillFragment(){
+        View rootView = getView();
+        if(rootView != null) {
+            View emptyMessage = rootView.findViewById(R.id.empty_message);
+            emptyMessage.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    public boolean contains(TodoItem item) throws AlreadyRemovedException{
+        return adapter.contains(item);
+    }
+
+    public int getRemainingItems(){
+        return adapter.getItemCount();
+    }
+
+
+    public void stopListening(){
+        adapter.stopListening();
     }
 
     /**
@@ -235,6 +488,6 @@ public class TodoItemListFragment extends Fragment implements TodoListAdapter.To
      */
     public interface OnListFragmentInteractionListener {
         void onItemClick(TodoItem item, View view, int clickedPosition);
-        void onItemSwipe(int swipedPosition);
+        void onItemSwipe(int swipedPosition, int direction);
     }
 }

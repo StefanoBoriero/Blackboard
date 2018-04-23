@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:divider="@drawable/divider_line_simple"
@@ -9,6 +10,24 @@
     android:dividerPadding="0dp"
     android:showDividers="middle">
 
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/my_constraint_layout"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:visibility="visible">
+
+        <ProgressBar
+            android:id="@+id/progress"
+            style="@style/Widget.AppCompat.ProgressBar"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </android.support.constraint.ConstraintLayout>
+
     <ImageView
         android:id="@+id/expanded_image"
         android:layout_width="250dp"
@@ -16,6 +35,7 @@
         android:adjustViewBounds="true"
         android:contentDescription="@string/content_description_user_icon"
         android:src="@drawable/debt_icon_red"
+        android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -27,16 +47,7 @@
         app:layout_constraintTop_toBottomOf="@+id/expanded_image">
 
         <ImageButton
-            android:id="@+id/button3"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:contentDescription="@string/content_description_recycling_bin_icon"
-            android:background="@drawable/imag_button_background"
-            android:src="@drawable/ic_delete_grey_24dp" />
-
-        <ImageButton
-            android:id="@+id/button5"
+            android:id="@+id/buttonCamera"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -46,7 +57,7 @@
              />
 
         <ImageButton
-            android:id="@+id/button4"
+            android:id="@+id/buttonGallery"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_weight="1"

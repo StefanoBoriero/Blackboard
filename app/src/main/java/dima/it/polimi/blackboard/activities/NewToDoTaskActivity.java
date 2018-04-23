@@ -8,6 +8,7 @@ import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.transition.Transition;
 import android.transition.TransitionInflater;
 import android.view.ContextMenu;
@@ -23,14 +24,27 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.text.ParseException;
+import java.util.Currency;
+import java.util.HashMap;
+import java.util.Map;
+
 import dima.it.polimi.blackboard.R;
+import dima.it.polimi.blackboard.model.TodoItem;
 import dima.it.polimi.blackboard.utils.GUIUtils;
 import dima.it.polimi.blackboard.utils.OnRevealAnimationListener;
+import faranjit.currency.edittext.CurrencyEditText;
 
 public class NewToDoTaskActivity extends AppCompatActivity {
+    private final static String ARG_HOUSE = "house";
+    private String house;
 
     private Button typeButton;
     private EditText editText;
@@ -42,6 +56,7 @@ public class NewToDoTaskActivity extends AppCompatActivity {
 
 
     private ConstraintLayout myConstraintLayout;
+    private FirebaseFirestore db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,6 +89,9 @@ public class NewToDoTaskActivity extends AppCompatActivity {
 
         setupEnterAnimation();
 
+        db = FirebaseFirestore.getInstance();
+        house = getIntent().getStringExtra(ARG_HOUSE);
+
     }
 
     //We override dispatchTouchEvent in order to take away the focus from
@@ -88,8 +106,10 @@ public class NewToDoTaskActivity extends AppCompatActivity {
             float x = ev.getRawX() + view.getLeft() - scrcoords[0];
             float y = ev.getRawY() + view.getTop() - scrcoords[1];
             if (x < view.getLeft() || x > view.getRight() || y < view.getTop() || y > view.getBottom()) {
-                if(this.getSystemService(Context.INPUT_METHOD_SERVICE) != null)
-                ((InputMethodManager) this.getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow((this.getWindow().getDecorView().getApplicationWindowToken()), 0);
+                InputMethodManager imm = (InputMethodManager) this.getSystemService(Context.INPUT_METHOD_SERVICE);
+                if(imm != null) {
+                    imm.hideSoftInputFromWindow((this.getWindow().getDecorView().getApplicationWindowToken()), 0);
+                }
                 view.clearFocus();
                 //give focus to constraint layout
                 myConstraintLayout.requestFocus();
@@ -271,5 +291,50 @@ public class NewToDoTaskActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    public void createActivity(View v) throws ParseException {
+        EditText nameEditText = findViewById(R.id.nameEditText);
+        Button typeButton = findViewById(R.id.typeButton);
+        CurrencyEditText currencyEditText = findViewById(R.id.costEditText);
+        Spinner spinner = findViewById(R.id.spinner2);
+        EditText description = findViewById(R.id.descriptionEditText);
+        Button submitButton = findViewById(R.id.submit_button);
+        Double amount = currencyEditText.getCurrencyDouble();
+        Map<String, Object> additionalInfo = new HashMap<>() ;
+        additionalInfo.put("description", description.getText().toString());
+        if(amount != 0.00)
+        {
+            additionalInfo.put("amount", amount);
+        }
+
+
+        String name = nameEditText.getText().toString().trim();
+        String type = typeButton.getText().toString();
+
+        if(TextUtils.isEmpty(name))
+        {
+            nameEditText.setError("Please enter name");
+
+            //We don't complete the request
+            return;
+        }
+
+        if(TextUtils.isEmpty(type))
+        {
+            typeButton.setError("Please select a type");
+
+            return;
+        }
+
+        TodoItem todoItem = new TodoItem(name, type ,spinner.getSelectedItem().toString(),additionalInfo);
+        DocumentReference newDoc = db.collection("houses").document(house).collection("items").document();
+        submitButton.setClickable(false);
+        String itemId = newDoc.getId();
+        todoItem.setId(itemId);
+        newDoc.set(todoItem);
+
+        setResult(RESULT_OK);
+        onBackPressed();
     }
 }

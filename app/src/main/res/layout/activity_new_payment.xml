@@ -9,7 +9,7 @@
 
 
 
-    tools:context="dima.it.polimi.blackboard.activities.NewToDoTaskActivity">
+    tools:context="dima.it.polimi.blackboard.activities.NewPaymentActivity">
 
     <RelativeLayout
         android:id="@+id/container_layout"
@@ -63,7 +63,7 @@
                     android:background="@drawable/focus_selector"
                     android:drawableStart="@drawable/grey_pencil"
                     android:drawablePadding="5dp"
-                    android:hint="@string/name_selection"
+                    android:hint="@string/payment_name_selection"
                     android:paddingEnd="10dp"
                     android:paddingStart="10dp"
                     android:textSize="20sp"
@@ -115,7 +115,8 @@
                     android:layout_height="50dp"
                     android:layout_gravity="center"
                     android:layout_marginTop="12dp"
-                    android:text="@string/new_activity"
+                    android:text="Add payment"
+                    android:onClick="createPayment"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/descriptionEditText" />
 

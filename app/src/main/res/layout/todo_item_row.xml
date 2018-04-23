@@ -37,7 +37,7 @@
         android:id="@+id/foreground_row"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/background_list_row"
+        android:background="@drawable/selector_item_row"
         android:clickable="false"
         android:clipChildren="false"
         android:clipToPadding="false"
@@ -49,6 +49,7 @@
             android:id="@+id/selected_flag"
             android:layout_width="8dp"
             android:layout_height="match_parent"
+
             app:layout_constraintStart_toStartOf="parent"
             android:contentDescription="@string/content_description_selected"/>
 
@@ -58,16 +59,18 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ellipsize="end"
-            android:lines="1"
+            android:ems="15"
+            android:maxLines="1"
             android:layout_marginStart="@dimen/margin_text"
             android:textAppearance="@style/TextAppearance.AppCompat.Body1"
             android:textSize="@dimen/msg_text_primary"
             android:textStyle="bold"
+            tools:drawableStart="@drawable/ic_priority_high_red_24dp"
             app:layout_constraintBottom_toTopOf="@+id/item_type"
             app:layout_constraintStart_toEndOf="@id/user_icon"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_chainStyle="packed"
-            tools:text="Pay Netflix" />
+            tools:text="Very long string to see the effect of lemax lenght" />
 
         <TextView
             android:id="@+id/item_type"
@@ -90,7 +93,7 @@
             android:layout_width="@dimen/icon_width_height"
             android:layout_height="@dimen/icon_width_height"
             android:layout_margin="@dimen/margin_icon"
-            android:background="@drawable/background_user_circle"
+            tools:src="@drawable/empty_profile_blue_circle"
             android:contentDescription="@string/content_description_user_icon"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -109,7 +112,7 @@
             tools:text="12:02" />
 
         <ImageView
-            android:id="@+id/icon_priority"
+            android:id="@+id/suggestion_star"
             android:layout_width="@dimen/icon_star"
             android:layout_height="@dimen/icon_star"
             android:alpha="0.5"

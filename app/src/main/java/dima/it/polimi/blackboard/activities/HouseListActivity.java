@@ -1,21 +1,25 @@
 package dima.it.polimi.blackboard.activities;
 
+import android.annotation.SuppressLint;
 import android.app.ActivityOptions;
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.app.DialogFragment;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
 
+import android.view.View;
+import android.widget.Toast;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
 
 import dima.it.polimi.blackboard.R;
+import dima.it.polimi.blackboard.fragments.TodoItemDetailFragment;
+import dima.it.polimi.blackboard.fragments.TodoItemListFragment;
 import dima.it.polimi.blackboard.model.TodoItem;
 import dima.it.polimi.blackboard.utils.DataGeneratorUtil;
 
@@ -25,18 +29,19 @@ import dima.it.polimi.blackboard.utils.DataGeneratorUtil;
  * one item displays the details in another fragment; if the device is large enough, the detail
  * fragment will be displayed permanently on the side of the screen
  */
-public class HouseListActivity extends DoubleFragmentActivity implements DialogInterface.OnClickListener{
-
-    // TODO select preferred
-    private int whichHouse = 0;
-
+public class HouseListActivity extends DoubleFragmentActivity{
+    private final static String TAG = "HOUSE_LIST";
+    private final static String ARG_HOUSE = "house";
+    private final static int CREATE_NEW_ITEM = 2;
 
     private FloatingActionButton mFab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setContentView(R.layout.activity_house_list);
-        super.setItemList(DataGeneratorUtil.generateTodoItems(30));
+
+        //super.setItemList(DataGeneratorUtil.generateTodoItems(30));
+        super.onCreate(savedInstanceState);
 
         mFab = findViewById(R.id.add_fab);
         mFab.setTransitionName("revealCircular");
@@ -44,23 +49,29 @@ public class HouseListActivity extends DoubleFragmentActivity implements DialogI
         Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle(R.string.title_activity_house_list);
         setSupportActionBar(toolbar);
-
-
-        super.onCreate(savedInstanceState);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_house_list, menu);
+        //getMenuInflater().inflate(R.menu.menu_house_list, menu);
 
         super.onCreateOptionsMenu(menu);
         return true;
     }
 
     @Override
-    protected void showUndoMessage(TodoItem removedItem, int position) {
-        Snackbar.make(mFab, "You took charge of the activity",
+    protected void showUndoMessage(TodoItem removedItem, int position, String action) {
+        String message;
+        switch(action){
+            case TodoItemDetailFragment.ACTION_TAKEN: message = "You took charge of the activity";
+                break;
+            case TodoItemDetailFragment.ACTION_DELETED: message = "You deleted the activity!";
+                break;
+            default:
+                message = "Wella bomber";
+        }
+        Snackbar.make(mFab, message,
                 Snackbar.LENGTH_LONG)
                 .setAction("UNDO", (v) ->
                         super.insertItem(removedItem, position)
@@ -69,7 +80,7 @@ public class HouseListActivity extends DoubleFragmentActivity implements DialogI
                     @Override
                     public void onDismissed(Snackbar transientBottomBar, int event) {
                         if(event == DISMISS_EVENT_TIMEOUT) {
-                            handleItemAccepted(removedItem, position);
+                            handleItemAccepted(removedItem, position, action);
                         }
                     }
                 })
@@ -77,67 +88,93 @@ public class HouseListActivity extends DoubleFragmentActivity implements DialogI
     }
 
     @Override
-    protected void callNetwork(TodoItem removedItem) {
-        //TODO update firebase
+    protected void callNetwork(TodoItem itemChanged, String action) {
+        switch(action){
+            case TodoItemDetailFragment.ACTION_TAKEN: acceptItem(itemChanged);
+                break;
+            case TodoItemDetailFragment.ACTION_DELETED: deleteItem(itemChanged);
+                break;
+        }
+
+
+    }
+
+    private void acceptItem(TodoItem itemAccepted){
+        String id = itemAccepted.getId();
+        String house = (String)houses[whichHouse];
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if(user != null){
+            String userId = user.getUid();
+            DocumentReference item = db.collection("houses").document(house).collection("items")
+                    .document(id);
+            item.update(
+                    "taken", true,
+                    "takenBy", userId
+            );
+        }
+    }
+
+    private void deleteItem(TodoItem itemDeleted){
+        String id = itemDeleted.getId();
+        String house = (String)houses[whichHouse];
+        DocumentReference item = db.collection("houses").document(house).collection("items")
+                .document(id);
+        item.delete();
+
     }
 
 
     @Override
-    public void onItemSwipe( int swipedPosition) {
-        super.removeItem(swipedPosition);
+    public void onItemSwipe( int swipedPosition, int direction) {
+        if(direction == ItemTouchHelper.LEFT) {
+            super.removeItem(swipedPosition, TodoItemDetailFragment.ACTION_TAKEN);
+        }
+        else{
+            super.removeItem(swipedPosition, TodoItemDetailFragment.ACTION_DELETED);
+        }
     }
 
-
-    public void onChooseHouse(MenuItem menuItem){
-        ChooseHouseDialog.mListener = this;
-        DialogFragment houseListDialog = ChooseHouseDialog.newInstance(whichHouse);
-        houseListDialog.show(getFragmentManager(), "dialog");
+    @Override
+    protected void showErrorToast(TodoItem item) {
+        String message = "Uh-oh, someone already took " + item.getName() + "!";
+        Toast.makeText(this, message, Toast.LENGTH_SHORT)
+                .show();
     }
 
     /*
-    FAB listener set in XML layout
-     */
+        FAB listener set in XML layout
+         */
+    @SuppressLint("restrictedApi")
     public void fabListener(View v){
-        Intent intent = new Intent(this, NewToDoTaskActivity.class);
+        if(houseDownloadComplete) {
+            Intent intent = new Intent(this, NewToDoTaskActivity.class);
+            intent.putExtra(ARG_HOUSE, houses[whichHouse]);
 
+            ActivityOptions options = ActivityOptions.
+                    makeSceneTransitionAnimation(this, mFab, mFab.getTransitionName());
+            startActivityForResult(intent, CREATE_NEW_ITEM, options.toBundle());
 
-        ActivityOptions options = ActivityOptions.
-                makeSceneTransitionAnimation(this, mFab, mFab.getTransitionName());
-        startActivity(intent, options.toBundle());
+        }
+        else{
+            Toast.makeText(this, "Error connecting to network, try again", Toast.LENGTH_SHORT)
+                    .show();
+        }
+
     }
 
-    /**
-     * This method return the chosen house from the list
-     * @param dialog the dialog sending data
-     * @param which the house chosen
-     */
     @Override
-    public void onClick(DialogInterface dialog, int which) {
-        this.whichHouse = which;
-        dialog.dismiss();
-
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode == CREATE_NEW_ITEM){
+            if(resultCode == RESULT_OK){
+                firstFragment.refresh();
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
-    public static class ChooseHouseDialog extends DialogFragment{
-        public static Dialog.OnClickListener mListener;
-
-        public static ChooseHouseDialog newInstance(int whichHouse) {
-
-            Bundle args = new Bundle();
-            args.putInt("chosen_house", whichHouse);
-            ChooseHouseDialog fragment = new ChooseHouseDialog();
-            fragment.setArguments(args);
-            return fragment;
-        }
-
-        @Override
-        public Dialog onCreateDialog(final Bundle savedInstanceState) {
-            int which = getArguments().getInt("chosen_house");
-            final AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
-            dialog.setTitle(R.string.action_choose_house);
-            CharSequence[] entries = new CharSequence[]{"One", "Two", "Three"};
-            dialog.setSingleChoiceItems(entries, which, mListener);
-            return dialog.create();
-        }
+    @Override
+    public void onBackPressed() {
+        firstFragment.stopListening();
+        super.onBackPressed();
     }
 }

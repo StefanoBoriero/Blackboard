@@ -7,14 +7,15 @@ package dima.it.polimi.blackboard.adapters;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.view.ViewGroup;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import dima.it.polimi.blackboard.fragments.PaymentListFragment;
 
 
 public class PaymentViewPagerAdapter extends FragmentPagerAdapter {
-    private final List<Fragment> mFragmentList = new ArrayList<>();
     private final List<String> mFragmentTitleList = new ArrayList<>();
 
     public PaymentViewPagerAdapter(FragmentManager manager) {
@@ -23,23 +24,23 @@ public class PaymentViewPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        return mFragmentList.get(position);
+        return new PaymentListFragment();
     }
 
     @Override
     public int getCount() {
-        return mFragmentList.size();
+        return 2;
     }
 
-    public void addFragment(Fragment fragment, String title) {
-        mFragmentList.add(fragment);
-        mFragmentTitleList.add(title);
-    }
 
     @Override
     public CharSequence getPageTitle(int position) {
-        return mFragmentTitleList.get(position);
+        if(position == 0)
+            return "Negative";
+        else
+            return "Positive";
     }
+
 
 
 }

@@ -16,6 +16,8 @@ import dima.it.polimi.blackboard.model.TodoItem;
  */
 
 public class DetailTodoItemActivity extends AppCompatActivity implements TodoItemDetailFragment.OnTodoItemDetailInteraction{
+    public static final String RES_ACTION = "action";
+    public static final String SHOWN_ITEM = "shown-item";
     private Fragment detailFragment;
     private int position;
 
@@ -46,12 +48,16 @@ public class DetailTodoItemActivity extends AppCompatActivity implements TodoIte
 
 
     @Override
-    public void onAcceptClick(TodoItem todoItem, int position) {
+    public void onAcceptClick(TodoItem todoItem, int position, String action) {
         Intent resultData = new Intent();
         resultData.putExtra(getResources().getString(R.string.position), position);
+        resultData.putExtra(RES_ACTION, action);
+        resultData.putExtra(SHOWN_ITEM, todoItem);
         setResult(RESULT_OK, resultData);
         onBackPressed();
     }
+
+
 
     @Override
     public void onBackPressed() {

@@ -2,39 +2,22 @@
 <android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <include
-        android:id="@+id/detail_header"
-        layout="@layout/detail_header" />
-
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/recycler_view_detail"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:transitionGroup="true"
-        app:layout_constraintEnd_toEndOf="parent"
+    <include layout="@layout/empty_detail_frag"
+        android:id="@+id/empty_message"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/detail_header"
-        app:layout_constraintBottom_toTopOf="@id/bottom_bar"
-        tools:listitem="@layout/detail_row"/>
-
-    <android.support.constraint.Guideline
-        android:id="@+id/guideline_bottom"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.86" />
-
-    <include
-        android:id="@+id/bottom_bar"
-        layout="@layout/bottom_detail"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:visibility="invisible"/>
 
+    <include layout="@layout/content_detail_fragment"
+        android:id="@+id/content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:visibility="visible"/>
 </android.support.constraint.ConstraintLayout>

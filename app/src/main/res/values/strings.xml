@@ -46,7 +46,10 @@
 
     <!-- Stats strings -->
     <string name="completed_tasks">Completed tasks</string>
-    <string name="average_completion_time">Average completion time</string>
+    <string name="completed_housekeeping_tasks">Completed housekeeping tasks</string>
+    <string name="completed_shopping_tasks">Completed shopping tasks</string>
+    <string name="completed_billing_tasks">Completed billing tasks</string>
+    <string name="average_completion_time">Average number of tasks in a day</string>
     <string name="most_task_completed">Most tasks completed in one day</string>
     <string name="preferred_type">Preferred type</string>
     <string name="days_in_credit">Days in debt</string>
@@ -77,14 +80,22 @@
         <item>Not so important</item>
     </string-array>
 
+    <!-- Sex strings -->
+    <string-array name="sex">
+        <item>Male</item>
+        <item>Female</item>
+
+    </string-array>
 
     <string name="shopping">Shopping</string>
     <string name="houseKeeping">Housekeeping</string>
+    <string name="billing">Billing</string>
     <string name="bills">Bills</string>
 
 
     <string name="type_selection">Select activity type</string>
     <string name="name_selection">Insert activity name</string>
+    <string name="payment_name_selection">Insert payment name</string>
     <string name="name">Name</string>
     <string name="type">Type</string>
     <string name="description">Description</string>
@@ -93,9 +104,7 @@
     <string name="new_activity">Add activity</string>
 
 
-
     <string name="swipe_text">Accept Task</string>
-
 
 
     <!-- Profile Info Strings -->
@@ -103,19 +112,13 @@
     <string name="house_name">House_name</string>
 
 
-
-
     <!-- Strings related to Settings -->
 
     <!-- Example General settings -->
 
     <string-array name="pref_sync_frequency_titles">
-        <item>15 minutes</item>
-        <item>30 minutes</item>
-        <item>1 hour</item>
-        <item>3 hours</item>
-        <item>6 hours</item>
-        <item>Never</item>
+        <item>Yes</item>
+        <item>No</item>
     </string-array>
 
     <!-- Example settings for Notifications -->
@@ -143,6 +146,9 @@
     <string name="content_description_heart_icon">Heart icon</string>
     <string name="content_description_timer_icon">Timer icon</string>
     <string name="content_description_check_icon">Check icon</string>
+    <string name="content_description_cart_icon">Cart icon</string>
+    <string name="content_description_house_icon">House icon</string>
+    <string name="content_description_card_icon">Card icon</string>
     <string name="content_description_fire_icon">Fire icon</string>
     <string name="content_description_image_icon">Image icon</string>
     <string name="content_description_positive_negative_icon">Positive or negative icon</string>
@@ -156,9 +162,8 @@
 
     <!-- Notifications settings -->
     <string-array name="notifications">
-        <item>Always</item>
-        <item>Only important</item>
-        <item>Never</item>
+        <item>Yes</item>
+        <item>No</item>
     </string-array>
 
     <string-array name="notifications_values">
@@ -187,5 +192,16 @@
     <string name="leave_house">Leave house</string>
 
     <string name="example">Example</string>
+
+    <string name="empty_list">Great, everything has been taken care of!\n
+                                Add something to do! </string>
+    <string name="empty_list_content">Empty list message</string>
+
+    <string name="default_notification_channel_id" translatable="false">fcm_default_channel</string>
+
+    <string name="empty_detail">There\'s nothing to show</string>
+
+    <string name="prev_week">LOAD PREVIOUS WEEK</string>
+    <string name="subsequent_week">LOAD SUBSEQUENT WEEK</string>
 
 </resources>

@@ -36,15 +36,18 @@ public class DataGeneratorUtil {
             int name = (int)(Math.random() * 3);
             int type = (int)(Math.random() * 3);
             double price = (Math.random() * 3);
+            String id = i + "a";
 
             TodoItem item;
+            /*
             if(Math.random() > 0.5) {
-                item = new TodoItem(i, names[name], types[type], "Lorem ipsum dolor sit amet", price);
+                item = new TodoItem(names[name], types[type], "Lorem ipsum dolor sit amet", price);
             }
             else{
-                item = new TodoItem(i, names[name], types[type], "We guajò, bella sta App");
+                item = new TodoItem(names[name], types[type], "We guajò, bella sta App");
             }
             out.add(item);
+            */
         }
         return out;
     }
@@ -59,8 +62,8 @@ public class DataGeneratorUtil {
             int to = (int)(Math.random() * 4);
             double price = (Math.random() * 4);
 
-            PaymentItem item = new PaymentItem(i,names[name],froms[from],tos[to] ,price);
-            out.add(item);
+            //PaymentItem item = new PaymentItem(names[name] ,0.00f);
+            //out.add(item);
         }
         return out;
     }
@@ -99,8 +102,8 @@ public class DataGeneratorUtil {
         List<House> houses = new ArrayList<>(amount);
 
         for(i=0; i<amount; i++){
-            House h = new House("House " + i);
-            houses.add(h);
+            //House h = new House("House " + i);
+            //houses.add(h);
         }
 
         return houses;
@@ -126,9 +129,8 @@ public class DataGeneratorUtil {
         for(i=0; i<amount; i++){
             int completed = (int)(Math.random() * 7);
             int added = (int)(Math.random() * 4);
-            double diff = (Math.random() * 3);
 
-            DayResume day = new DayResume(completed, diff, added);
+            DayResume day = new DayResume(completed, added);
             days.add(day);
         }
         return days;

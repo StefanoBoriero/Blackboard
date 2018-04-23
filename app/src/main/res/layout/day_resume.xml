@@ -38,7 +38,7 @@
             android:id="@+id/completed_tasks"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:drawableStart="@drawable/ic_my_list_white"
+            android:drawableStart="@drawable/ic_my_list_green"
             android:textSize="16sp"
             android:drawablePadding="8dp"
             android:gravity="center"
@@ -61,21 +61,6 @@
             android:layout_marginBottom="4dp"
 
             tools:text="Added tasks: 0"/>
-
-        <TextView
-            android:id="@+id/balance_diff"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:drawableStart="@drawable/ic_payment_black_24dp"
-            android:textSize="16sp"
-            android:drawablePadding="8dp"
-            android:gravity="center"
-
-            android:layout_marginTop="4dp"
-            android:layout_marginBottom="4dp"
-
-            tools:text="Balance activity: -3$"/>
-
 
     </LinearLayout>
 

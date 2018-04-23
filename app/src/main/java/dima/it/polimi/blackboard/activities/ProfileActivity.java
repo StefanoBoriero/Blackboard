@@ -73,6 +73,8 @@ public class ProfileActivity extends AppCompatActivity implements ProfileInfoFra
     @Override
     public void onItemClick(House item, View view, int clickedPosition) {
         Intent intent = new Intent(this, HouseDialogActivity.class);
+        intent.putExtra("house", item.getName());
+        intent.putExtra("houseId",item.getId());
         ActivityOptions options = ActivityOptions.
                 makeScaleUpAnimation(view,-(int)view.getX(),-(int)view.getY(),0, 0);
         startActivity(intent, options.toBundle());
