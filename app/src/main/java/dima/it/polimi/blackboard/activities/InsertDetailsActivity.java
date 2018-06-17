@@ -21,6 +21,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -40,9 +41,11 @@ import com.bumptech.glide.signature.ObjectKey;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -57,6 +60,8 @@ import dima.it.polimi.blackboard.R;
 import dima.it.polimi.blackboard.utils.GlideApp;
 
 public class InsertDetailsActivity extends AppCompatActivity implements DialogInterface.OnClickListener {
+    private final static String TAG = "Sign in activity";
+
     FirebaseFirestore db;
     ConstraintLayout myConstraintLayout;
     private static final int REQUEST_IMAGE_CAPTURE = 1;
@@ -124,13 +129,28 @@ public class InsertDetailsActivity extends AppCompatActivity implements DialogIn
 
 
 
-        db.collection("users").document(FirebaseAuth.getInstance().getCurrentUser().getUid()).set(user);
+        db.collection("users").document(FirebaseAuth.getInstance().getCurrentUser().getUid()).set(user)
+        .addOnCompleteListener((task) -> sendToken());
 
 
         finish();
         Intent i = new Intent(InsertDetailsActivity.this,MainActivity.class);
         startActivity(i);
 
+    }
+
+    private void sendToken(){
+        FirebaseInstanceId instanceId = FirebaseInstanceId.getInstance();
+        String currentToken = instanceId.getToken();
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if(user != null){
+            String uid = user.getUid();
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+            db.collection("users").document(uid).update("token", currentToken).addOnFailureListener(e ->
+                    Log.w(TAG, "Error updating document", e)
+            );
+        }
     }
 
     //We override dispatchTouchEvent in order to take away the focus from
