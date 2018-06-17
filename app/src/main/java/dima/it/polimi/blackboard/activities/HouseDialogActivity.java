@@ -137,7 +137,7 @@ public class HouseDialogActivity extends Activity implements RoomMateListAdapter
                                             }
                                             }
                                         String finalId = FirebaseAuth.getInstance().getCurrentUser().getDisplayName() + System.currentTimeMillis();
-                                        String finalName = FirebaseAuth.getInstance().getCurrentUser().getDisplayName() + " left";
+                                        String finalName = UserDecoder.getInstance().getNameFromId(FirebaseAuth.getInstance().getCurrentUser().getUid()) + " left the house";
                                         Date date = Calendar.getInstance().getTime();
                                         if(exitBalance != 0)
                                             {
