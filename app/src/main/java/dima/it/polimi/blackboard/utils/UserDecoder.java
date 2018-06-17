@@ -50,9 +50,11 @@ public class UserDecoder {
                                     .addOnCompleteListener(task1 -> {
                                         if(task1.isSuccessful()){
                                             DocumentSnapshot doc1 = task1.getResult();
-                                            Map<String, Object> personalInfo = (Map<String, Object>)doc1.get("personal_info");
-                                            String name = (String)personalInfo.get("name");
-                                            mMap.put(uid, name);
+                                            if(doc1.exists()) {
+                                                Map<String, Object> personalInfo = (Map<String, Object>) doc1.get("personal_info");
+                                                String name = (String) personalInfo.get("name");
+                                                mMap.put(uid, name);
+                                            }
                                         }
                                     });
                         }
