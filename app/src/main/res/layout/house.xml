@@ -16,7 +16,7 @@
         android:id="@+id/house_icon"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:background="@drawable/background_user_circle"
+        android:background="@drawable/ic_home_black_24dp"
         android:contentDescription="@string/content_description_house"
         android:elevation="8dp"
         app:layout_constraintBottom_toTopOf="@+id/house_name"
