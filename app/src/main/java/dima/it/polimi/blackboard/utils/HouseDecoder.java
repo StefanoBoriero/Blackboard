@@ -28,20 +28,21 @@ public class HouseDecoder {
     public void populateFromUser(User u){
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         List<Object> housesID = u.getHouses();
-        for(Object o: housesID){
-            String id = (String)o;
-            db.collection("houses").document(id).get().addOnCompleteListener(task -> {
-                if(task.isSuccessful()) {
-                    DocumentSnapshot doc = task.getResult();
-                    if(doc.exists()) {
-                        String name = (String)doc.getData().get("name");
-                        mMap.put(id, name);
+        if(housesID != null) {
+            for (Object o : housesID) {
+                String id = (String) o;
+                db.collection("houses").document(id).get().addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot doc = task.getResult();
+                        if (doc.exists()) {
+                            String name = (String) doc.getData().get("name");
+                            mMap.put(id, name);
+                        }
+                    } else {
+                        Log.e(TAG, "Error in getting document: " + id);
                     }
-                }
-                else{
-                    Log.e(TAG, "Error in getting document: " + id);
-                }
-            });
+                });
+            }
         }
     }
 
