@@ -330,6 +330,9 @@ public class LoginActivity extends AppCompatActivity {
     public void onClick(View v)
     {
         Intent intent = new Intent(LoginActivity.this, SignInActivity.class);
+        if (mAuthListener != null) {
+            mAuth.removeAuthStateListener(mAuthListener);
+        }
         startActivity(intent);
     }
 

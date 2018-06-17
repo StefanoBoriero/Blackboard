@@ -77,7 +77,10 @@ public class InsertDetailsActivity extends AppCompatActivity implements DialogIn
 
 
         setUpPhotoButton();
-        loadProfilePicture();
+        ImageView ivProfile = findViewById(R.id.imageViewProfile);
+        ProgressBar progressBar = (ProgressBar) findViewById(R.id.progress);
+        ivProfile.setVisibility(View.VISIBLE);
+        progressBar.setVisibility(View.GONE);
 
     }
 
@@ -111,7 +114,12 @@ public class InsertDetailsActivity extends AppCompatActivity implements DialogIn
         user.put("auth_id",FirebaseAuth.getInstance().getCurrentUser().getUid() );
         user.put("personal_info",personalInfo);
         user.put("stats", stats);
+        SharedPreferences sharedPref = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE);
 
+        //this means cache has been cleaned, we need to retrieve the value
+        String imageCaching =  sharedPref.getString("imageCaching","0");
+
+        user.put("lastEdit",imageCaching);
 
 
 
@@ -198,8 +206,6 @@ public class InsertDetailsActivity extends AppCompatActivity implements DialogIn
                     SharedPreferences.Editor editor = sharedPref.edit();
                     editor.putString("imageCaching", lastEdit);
                     editor.commit();
-                    DocumentReference userReference = FirebaseFirestore.getInstance().collection("users").document(FirebaseAuth.getInstance().getCurrentUser().getUid());
-                    userReference.update("lastEdit",lastEdit);
                     loadProfilePicture();
                     ivProfile.setVisibility(View.VISIBLE);
                     progressBar.setVisibility(View.GONE);
@@ -247,8 +253,6 @@ public class InsertDetailsActivity extends AppCompatActivity implements DialogIn
                 SharedPreferences.Editor editor = sharedPref.edit();
                 editor.putString("imageCaching", lastEdit);
                 editor.commit();
-                DocumentReference userReference = FirebaseFirestore.getInstance().collection("users").document(FirebaseAuth.getInstance().getCurrentUser().getUid());
-                userReference.update("lastEdit",lastEdit);
                 loadProfilePicture();
             }
         });
@@ -257,30 +261,37 @@ public class InsertDetailsActivity extends AppCompatActivity implements DialogIn
     private void loadProfilePicture()
     {
         FirebaseStorage storage = FirebaseStorage.getInstance();
-        String lastEdit = readSharedPreferenceForCache();
-        StorageReference reference = storage.getReference().child(FirebaseAuth.getInstance().getCurrentUser().getUid().toString() + "/profile" + lastEdit);
         ImageView ivProfile = findViewById(R.id.imageViewProfile);
         final ProgressBar progressBar = (ProgressBar) findViewById(R.id.progress);
-        GlideApp.with(getBaseContext())
-                .load(reference)
-                .listener(new RequestListener<Drawable>() {
-                    @Override
-                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-                        progressBar.setVisibility(View.GONE);
-                        ivProfile.setVisibility(View.VISIBLE);
-                        return false;
-                    }
+        String lastEdit = readSharedPreferenceForCache();
+        if(FirebaseAuth.getInstance().getCurrentUser() != null) {
+            StorageReference reference = storage.getReference().child(FirebaseAuth.getInstance().getCurrentUser().getUid().toString() + "/profile" + lastEdit);
+            GlideApp.with(getBaseContext())
+                    .load(reference)
+                    .listener(new RequestListener<Drawable>() {
+                        @Override
+                        public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                            progressBar.setVisibility(View.GONE);
+                            ivProfile.setVisibility(View.VISIBLE);
+                            return false;
+                        }
 
-                    @Override
-                    public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-                        progressBar.setVisibility(View.GONE);
-                        ivProfile.setVisibility(View.VISIBLE);
-                        return false;
-                    }
-                })
-                .error(R.drawable.empty_profile_blue_circle)
-                .apply(RequestOptions.circleCropTransform())
-                .into(ivProfile);
+                        @Override
+                        public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                            progressBar.setVisibility(View.GONE);
+                            ivProfile.setVisibility(View.VISIBLE);
+                            return false;
+                        }
+                    })
+                    .error(R.drawable.empty_profile_blue_circle)
+                    .apply(RequestOptions.circleCropTransform())
+                    .into(ivProfile);
+        }
+        else
+        {
+            progressBar.setVisibility(View.GONE);
+            ivProfile.setVisibility(View.VISIBLE);
+        }
     }
 
     public static class ProfilePictureDialog extends DialogFragment {
@@ -359,25 +370,28 @@ public class InsertDetailsActivity extends AppCompatActivity implements DialogIn
 
         //this means cache has been cleaned, we need to retrieve the value
         String imageCaching =  sharedPref.getString("imageCaching","0");
-        if(imageCaching == "0")
-        {
-            DocumentReference userReference = FirebaseFirestore.getInstance().collection("users").document(FirebaseAuth.getInstance().getCurrentUser().getUid());
-            userReference.get().addOnCompleteListener((task) -> {
-                List<CharSequence> myHouses = new ArrayList<>();
-                if (task.isSuccessful()) {
-                    {
-                        DocumentSnapshot document = task.getResult();
-                        Map<String, Object> userParam = document.getData();
-                        String lastEdit = (String)userParam.get("lastEdit");
-                        SharedPreferences.Editor editor = sharedPref.edit();
-                        editor.putString("imageCaching", lastEdit);
-                        editor.commit();
-                    }
+        if(imageCaching == "0") {
+            if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+                DocumentReference userReference = FirebaseFirestore.getInstance().collection("users").document(FirebaseAuth.getInstance().getCurrentUser().getUid());
+                userReference.get().addOnCompleteListener((task) -> {
+                    List<CharSequence> myHouses = new ArrayList<>();
+                    if (task.isSuccessful()) {
+                        {
+                            DocumentSnapshot document = task.getResult();
+                            if(document.exists()) {
+                                Map<String, Object> userParam = document.getData();
+                                String lastEdit = (String) userParam.get("lastEdit");
+                                SharedPreferences.Editor editor = sharedPref.edit();
+                                editor.putString("imageCaching", lastEdit);
+                                editor.commit();
+                            }
+                        }
 
-                } else {
-                    Toast.makeText(this,"Failed in retrieving profile image",Toast.LENGTH_SHORT);
-                }
-            });
+                    } else {
+                        Toast.makeText(this, "Failed in retrieving profile image", Toast.LENGTH_SHORT);
+                    }
+                });
+            }
         }
         return  sharedPref.getString("imageCaching","0");
     }

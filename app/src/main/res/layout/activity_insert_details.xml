@@ -43,7 +43,7 @@
                 android:cropToPadding="false"
                 android:elevation="10sp"
                 android:visibility="gone"
-                app:srcCompat="@drawable/ic_account_circle_blue_24dp" />
+                app:srcCompat="@drawable/empty_profile_blue_circle" />
 
             <android.support.design.widget.TextInputLayout
                 android:id="@+id/textInputLayout2"
