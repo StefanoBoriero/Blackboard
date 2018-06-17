@@ -93,6 +93,7 @@ public class MainActivity extends AppCompatActivity
     private String[] datesCreated;
     private String[] datesCompleted;
     private SwipeRefreshLayout swipeRefreshLayout;
+    private boolean newbie = true;
 
     @Override
     @SuppressWarnings("unchecked")
@@ -317,6 +318,10 @@ public class MainActivity extends AppCompatActivity
     public void onComplete(boolean emptyResult) {
         stopRefreshing();
         if(!emptyResult){
+            if(newbie){
+                hideWelcomeMessage();
+                newbie = false;
+            }
             recyclerView.scrollToPosition(0);
             recyclerView.setVisibility(View.VISIBLE);
             if(!graphInstantiated) {
@@ -383,10 +388,25 @@ public class MainActivity extends AppCompatActivity
             }
         }
         else{
-            adapter.goBackOneWeek();
-            Toast.makeText(this, "There's no more data to load!", Toast.LENGTH_SHORT)
-                    .show();
+            if(!newbie) {
+                adapter.goBackOneWeek();
+                Toast.makeText(this, "There's no more data to load!", Toast.LENGTH_SHORT)
+                        .show();
+            }
+            else{
+                showWelcomeMessage();
+            }
         }
+    }
+
+    private void showWelcomeMessage(){
+        findViewById(R.id.activity_dashboard).setVisibility(View.INVISIBLE);
+        findViewById(R.id.welcome_message).setVisibility(View.VISIBLE);
+    }
+
+    private void hideWelcomeMessage(){
+        findViewById(R.id.activity_dashboard).setVisibility(View.VISIBLE);
+        findViewById(R.id.welcome_message).setVisibility(View.GONE);
     }
 
     private List<Entry> createNewEntries(){
