@@ -144,7 +144,7 @@ public class DayResumeAdapter extends FirestoreAdapter<DayResumeAdapter.ViewHold
     public void goBackOneWeek(){
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if(user != null) {
+        if(user != null && weekNumber != 0) {
             hideRecyclerViewWhileLoading();
             weekNumber--;
             String id = user.getUid();
