@@ -109,6 +109,7 @@ public class AddMemberDialogActivity extends Activity {
                     roomMatesMap.put("joinedTime",dateJoined);
                     houseParams.put("roommates",roomMatesMap);
                     db.collection("houses").document(houseId).set(houseParams);
+                    setResult(2);
                     onBackPressed();
                 }
             }

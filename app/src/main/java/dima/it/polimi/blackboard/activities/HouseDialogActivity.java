@@ -37,6 +37,7 @@ public class HouseDialogActivity extends Activity implements RoomMateListAdapter
 
     private String id;
     private FirebaseFirestore db;
+    private RecyclerView rv;
 
 
     @Override
@@ -51,32 +52,13 @@ public class HouseDialogActivity extends Activity implements RoomMateListAdapter
         houseName.setText(name);
         this.setTitle("House information");
 
-        RecyclerView rv = findViewById(R.id.recycler_view_room_mates);
+         rv = findViewById(R.id.recycler_view_room_mates);
 
 
         db = FirebaseFirestore.getInstance();
-        db.collection("houses").document(id).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if(task.isSuccessful())
-                {
-                    DocumentSnapshot document = task.getResult();
-                    Map<String, Object> house = document.getData();
-                    Map<String, Object> mapRoomates = (Map<String, Object>) house.get("roommates");
-                    ArrayList<String> roomMates = (ArrayList<String>) mapRoomates.get("roommates");
-                    List<RoomMate> mates = new ArrayList<>();
-                    for(String s : roomMates)
-                    {
-                        RoomMate roomMate = new RoomMate(s);
-                        mates.add(roomMate);
-                    }
-                    RecyclerView.Adapter adapter = new RoomMateListAdapter(mates, HouseDialogActivity.this);
-                    rv.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
-                    rv.setAdapter(adapter);
-                    setUpButtons(roomMates);
-                }
-            }
-        });
+
+
+        loadUsers();
 
 
 
@@ -92,7 +74,7 @@ public class HouseDialogActivity extends Activity implements RoomMateListAdapter
                 Intent intent = new Intent(HouseDialogActivity.this,AddMemberDialogActivity.class);
                 intent.putExtra("roommates",roommates);
                 intent.putExtra("houseId",id);
-                startActivity(intent);
+                startActivityForResult(intent,0);
             }
         });
 
@@ -174,4 +156,36 @@ public class HouseDialogActivity extends Activity implements RoomMateListAdapter
 
 
     }
+
+    private void loadUsers()
+    {
+        db.collection("houses").document(id).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if(task.isSuccessful())
+                {
+                    DocumentSnapshot document = task.getResult();
+                    Map<String, Object> house = document.getData();
+                    Map<String, Object> mapRoomates = (Map<String, Object>) house.get("roommates");
+                    ArrayList<String> roomMates = (ArrayList<String>) mapRoomates.get("roommates");
+                    List<RoomMate> mates = new ArrayList<>();
+                    for(String s : roomMates)
+                    {
+                        RoomMate roomMate = new RoomMate(s);
+                        mates.add(roomMate);
+                    }
+                    RecyclerView.Adapter adapter = new RoomMateListAdapter(mates, HouseDialogActivity.this);
+                    rv.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+                    rv.setAdapter(adapter);
+                    setUpButtons(roomMates);
+                }
+            }
+        });
+    }
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode == 0 && resultCode == 2)
+            loadUsers();
+    }
+
 }

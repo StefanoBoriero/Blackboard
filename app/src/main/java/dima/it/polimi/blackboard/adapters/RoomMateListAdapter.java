@@ -54,6 +54,7 @@ public class RoomMateListAdapter extends RecyclerView.Adapter<RoomMateListAdapte
         holder.roomMateName.setText(UserDecoder.getInstance().getNameFromId(roomMate.getName()));
 
 
+
         FirebaseStorage storage = FirebaseStorage.getInstance();
         DocumentReference userReference = FirebaseFirestore.getInstance().collection("users").document(roomMate.getName());
         userReference.get().addOnCompleteListener((task) -> {
@@ -63,6 +64,9 @@ public class RoomMateListAdapter extends RecyclerView.Adapter<RoomMateListAdapte
                     DocumentSnapshot document = task.getResult();
                     Map<String, Object> userParam = document.getData();
                     String lastEdit = (String)userParam.get("lastEdit");
+                    Map<String, Object> personal_info = (Map<String, Object>) userParam.get("personal_info");
+                    String name = (String) personal_info.get("name");
+                    holder.roomMateName.setText(name);
                     StorageReference reference = storage.getReference().child(roomMate.getName() + "/profile" + lastEdit);
                     GlideApp.with((HouseDialogActivity)mListener)
                             .load(reference)
