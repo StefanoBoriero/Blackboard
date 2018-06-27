@@ -316,7 +316,7 @@ public class LoginActivity extends AppCompatActivity {
                             Map<String,Object> email = new HashMap<>();
                             email.put("uid",mAuth.getCurrentUser().getUid().toString());
                             FirebaseFirestore.getInstance().collection("e-mail").document(mAuth.getCurrentUser().getEmail()).set(email);
-                            finish();
+
 
                         } else {
                             // If sign in fails, display a message to the user.
