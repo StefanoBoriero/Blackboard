@@ -202,7 +202,8 @@ public class MainActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            return true;
+            Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+            startActivity(intent);
         }
 
         return super.onOptionsItemSelected(item);
@@ -226,11 +227,7 @@ public class MainActivity extends AppCompatActivity
         } else if(id == R.id.nav_profile){
             Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
             startActivityForResult(intent,2);
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
-        } else if (id == R.id.nav_settings){
+        }  else if (id == R.id.nav_settings){
             Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
             startActivity(intent);
         }
